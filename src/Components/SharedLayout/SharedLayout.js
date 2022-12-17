@@ -1,12 +1,12 @@
 import React from 'react'
-import { Outlet , Link} from 'react-router-dom'
+import { Link} from 'react-router-dom'
 import './SharedLayout.css'
 const SharedLayout = () => {
   return (
-    <div className='container border border-primary'>
+    <div className='border border-primary'>
     <Link to='/'><div className='h1 text-center'>iCMS - Innovative College Management System</div></Link>
     
-    <Outlet/>
+     
     </div>
   )
 }

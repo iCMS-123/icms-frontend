@@ -1,66 +1,29 @@
-import React, { useEffect, useState } from "react";
-import { Button, InputGroup, Form } from "react-bootstrap";
-import { Link } from "react-router-dom";
-
-const FormStyle = {
-  width: "50%",
-  margin: "auto",
-  padding: "10px",
-  border: "1px solid #ccc",
-  borderRadius: "5px",
-  boxShadow: "0 0 10px #ccc",
-};
-
-const registerBtnStyles = {
-  float:'right'
-}
+import React from "react";
+import { Button, Form } from "react-bootstrap";
+import { Link, useNavigate } from "react-router-dom";
+import useDocumentTitle from "../../Hooks/useDocumentTitle";
+import "./Login.css";
 
 const LoginForm = () => {
-  // const [role, setRole] = useState("student")
+  useDocumentTitle("Login");
 
-  // useEffect(() => {
-  //   console.log('chnages')
-  //   let registerBtn = document.querySelector('.reg-btn')
+  const navigate = useNavigate();
 
-  //    return;
-  // }, [role])
+  const handleSubmit = (event) => {
+    event.preventDefault();
 
-  function handleRoleChange(e) {
-    let role = e.target.selectedOptions[0].value;
-    let registerBtn = document.querySelector(".reg-btn");
-
-    if(role === "teacher")
-    {
-      registerBtn.style.setProperty('display','none');
-    }
-    else{
-      registerBtn.style.setProperty('display','inline');
-    }
-  }
-
+    // 👇️ redirect to /contacts
+    navigate("/dashboard");
+  };
   return (
     <div>
-      <Form style={FormStyle}>
-        {/* <div className="input-group mb-3">
-          <label className="input-group-text" for="inputGroupSelect01">
-            Role
-          </label>
-          <select className="form-select" id="inputGroupSelect01">
-            <option selected value="student">
-              Student
-            </option>
-            <option value="teacher">Teacher</option>
-          </select>
-        </div> */}
-
-        <Form.Group controlId="formRoleSelection">
+      <h1 style={{ fontWeight: "900" }} className="mb-3 text-center">
+        Good to see you again
+      </h1>
+      <Form id="login-form" onSubmit={handleSubmit}>
+        <Form.Group className="mb-2" controlId="formRoleSelection">
           <Form.Label>Role</Form.Label>
-          <Form.Select
-            onChange={(e) => {
-              handleRoleChange(e);
-            }}
-            aria-label="Default select example"
-          >
+          <Form.Select aria-label="Default select example">
             <option defaultValue value="student">
               Student
             </option>
@@ -68,25 +31,30 @@ const LoginForm = () => {
           </Form.Select>
         </Form.Group>
 
-        <Form.Group controlId="formBasicEmail">
+        <Form.Group required className="mb-2" controlId="formBasicEmail">
           <Form.Label>Email address</Form.Label>
-          <Form.Control type="email" placeholder="Enter email" />
+          <Form.Control type="email" required placeholder="Enter email" />
+          <Form.Control.Feedback type="invalid">
+            Please enter valid email
+          </Form.Control.Feedback>
         </Form.Group>
 
-        <Form.Group className="mb-3" controlId="formBasicPassword">
+        <Form.Group className="mb-4" controlId="formBasicPassword">
           <Form.Label>Password</Form.Label>
-          <Form.Control type="password" placeholder="Password" />
+          <Form.Control  type="password" required placeholder="Password" />
         </Form.Group>
 
-            
-        <Button variant="success" type="submit">
+        <Button className="lgn-btn" variant="success" type="submit">
           Login
         </Button>
-        
-        <Link to='/register'><Button style={registerBtnStyles} className="reg-btn" variant="primary" type="submit">
-          Register
-        </Button></Link>
-        
+
+        <hr />
+        <p className="text-center fw-bold">Not Registered yet ?</p>
+        <Link style={{ textDecoration: "none" }} to="/register">
+          <Button className="reg-btn" variant="primary" type="submit">
+            Register here
+          </Button>
+        </Link>
       </Form>
     </div>
   );
