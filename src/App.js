@@ -1,7 +1,6 @@
 import "./App.css";
 import { Routes, Route } from "react-router-dom";
 import Home from "./Components/Home/Home";
-import SharedLayout from "./Components/SharedLayout/SharedLayout";
 import NotFound from "./Components/NotFound";
 import Login from "./Components/Login/Login";
 import Register from "./Components/Register/Register";

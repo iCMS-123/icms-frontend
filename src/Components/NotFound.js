@@ -9,13 +9,21 @@ const NotFound = () => {
   useDocumentTitle("404-Page Not Found");
   return (
     <div className="text-center">
-      <h1 className="fw-bold" style={{fontSize:'3rem'}}>Page Not Found, 🤯</h1>
-      <h1 className="mb-3">Hover on image to see what Birendra Sir has to say</h1>
+      <h1 className="fw-bold" style={{ fontSize: "3rem" }}>
+        Page Not Found, 🤯
+      </h1>
 
       <div id="cf">
-         
-        <img className="img2" src={require("../assets/images/4.jpg")} alt="wad" />
-        <img className="img1" src={require("../assets/images/1.jpg")} alt="wadawd" />
+        <img
+          className="img2"
+          src={require("../assets/images/4.jpg")}
+          alt="wad"
+        />
+        <img
+          className="img1"
+          src={require("../assets/images/1.jpg")}
+          alt="wadawd"
+        />
       </div>
 
       <Button
