@@ -2,14 +2,17 @@
 <html lang="en-US">
   <head>
     <meta charset="UTF-8" />
-    <meta http-equiv="refresh" content="0; url=https://netlfiy-react-example.netlify.com" />
-    <script type="text/javascript">
-      window.location.href = window.location.origin + "/notfound";
-    </script>
+
     <title>Page Redirection</title>
   </head>
 
   <body>
     Something went wrong...................
+
+    <script type="text/javascript">
+      setTimeout(() => {
+        window.location.href = window.location.origin + "/notfound";
+      }, 1);
+    </script>
   </body>
 </html>
