@@ -1,26 +1,6 @@
-#cf {
-  position: relative;
-  height: 281px;
-  width: 450px;
-  margin: 0 auto 200px;
-}
-
-#cf img {
-  position: absolute;
-  left: 0;
-  -webkit-transition: opacity 1s ease-in-out;
-  -moz-transition: opacity 1s ease-in-out;
-  -o-transition: opacity 1s ease-in-out;
-  transition: opacity 1s ease-in-out;
-}
-
-#cf img.img1:hover {
-  opacity: 0;
-}
 
 #go-back-btn {
-  width: 50%;
+  width: 30%;
   font-size: 3rem;
-  margin-bottom: 1020px;
-  font-size: 3rem;
+ 
 }

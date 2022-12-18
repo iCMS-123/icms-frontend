@@ -2,7 +2,6 @@ import React from "react";
 import useDocumentTitle from "../Hooks/useDocumentTitle";
 import Image from "react-bootstrap/Image";
 import { Button } from "react-bootstrap";
-import { Link } from "react-router-dom";
 import "./NotFound.css";
 
 const NotFound = () => {
@@ -10,13 +9,10 @@ const NotFound = () => {
   return (
     <div className="text-center">
       <h1 className="fw-bold" style={{fontSize:'3rem'}}>Page Not Found, 🤯</h1>
-      <h1 className="mb-3">Hover on image to see what Birendra Sir has to say</h1>
-
-      <div id="cf">
-         
-        <img className="img2" src={require("../assets/images/4.jpg")} alt="wad" />
-        <img className="img1" src={require("../assets/images/1.jpg")} alt="wadawd" />
-      </div>
+    
+    <Image src="https://img.freepik.com/free-vector/oops-404-error-with-broken-robot-concept-illustration_114360-1932.jpg?w=400
+    " />
+ 
 
       <Button
         id="go-back-btn"
@@ -31,11 +27,8 @@ const NotFound = () => {
 
       <br />
       <br />
-      <br />
-      <br />
-      {/*   
-    <Image src="https://img.freepik.com/free-vector/oops-404-error-with-broken-robot-concept-illustration_114360-1932.jpg
-    " /> */}
+    
+        
     </div>
   );
 };
