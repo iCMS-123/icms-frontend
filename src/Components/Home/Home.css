@@ -3,4 +3,27 @@
      font-weight: 700;
 }
 
+#college-img{
+
+     height: 400px;
+     width: 60%;
+     margin: 0 auto;
+     display: block;
+}
+
+.get-started-btn{
+     font-size: 2rem;
+     border-radius: 60px;
+     padding: 10px 30px 10px;
+      
+     transition: .2s ease-in-out 0s;
+}
+
+.get-started-btn:hover{
+     transform: scale(1.2);
+     color: white;
+     background-color: #4BB543;
+ 
+}
+
  
