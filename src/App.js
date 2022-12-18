@@ -15,7 +15,7 @@ function App() {
         <Route path="/dashboard/*" element={<Dashboard />} />
         <Route path="/notfound" element={<NotFound />} />
         {/* for local */}
-        <Route path="*" element={<NotFound />} />
+        {/* <Route path="*" element={<NotFound />} /> */}
        
 
     </Routes>
