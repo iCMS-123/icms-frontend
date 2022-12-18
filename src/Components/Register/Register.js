@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { Button, Form } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import useDocumentTitle from "../../Hooks/useDocumentTitle";
 import "./Register.css";
 const Register = () => {
   useDocumentTitle("Register");
-
+  const navigate = useNavigate();
   const [valid, setValid] = useState(false);
   const [invalid, setInvalid] = useState(false);
 
@@ -22,9 +22,12 @@ const Register = () => {
   }
 
   function handleSubmit(e) {
+    e.preventDefault();
+
     if (invalid) {
       alert("Please upload jpg/jpeg/png file only.");
-      e.preventDefault();
+    } else {
+      navigate("/dashboard");
     }
   }
 
@@ -103,7 +106,7 @@ const Register = () => {
         <hr />
         <p className="text-center fw-bold">Already Registered ?</p>
         <Link style={{ textDecoration: "none" }} to="/login">
-          <Button className="reg-btn" variant="success" type="submit">
+          <Button className="reg-btn" variant="success">
             Login
           </Button>
         </Link>

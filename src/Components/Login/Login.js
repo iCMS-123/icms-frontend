@@ -12,7 +12,7 @@ const LoginForm = () => {
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    // 👇️ redirect to /contacts
+   
     navigate("/dashboard");
   };
   return (
