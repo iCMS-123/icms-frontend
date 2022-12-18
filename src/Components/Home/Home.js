@@ -9,12 +9,12 @@ const Home = () => {
   return (
     <div className="home-hero text-center">
       <h1 className="text-center mb-2">Welcome to iCMS</h1>
-      <p className="h6">A Single Tool to Manage Entire Institute</p>
-      <p className="h6">ERP Solution for Seamless Management of College</p>
-      <p className="h6">
+      {/* <p className="h6">A Single Tool to Manage Entire Institute</p> */}
+      {/* <p className="h6">ERP Solution for Seamless Management of College</p> */}
+      <h6>
         Cloud Hosted and Mobile-Ready Education CRM Education ERP and CRM
         software for the Administration of Schools, Colleges and Universities{" "}
-      </p>
+      </h6>
       <Image
         id="college-img"
         src={require("../../assets/images/collegebg.jpg")}
