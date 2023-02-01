@@ -1,4 +1,5 @@
-import React from "react";
+import axios from "axios";
+import React, { useRef } from "react";
 import { Button, Form } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import useDocumentTitle from "../../Hooks/useDocumentTitle";
@@ -6,14 +7,30 @@ import "./Login.css";
 
 const LoginForm = () => {
   useDocumentTitle("Login");
-
   const navigate = useNavigate();
+  // Refs
+  const emailRef = useRef(null);
+  const passwordRef = useRef(null);
+  const collegeRoleRef = useRef(null);
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-
-   
-    navigate("/dashboard");
+    let collegeRole = collegeRoleRef["current"].value;
+    try {
+      const dataObj = await axios.post(
+        `http://localhost:8002/api/v1/${collegeRole}/auth`,
+        {
+          email: `${emailRef["current"].value}`,
+          password: `${passwordRef["current"].value}`,
+        }
+      );
+      let icmsUserInfo = JSON.stringify(dataObj.data.data);
+      localStorage.setItem("icmsUserInfo", icmsUserInfo);
+      // Success :: Redirect to dashboard
+      navigate("/dashboard");
+    } catch (err) {
+      console.log(err);
+    }
   };
   return (
     <div>
@@ -23,7 +40,7 @@ const LoginForm = () => {
       <Form id="login-form" onSubmit={handleSubmit}>
         <Form.Group className="mb-2" controlId="formRoleSelection">
           <Form.Label>Role</Form.Label>
-          <Form.Select aria-label="Default select example">
+          <Form.Select ref={collegeRoleRef} aria-label="Default select example">
             <option defaultValue value="student">
               Student
             </option>
@@ -33,7 +50,13 @@ const LoginForm = () => {
 
         <Form.Group required className="mb-2" controlId="formBasicEmail">
           <Form.Label>Email address</Form.Label>
-          <Form.Control type="email" required placeholder="Enter email" />
+          <Form.Control
+            ref={emailRef}
+            type="email"
+            required
+            placeholder="Enter email"
+            autoComplete="username"
+          />
           <Form.Control.Feedback type="invalid">
             Please enter valid email
           </Form.Control.Feedback>
@@ -41,7 +64,13 @@ const LoginForm = () => {
 
         <Form.Group className="mb-4" controlId="formBasicPassword">
           <Form.Label>Password</Form.Label>
-          <Form.Control  type="password" required placeholder="Password" />
+          <Form.Control
+            ref={passwordRef}
+            type="password"
+            required
+            placeholder="Password"
+            autoComplete="current-password"
+          />
         </Form.Group>
 
         <Button className="lgn-btn" variant="success" type="submit">
