@@ -6,15 +6,20 @@ import App from "./App";
 import { BrowserRouter } from "react-router-dom";
 // import { Navbar } from "react-bootstrap";
 import SharedLayout from "./Components/SharedLayout/SharedLayout";
+import { ProSidebarProvider } from "react-pro-sidebar";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-  <React.StrictMode>
+   
     <BrowserRouter>
-      <div className="container">
+    <ProSidebarProvider>
+
+      <div className="container-fluid">
         <SharedLayout />
         <App />
       </div>
+    </ProSidebarProvider>
+      
     </BrowserRouter>
-  </React.StrictMode>
+   
 );
