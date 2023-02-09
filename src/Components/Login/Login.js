@@ -17,17 +17,25 @@ const LoginForm = () => {
     event.preventDefault();
     let collegeRole = collegeRoleRef["current"].value;
     try {
-      const dataObj = await axios.post(
+      const {data} = await axios.post(
         `http://localhost:8002/api/v1/${collegeRole}/auth`,
         {
           email: `${emailRef["current"].value}`,
           password: `${passwordRef["current"].value}`,
         }
       );
-      let icmsUserInfo = JSON.stringify(dataObj.data.data);
-      localStorage.setItem("icmsUserInfo", icmsUserInfo);
-      // Success :: Redirect to dashboard
-      navigate("/dashboard");
+      console.log(data)
+      if(data.success===false)
+      {
+        alert("Email or Password is wrong");
+      }else{
+        let icmsUserInfo = JSON.stringify(data);
+        if(icmsUserInfo)
+        localStorage.setItem("icmsUserInfo", icmsUserInfo);
+        // Success :: Redirect to dashboard
+        navigate("/dashboard");
+      }
+      
     } catch (err) {
       console.log(err);
     }
