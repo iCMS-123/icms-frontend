@@ -3,9 +3,12 @@ import useDocumentTitle from "../Hooks/useDocumentTitle";
 import Image from "react-bootstrap/Image";
 import { Button } from "react-bootstrap";
 import "./NotFound.css";
+import { Navigate, useNavigate } from "react-router-dom";
 
 const NotFound = () => {
+  
   useDocumentTitle("404-Page Not Found");
+  const navigate = useNavigate();
   return (
     <div className="text-center">
       <h1 className="fw-bold" style={{fontSize:'3rem'}}>Page Not Found, 🤯</h1>
@@ -18,7 +21,7 @@ const NotFound = () => {
         id="go-back-btn"
         className="d-block my-0 mx-auto"
         onClick={() => {
-          window.history.back();
+          navigate("../dashboard");
         }}
         variant="dark"
       >

@@ -1,7 +1,9 @@
 import React from 'react'
+import useDocumentTitle from "../../Hooks/useDocumentTitle";
 
 export const Basic = () => {
+  useDocumentTitle("Dashboard");
   return (
-    <div>Zuck Lorem ipsum dolor sit amet consectetur adipisicing elit. Corrupti, dicta?</div>
+    <div>Dashboard Home</div>
   )
 }

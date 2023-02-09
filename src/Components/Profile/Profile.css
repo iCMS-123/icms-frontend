@@ -1,13 +1,13 @@
 .profile-section {
     display: flex;
     /* justify-content: space-around; */
-    border: 3px solid red;
+    /* border: 3px solid red; */
     width: 100%;
+     
 }
 
 #profile-img {
-
-    border: 1px solid palevioletred;
+    border-right:1px solid #5a5a5a;
     padding: 50px;
     width: 30%;
     display: flex;
