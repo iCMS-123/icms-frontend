@@ -7,8 +7,9 @@ import Profile from "../Profile/Profile";
 import "./Dashboard.css";
 import { Basic } from "./Basic";
 import { Container, Nav, Navbar } from "react-bootstrap";
-import NotFound from "../NotFound";
 import DashboardNotFound from "./DashboardNotFound";
+import StudentsInfo from "../StudentsInfo/StudentsInfo";
+import Classrooms from "../Classrooms/Classrooms"
 
 
 const navLinkStyles = {
@@ -88,8 +89,8 @@ const Dashboard = () => {
         <Routes>
           <Route index element={<Basic/>}/>
           <Route path="/profile" element={<Profile/>} />
-          <Route path="/studentsinfo" element={<Profile/>} />
-          <Route path="/classrooms" element={<Profile/>} />
+          <Route path="/studentsinfo" element={<StudentsInfo/>} />
+          <Route path="/classrooms" element={<Classrooms/>} />
           <Route path="*" element={<DashboardNotFound/>}/>
         </Routes>
 

@@ -3,7 +3,7 @@ import useDocumentTitle from "../Hooks/useDocumentTitle";
 import Image from "react-bootstrap/Image";
 import { Button } from "react-bootstrap";
 import "./NotFound.css";
-import { Navigate, useNavigate } from "react-router-dom";
+import {useNavigate } from "react-router-dom";
 
 const NotFound = () => {
   

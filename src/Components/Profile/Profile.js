@@ -2,13 +2,13 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useRef } from "react";
 import { Button, Form, Image, Toast, ToastContainer } from "react-bootstrap";
-import { Link, Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import useDocumentTitle from "../../Hooks/useDocumentTitle";
 import "./Profile.css";
 function Profile() {
   useDocumentTitle("Profile");
   // A variable that will help to re-render by using it as inverter
-  let [updateFormFields, setUpdateFormFields] = useState(false);
+  // let [updateFormFields, setUpdateFormFields] = useState(false);
   // Referenced Variables
   const firstNameRef = useRef(null);
   const lastNameRef = useRef(null);
