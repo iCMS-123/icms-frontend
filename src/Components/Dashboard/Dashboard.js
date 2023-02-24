@@ -22,7 +22,6 @@ const Dashboard = () => {
   useDocumentTitle("Dashboard");
   const icmsUserInfo =  JSON.parse(localStorage.getItem("icmsUserInfo"));
   console.log(icmsUserInfo);
-  let isHod = icmsUserInfo.isHod;
   useEffect(() => { 
     if (icmsUserInfo === null) {
       navigate("/login");

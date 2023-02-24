@@ -28,17 +28,15 @@ function Profile() {
     {
       navigate("../login");
     }else{
-      let userData = icmsLocalStorageData["data"]["user"];
-      if(userData == null){
-        userData = icmsLocalStorageData["data"]
-      }   
+      let userData = icmsLocalStorageData.data;     
       console.log(userData);
-      firstNameRef.current.value = userData.firstName;
-      lastNameRef.current.value = userData.lastName;
-      emailRef.current.value = userData.email;
-      collegeIdRef.current.value = userData.collegeIdCard;
-      profileImgRef.current.src = userData.profileImg;
-      phoneRef.current.value = userData.mobileNumber || "";
+      // console.log(icmsLocalStorageData);
+      firstNameRef.current.value = userData.firstName || userData.user.firstName;
+      lastNameRef.current.value = userData.lastName || userData.user.lastName;
+      emailRef.current.value = userData.email || userData.user.email;
+      collegeIdRef.current.value = userData.collegeIdCard || userData.user.collegeIdCard;
+      profileImgRef.current.src = userData.profileImg || userData.user.profileImg;
+      phoneRef.current.value = userData.mobileNumber || userData.user.mobileNumber || "";
     }
     
     // eslint-disable-next-line
@@ -58,11 +56,12 @@ function Profile() {
     else{   
     
     // Getting userID  
-    let userData = JSON.parse(localStorage.getItem("icmsUserInfo"))["data"]["user"];
-    if(userData == null){
-      userData = JSON.parse(localStorage.getItem("icmsUserInfo"))["data"]
-    }
-    let userID = JSON.parse(localStorage.getItem("icmsUserInfo"))["data"]["_id"];
+    
+    let icmsLocalStorageData = JSON.parse(localStorage.getItem("icmsUserInfo"));
+    let userData = icmsLocalStorageData.data;
+    console.log(userData);
+  
+    let userID = userData._id;
     console.log(userID);
     const updatedDetails = {
           userId :  userID,

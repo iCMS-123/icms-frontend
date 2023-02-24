@@ -46,7 +46,7 @@ const Register = () => {
 let collegeRole = collegeRoleRef['current']?.value;
 try{
 
-  const dataObj = await axios.post(`http://localhost:8002/api/v1/${collegeRole}/register`,{
+  const {data} = await axios.post(`http://localhost:8002/api/v1/${collegeRole}/register`,{
   firstName: `${ firstNameRef['current']?.value }`,
   lastName : `${ lastNameRef['current']?.value }` ,
   email : `${ emailRef['current']?.value }`,
@@ -56,10 +56,10 @@ try{
   
 });
 
-console.log(dataObj.data.data);
-let icmsUserInfo = JSON.stringify(dataObj.data.data);
+console.log(data);
+let icmsUserInfo = JSON.stringify(data);
 localStorage.setItem('icmsUserInfo', icmsUserInfo);
-// Sucess :: Redirect to dashboard
+// Success :: Redirect to dashboard
 navigate('/dashboard');
 
 }catch(e){
