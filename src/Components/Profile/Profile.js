@@ -38,12 +38,10 @@ function Profile() {
       emailRef.current.value = userData.email;
       collegeIdRef.current.value = userData.collegeIdCard;
       profileImgRef.current.src = userData.profileImg;
-      phoneRef.current.value = userData.mobileNumber;
-
-
+      phoneRef.current.value = userData.mobileNumber || "";
     }
     
-     
+    // eslint-disable-next-line
   }, []);
 
 

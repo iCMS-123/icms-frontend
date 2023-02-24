@@ -58,7 +58,7 @@ try{
 
 console.log(dataObj.data.data);
 let icmsUserInfo = JSON.stringify(dataObj.data.data);
-localStorage.setItem('icmsUserInfo', JSON.stringify(icmsUserInfo));
+localStorage.setItem('icmsUserInfo', icmsUserInfo);
 // Sucess :: Redirect to dashboard
 navigate('/dashboard');
 

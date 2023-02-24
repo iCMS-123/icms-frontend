@@ -15,14 +15,12 @@ import Classrooms from "../Classrooms/Classrooms"
 const navLinkStyles = {
   textDecoration: 'none',
   color:'white'
-
-
 }
 
 const Dashboard = () => {
   const navigate = useNavigate();
   useDocumentTitle("Dashboard");
-  const icmsUserInfo = JSON.parse(localStorage.getItem("icmsUserInfo"));
+  const icmsUserInfo =  JSON.parse(localStorage.getItem("icmsUserInfo"));
   console.log(icmsUserInfo);
   let isHod = icmsUserInfo.isHod;
   useEffect(() => { 
