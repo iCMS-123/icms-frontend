@@ -21,48 +21,7 @@ function Profile() {
   const navigate = useNavigate();
   // For toast
   const [show, setShow] = useState(false);
-// Login
-//   {
-//     "success": true,
-//     "msg": "Successfully LoggedIn",
-//     "data": {
-//         "_id": "63de8a091489c9d20e4dbf19",
-//         "user": {
-//             "firstName": "Sujal",
-//             "lastName": "Gupta",
-//             "email": "testuser@it2.com",
-//             "collegeIdCard": "https://aman123956",
-//             "profileImg": "https://res.cloudinary.com/abhistrike/image/upload/v1626953029/avatar-370-456322_wdwimj.png",
-//             "branchName": "it"
-//         },
-//         "isHod": false,
-//         "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYzZGU4YTA5MTQ4OWM5ZDIwZTRkYmYxOSIsImlhdCI6MTY3NTg1MTQyNSwiZXhwIjoxNjc4NDQzNDI1fQ.hpBgpIYuMLBrZUZtz-t9cTOx-tXg2jBp4iaFLeEZjO8"
-//     }
-// }
 
-// Update
-
-
-//   {
-//     "success": true,
-//     "data": {
-//         "_id": "63de8a091489c9d20e4dbf19",
-//         "firstName": "Sujal",
-//         "lastName": "Gupta",
-//         "email": "testuser@it2.com",
-//         "password": "$2a$10$7D.m1g6BafFKyt512MxjieqhD1M3Vb4j5hC.MO23R1SxgDDBZ4YkS",
-//         "collegeIdCard": "https://aman123956",
-//         "profileImg": "https://res.cloudinary.com/abhistrike/image/upload/v1626953029/avatar-370-456322_wdwimj.png",
-//         "branchName": "it",
-//         "isHod": false,
-//         "isVerified": false,
-//         "createdAt": "2023-02-04T16:38:33.168Z",
-//         "updatedAt": "2023-02-08T12:14:17.605Z",
-//         "__v": 0,
-//         "isSectionHead": false
-//     },
-//     "msg": "Profile Updated Succesfully"
-// }
   useEffect(() => {
     let icmsLocalStorageData = JSON.parse(localStorage.getItem("icmsUserInfo"));
     if(icmsLocalStorageData == null)
