@@ -30,10 +30,11 @@ const LoginForm = () => {
         alert("Email or Password is wrong");
       }else{
         let icmsUserInfo = JSON.stringify(data);
-        if(icmsUserInfo)
-        localStorage.setItem("icmsUserInfo", icmsUserInfo);
-        // Success :: Redirect to dashboard
-        navigate("/dashboard");
+        if(icmsUserInfo){
+          localStorage.setItem("icmsUserInfo", icmsUserInfo);
+          // Success :: Redirect to dashboard
+          navigate("/dashboard");
+        }
       }
       
     } catch (err) {
