@@ -41,7 +41,7 @@ const Dashboard = () => {
           display: "flex",
           height:"100%",
           minHeight: "400px",
-          border: "1px solid black",
+          // border: "1px solid black",
         }}
       >
      <div className="dashboard-left">

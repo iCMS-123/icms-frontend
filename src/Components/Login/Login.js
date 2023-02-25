@@ -4,6 +4,7 @@ import { Button, Form } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import useDocumentTitle from "../../Hooks/useDocumentTitle";
 import "./Login.css";
+import ICMSTitle from "../ICMSTitle/ICMSTitle";
 
 const LoginForm = () => {
   useDocumentTitle("Login");
@@ -50,6 +51,7 @@ const LoginForm = () => {
   };
   return (
     <div>
+    <ICMSTitle/>
       <h1 style={{ fontWeight: "900" }} className="mb-3 text-center">
         Good to see you again
       </h1>

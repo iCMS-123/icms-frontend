@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { useRef } from "react";
+import axios from 'axios';
 import { Button, Form, Modal } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import useDocumentTitle from "../../Hooks/useDocumentTitle";
+import ICMSTitle from "../ICMSTitle/ICMSTitle";
 import "./Register.css";
-import axios from 'axios';
 
 const Register = () => {
   useDocumentTitle("Register");
@@ -94,6 +95,7 @@ if(collegeRole === "teacher"){
  
   return (
     <div>
+    <ICMSTitle/>
       <h1 style={{ fontWeight: "900" }} className="text-center">
         Registration Form
       </h1>

@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import "./SharedLayout.css";
-const SharedLayout = () => {
+import "./ICMSTitle.css";
+const ICMSTitle = () => {
   return (
     <div>
       <Link to="/" className="home-link">
@@ -13,4 +13,4 @@ const SharedLayout = () => {
   );
 };
 
-export default SharedLayout;
+export default ICMSTitle;
