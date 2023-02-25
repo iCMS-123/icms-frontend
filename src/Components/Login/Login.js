@@ -24,7 +24,8 @@ const LoginForm = () => {
           password: `${passwordRef["current"].value}`,
         }
       );
-      console.log(data)
+      console.log(data);
+      console.log('i am here');
       if(data.success===false)
       {
         alert("Email or Password is wrong");
@@ -33,7 +34,13 @@ const LoginForm = () => {
         if(icmsUserInfo){
           localStorage.setItem("icmsUserInfo", icmsUserInfo);
           // Success :: Redirect to dashboard
-          navigate("/dashboard");
+          if(collegeRole === "teacher"){
+            navigate("/dashboard");
+            console.log('ia m on');
+          }else{
+            navigate("/studentdashboard");
+            console.log("Student")
+          }
         }
       }
       

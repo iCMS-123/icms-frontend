@@ -8,6 +8,8 @@ import {useNavigate } from "react-router-dom";
 const NotFound = () => {
   
   useDocumentTitle("404-Page Not Found");
+  let localStorageData = JSON.parse(localStorage.getItem("icmsUserInfo"));
+
   const navigate = useNavigate();
   return (
     <div className="text-center">
@@ -20,8 +22,7 @@ const NotFound = () => {
       <Button
         id="go-back-btn"
         className="d-block my-0 mx-auto"
-        onClick={() => {
-          navigate("../dashboard");
+        onClick={() => { navigate("");
         }}
         variant="dark"
       >

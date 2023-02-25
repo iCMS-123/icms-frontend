@@ -8,8 +8,8 @@ const StudentsInfo = () => {
   const [fourthYearVal, setFourthYearVal] = useState(0);
   useEffect(() => {
     try {
-      const response = axios.get('');
-      console.log(response);
+      // const response = axios.get('');
+      // console.log(response);
 
     //   setFirstYearVal(response.firstYear);
     //   setSecondYearVal(response.secondYear);
@@ -26,7 +26,7 @@ const StudentsInfo = () => {
   return (
     <div>
       <section className="student-count">
-        
+        hello
       </section>
     </div>
   );
