@@ -222,7 +222,7 @@ const Classrooms = () => {
               <Row xs={2} md={2}>
                 <Col>
                   <Form.Group
-                    style={selectTagStyles}
+                    
                     className="mb-2"
                     controlId="formPassword"
                   >
@@ -251,7 +251,7 @@ const Classrooms = () => {
                 </Col>
                 <Col>
                   <Form.Group
-                    style={selectTagStyles}
+                    
                     className="mb-2"
                     controlId="modalSectionSelection"
                   >
@@ -301,12 +301,9 @@ const Classrooms = () => {
 export default Classrooms;
 
 const formStyles = {
-  display: "flex",
-
-  justifyContent: "space-around",
-};
-
-let selectTagStyles = { marginRight: "10px" };
-selectTagStyles = {
-  width: "30%",
+  // display: "flex",
+  // justifyContent: "space-around",
+  // border : "1px solid black",
+  padding : "1% 6% 0%",
+  width : "95%"
 };
