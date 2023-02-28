@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Badge,
   Button,
@@ -16,13 +16,22 @@ import axios from "axios";
 
 const Classrooms = () => {
   const [loading, setLoading] = useState(false);
-
-  const [classroomList, setClassroomList] = useState(null);
+  // setClassroomList(classroomList);
+// classroomList.data.data.sectionData.sectionYear;
+  let [classroomList, setClassroomList] = useState(null);
   const [classroomCardModalShow, setClassroomCardModalShow] = useState(false);
   const [classroomCardDetailsForModal, setClassroomCardDetailsForModal] =
     useState(false);
   const [showCreateClassroomModal, setModalCreateClassroomShow] =
     useState(false);
+
+// Refs
+
+  const modalYearRef = useRef(null);
+  const modalBranchRef = useRef(null);
+  const modalSectionRef = useRef(null);
+  const modalClassCoordinatorRef = useRef(null);
+  
   const branchName =
     JSON.parse(localStorage.getItem("icmsUserInfo")).data.user.branchName || "";
   console.log(branchName);
@@ -34,8 +43,8 @@ const Classrooms = () => {
         const { data } = await axios.get(`http://localhost:8002/api/v1/hod/get-list-section?branchName=${branchName}`);
 
         if (data && data.success) {
-          console.log([data.firstYear, data.secondYear, data.thirdYear, data.fourthYear]);
           setClassroomList([data.firstYear, data.secondYear, data.thirdYear, data.fourthYear]);
+          console.log([data.firstYear, data.secondYear, data.thirdYear, data.fourthYear]);
           console.log(classroomList, "Classroom LIST");
         }
       } catch (e) {
@@ -57,6 +66,7 @@ const Classrooms = () => {
   const [notSectionHeadList, setNotSectionHeadList] = useState([]);
 
   const getNotSectionHeadList = async () => {
+    
     try {
       const { data } = await axios.get(
         `http://localhost:8002/api/v1/hod/get-availabel-section-head?branchName=${branchName}&isSectionHead=false`
@@ -66,10 +76,35 @@ const Classrooms = () => {
         setNotSectionHeadList(data.data);
         console.log(data.data, "setNotSectionHeadList");
       }
+      
     } catch (e) {
       console.log(e, "e");
     }
   };
+  async function handleModalForm(e) {
+    e.preventDefault();
+    console.log(modalSectionRef?.current);
+    console.log(JSON.parse(localStorage.getItem("icmsUserInfo")).data._id);
+    try{
+      let {data} = await axios.post("http://localhost:8002/api/v1/hod/create-section", {
+        year : modalYearRef?.current?.value,
+        branchName : (modalBranchRef?.current?.value).toLowerCase(),
+        sectionName : modalSectionRef?.current?.value,
+        sectionHead : modalClassCoordinatorRef?.current?.value,
+        sectionCreatedBy : JSON.parse(localStorage.getItem("icmsUserInfo")).data._id,
+      });
+       
+      setModalCreateClassroomShow(false);
+       
+      let year = data.data.sectionData.sectionYear;
+      classroomList[year-1].push(data.data.sectionData);
+      setClassroomList(classroomList);
+    }catch(err){
+      alert(err.message);
+    }
+   
+
+}
 
   return (
     <div className="container">
@@ -87,7 +122,7 @@ const Classrooms = () => {
         {years.map((yr, idx) => (
 
           <Row xs={1} md={4} className="">
-            {classroomList != null && classroomList[idx].length != 0 &&
+            {classroomList != null && classroomList[idx].length !== 0 &&
               classroomList[idx].map((classRoom, index) => (
                 <Col>
                   <Card
@@ -95,9 +130,9 @@ const Classrooms = () => {
                     onClick={(e) => showClassroomCardModal(idx, index)}
                   >
                     <Card.Body>
-                      <Card.Title>{classRoom.sectionName.toUpperCase()}</Card.Title>
+                      <Card.Title>{classRoom?.sectionName?.toUpperCase() || ""}</Card.Title>
                       <Badge bg="dark" style={{ position: 'absolute', top: '10px', right: '30px' }}>
-                        {classRoom.sectionBranchName.toUpperCase()}
+                        {classRoom?.sectionBranchName?.toUpperCase() || ""}
                       </Badge>
                       <Badge bg="dark" style={{ position: 'absolute', bottom: '10px', right: '30px' }}>
                         {yr}
@@ -180,13 +215,13 @@ const Classrooms = () => {
                     <Col style={{ display: "flex", flexDirection: "column" }}>
                       <h6>Section</h6>
                       <p className="text-muted">
-                        {classroomCardDetailsForModal.sectionName?.toUpperCase()}
+                        {classroomCardDetailsForModal?.sectionName?.toUpperCase() || ""}
                       </p>
                     </Col>
                     <Col style={{ display: "flex", flexDirection: "column" }}>
                       <h6>Branch</h6>
                       <p className="text-muted">
-                        {classroomCardDetailsForModal.sectionBranchName?.toUpperCase()}
+                        {classroomCardDetailsForModal?.sectionBranchName?.toUpperCase() || ""}
                       </p>
                     </Col>
                   </Row>
@@ -245,10 +280,10 @@ const Classrooms = () => {
                   <Form.Group
 
                     className="mb-2"
-                    controlId="formPassword"
+                    controlId="modalFormYear"
                   >
                     <Form.Label>Year</Form.Label>
-                    <Form.Select aria-label="Default select example">
+                    <Form.Select ref={modalYearRef} aria-label="Default select example">
                       <option defaultValue value="1">
                         {" "}
                         1st Year
@@ -260,10 +295,11 @@ const Classrooms = () => {
                   </Form.Group>
                 </Col>
                 <Col>
-                  <Form.Group className="mb-2" controlId="formPassword">
+                  <Form.Group className="mb-2" controlId="modalFormBranch">
                     <Form.Label>Branch Name</Form.Label>
                     <Form.Control
-                      value={branchName.toUpperCase()}
+                      value={branchName?.toUpperCase() || ""}
+                      ref = {modalBranchRef}
                       readOnly
                       required
                       type="text"
@@ -274,15 +310,15 @@ const Classrooms = () => {
                   <Form.Group
 
                     className="mb-2"
-                    controlId="modalSectionSelection"
+                    controlId="modalFormSectionSelection"
                   >
                     <Form.Label>Section</Form.Label>
-                    <Form.Select aria-label="Default select example">
-                      <option defaultValue value="1">
-                        {branchName.toUpperCase()}-1
+                    <Form.Select ref = {modalSectionRef} aria-label="Default select example">
+                      <option defaultValue value={`${branchName}-1`}>
+                        {branchName?.toUpperCase() || ""}-1
                       </option>
-                      <option value="2">{branchName.toUpperCase()}-2</option>
-                      <option value="3">{branchName.toUpperCase()}-3</option>
+                      <option value={`${branchName}-2`}>{branchName?.toUpperCase() || ""}-2</option>
+                      <option value={`${branchName}-3`}>{branchName?.toUpperCase() || ""}-3</option>
                     </Form.Select>
                   </Form.Group>
                 </Col>
@@ -290,10 +326,10 @@ const Classrooms = () => {
                 <Col>
                   <Form.Group
                     className="mb-2"
-                    controlId="modalCoordinatorSelection"
+                    controlId="modalFormCoordinatorSelection"
                   >
                     <Form.Label>Assign a class coordinator</Form.Label>
-                    <Form.Select aria-label="Default select example">
+                    <Form.Select ref={modalClassCoordinatorRef} aria-label="Default select example">
 
                       {notSectionHeadList.map((option, index) => (
                         <option key={index} value={option._id}>
@@ -308,7 +344,7 @@ const Classrooms = () => {
           </Modal.Body>
 
           <Modal.Footer>
-            <Button variant="success" className="mt-2" type="submit">
+            <Button onClick={handleModalForm} variant="success" className="mt-2">
               Submit
             </Button>
           </Modal.Footer>

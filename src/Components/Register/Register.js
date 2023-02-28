@@ -85,10 +85,7 @@ if(collegeRole === "teacher"){
 }
 
 }catch(e){
-
-  console.log( e );
-  
-  // alert(e.response.data.error);
+console.log(e);
 }
 };
    
