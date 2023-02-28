@@ -27,6 +27,33 @@ const Classrooms = () => {
     JSON.parse(localStorage.getItem("icmsUserInfo")).data.user.branchName || "";
   console.log(branchName);
 
+  useEffect(() => {
+    const getClassroomsList = async () => {
+      try {
+        console.log(branchName);
+        const { data } = await axios.get(`http://localhost:8002/api/v1/hod/get-list-section?branchName=${branchName}`);
+
+        if (data && data.success) {
+          console.log([data.firstYear, data.secondYear, data.thirdYear, data.fourthYear]);
+          setClassroomList([data.firstYear, data.secondYear, data.thirdYear, data.fourthYear]);
+          console.log(classroomList, "Classroom LIST");
+        }
+      } catch (e) {
+        console.log(e, "e");
+      }
+    };
+
+    getClassroomsList();
+
+  }, []);
+  let years = ["First Year", "Second Year", "Third Year", "Fourth Year"];
+
+  async function showClassroomCardModal(idx, index){
+    console.log(classroomList[idx][index], "classroomList[idx][index]");
+    setClassroomCardDetailsForModal(classroomList[idx][index]);
+    setClassroomCardModalShow(true);
+  }
+
   const [notSectionHeadList, setNotSectionHeadList] = useState([]);
 
   const getNotSectionHeadList = async () => {
@@ -54,57 +81,45 @@ const Classrooms = () => {
         {classroomList == null && (
           <p>Currently there are no classrooms added.</p>
         )}
-        <Row xs={1} md={4} className="g-4">
-          {classroomList != null &&
-            classroomList.map((branch, index) => (
-              <Col>
-                <Card
-                  className={styles.branchCards}
-                  onClick={(e) => setClassroomCardModalShow(index)}
-                >
-                  <Card.Body>
-                    <Card.Title>{branch.name.toUpperCase()}</Card.Title>
-                    <div style={{ display: "flex" }}>
-                      <Image
-                        src={branch.hodRef.profileImg}
-                        roundedCircle={true}
-                        style={{ height: "40px", width: "40px" }}
-                        className="me-3"
-                      />
-                      <span
-                        style={{ display: "flex", flexDirection: "column" }}
-                      >
-                        <b>
-                          {branch.hodRef.firstName +
-                            " " +
-                            branch.hodRef.lastName}
-                        </b>
-                        <b className="mb-2 text-muted">HOD </b>
-                      </span>
-                    </div>
-                    {/* <Card.Text>
-                                            Some quick example text to build on the card title and make up the
-                                            bulk of the card's content.
-                                        </Card.Text>
-                                        <Card.Link href="#">Card Link</Card.Link>
-                                        <Card.Link href="#">Another Link</Card.Link> */}
-                    <div className={styles.gocorner} href="#">
-                      <div className={styles.goarrow}>→</div>
-                    </div>
-                  </Card.Body>
-                </Card>
-              </Col>
-            ))}
-        </Row>
 
-        {/* Modal (For branch details and HOD update) code starts */}
+        {/* Year Wise Classroom Cards */}
+
+        {years.map((yr, idx) => (
+
+          <Row xs={1} md={4} className="">
+            {classroomList != null && classroomList[idx].length != 0 &&
+              classroomList[idx].map((classRoom, index) => (
+                <Col>
+                  <Card
+                    className={styles.branchCards}
+                    onClick={(e) => showClassroomCardModal(idx, index)}
+                  >
+                    <Card.Body>
+                      <Card.Title>{classRoom.sectionName.toUpperCase()}</Card.Title>
+                      <Badge bg="dark" style={{ position: 'absolute', top: '10px', right: '30px' }}>
+                        {classRoom.sectionBranchName.toUpperCase()}
+                      </Badge>
+                      <Badge bg="dark" style={{ position: 'absolute', bottom: '10px', right: '30px' }}>
+                        {yr}
+                      </Badge>
+                      <div className={styles.gocorner} href="#">
+                        <div className={styles.goarrow}>→</div>
+                      </div>
+                    </Card.Body>
+                  </Card>
+                </Col>
+              ))}
+          </Row>
+        ))}
+
+        {/* Modal (for classroom details) code starts */}
         <Modal
           show={classroomCardModalShow}
           fullscreen={true}
           onHide={() => setClassroomCardModalShow(false)}
         >
           <Modal.Header closeButton>
-            <Modal.Title>Branch Details</Modal.Title>
+            <Modal.Title>Classroom Details</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             {/* {classroomCardDetailsForModal} */}
@@ -124,22 +139,22 @@ const Classrooms = () => {
               >
                 <h5>
                   <Badge bg="secondary" style={{ marginBottom: "20px" }}>
-                    HOD
+                    Classroom Head
                   </Badge>
                 </h5>
                 <Image
-                  src={classroomCardDetailsForModal.hodRef?.profileImg}
+                  src={classroomCardDetailsForModal.sectionHead?.profileImg}
                   roundedCircle={true}
                   style={{ height: "100px", width: "100px" }}
                   className="mb-3"
                 />
                 <h5>
-                  {classroomCardDetailsForModal.hodRef?.firstName +
+                  {classroomCardDetailsForModal.sectionHead?.firstName +
                     " " +
-                    classroomCardDetailsForModal.hodRef?.lastName}
+                    classroomCardDetailsForModal.sectionHead?.lastName}
                 </h5>
 
-                {classroomCardDetailsForModal.hodRef?.isVerified && (
+                {classroomCardDetailsForModal.sectionHead?.isVerified && (
                   <p>
                     VERIFIED
                     <FaUserCheck
@@ -147,7 +162,7 @@ const Classrooms = () => {
                     />
                   </p>
                 )}
-                {!classroomCardDetailsForModal.hodRef?.isVerified && (
+                {!classroomCardDetailsForModal.sectionHead?.isVerified && (
                   <p>
                     NOT VERIFIED
                     <FaUserTimes style={{ marginLeft: "10px", color: "red" }} />
@@ -163,9 +178,15 @@ const Classrooms = () => {
                 <div style={{ padding: "10px 20px" }}>
                   <Row>
                     <Col style={{ display: "flex", flexDirection: "column" }}>
+                      <h6>Section</h6>
+                      <p className="text-muted">
+                        {classroomCardDetailsForModal.sectionName?.toUpperCase()}
+                      </p>
+                    </Col>
+                    <Col style={{ display: "flex", flexDirection: "column" }}>
                       <h6>Branch</h6>
                       <p className="text-muted">
-                        {classroomCardDetailsForModal.name?.toUpperCase()}
+                        {classroomCardDetailsForModal.sectionBranchName?.toUpperCase()}
                       </p>
                     </Col>
                   </Row>
@@ -173,13 +194,13 @@ const Classrooms = () => {
                     <Col style={{ display: "flex", flexDirection: "column" }}>
                       <h6>Students</h6>
                       <p className="text-muted">
-                        {classroomCardDetailsForModal.students?.length}
+                        {classroomCardDetailsForModal.sectionStudents?.length}
                       </p>
                     </Col>
                     <Col style={{ display: "flex", flexDirection: "column" }}>
                       <h6>Teachers </h6>
                       <p className="text-muted">
-                        {classroomCardDetailsForModal.teachers?.length}
+                        {classroomCardDetailsForModal.sectionTeachers?.length}
                       </p>
                     </Col>
                   </Row>
@@ -191,11 +212,11 @@ const Classrooms = () => {
                         
                     </Modal.Footer> */}
         </Modal>
-        {/* Modal (for branch details) code ends */}
+        {/* Modal (for classroom details) code ends */}
 
         <Button
           key={true}
-          className="me-2 mt-2 mb-2"
+          className="me-2 mt-4 mb-2"
           onClick={() => {
             setModalCreateClassroomShow(true);
 
@@ -222,7 +243,7 @@ const Classrooms = () => {
               <Row xs={2} md={2}>
                 <Col>
                   <Form.Group
-                    
+
                     className="mb-2"
                     controlId="formPassword"
                   >
@@ -251,7 +272,7 @@ const Classrooms = () => {
                 </Col>
                 <Col>
                   <Form.Group
-                    
+
                     className="mb-2"
                     controlId="modalSectionSelection"
                   >
@@ -273,7 +294,7 @@ const Classrooms = () => {
                   >
                     <Form.Label>Assign a class coordinator</Form.Label>
                     <Form.Select aria-label="Default select example">
-                      
+
                       {notSectionHeadList.map((option, index) => (
                         <option key={index} value={option._id}>
                           {option.firstName + " " + option.lastName}
@@ -304,6 +325,6 @@ const formStyles = {
   // display: "flex",
   // justifyContent: "space-around",
   // border : "1px solid black",
-  padding : "1% 6% 0%",
-  width : "95%"
+  padding: "1% 6% 0%",
+  width: "95%"
 };
