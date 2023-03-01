@@ -164,13 +164,13 @@ console.log(e);
        { (collegeRole ==="student") && <Form.Group className="mb-2" controlId="formSectionSelection">
           <Form.Label>Section</Form.Label>
           <Form.Select ref={sectionRef} aria-label="Default select example">
-            <option defaultValue value="1">
+            <option defaultValue value="it-1">
               IT-1
             </option>
-            <option  value="2">
+            <option  value="it-2">
             IT-2
             </option>
-            <option  value="3">
+            <option  value="it-3">
             IT-3
             </option>
             
