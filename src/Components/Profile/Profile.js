@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useRef } from "react";
-import { Button, Form, Image, Toast, ToastContainer } from "react-bootstrap";
+import { Button, Form, Image, Toast, ToastContainer, Row, Col } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import useDocumentTitle from "../../Hooks/useDocumentTitle";
 import "./Profile.css";
@@ -18,6 +18,7 @@ function Profile() {
   const profileImgRef = useRef(null);
   const passwordRef = useRef(null);
   const confirmPasswordRef = useRef(null);
+  const [fullName, setFullName] = useState("");
   const navigate = useNavigate();
   // For toast
   const [show, setShow] = useState(false);
@@ -37,6 +38,11 @@ function Profile() {
       collegeIdRef.current.value = userData.collegeIdCard || userData.user.collegeIdCard;
       profileImgRef.current.src = userData.profileImg || userData.user.profileImg;
       phoneRef.current.value = userData.mobileNumber || userData.user.mobileNumber || "";
+
+      if(userData.user)
+        setFullName(userData.user?.firstName + " " + userData.user?.lastName);
+        else
+        setFullName(userData?.firstName + " " + userData?.lastName);
     }
     
     // eslint-disable-next-line
@@ -94,15 +100,19 @@ function Profile() {
           className="img img-fluid"
           src=""
           ref={profileImgRef}
+          thumbnail = "true"
           alt="profile-img"
         />
+        <h6 className="mt-4">{fullName}</h6>
       </div>
       <div className="profile-details">
         <Form onSubmit={updateProfile} id="update-profile-form">
+        <h6 className="fw-bold">Personal Details</h6>
           {/* First Name */}
-
+          <Row>
+            <Col>
           <Form.Group className="mb-2" controlId="formFirstName">
-            <Form.Label>First Name</Form.Label>
+            <Form.Label className="text-muted">First Name</Form.Label>
             <Form.Control
               ref={firstNameRef}
               required
@@ -110,10 +120,12 @@ function Profile() {
               placeholder="Enter First Name"
             />
           </Form.Group>
+          </Col>
 
+          <Col>
           {/* Last name */}
           <Form.Group className="mb-2" controlId="formLastName">
-            <Form.Label>Last Name</Form.Label>
+            <Form.Label className="text-muted">Last Name</Form.Label>
             <Form.Control
               ref={lastNameRef}
               required
@@ -123,6 +135,9 @@ function Profile() {
 
             
           </Form.Group>
+          </Col>
+          </Row>
+
           {/* <FloatingLabel
         controlId="floatingInput"
         label="Email address"
@@ -131,7 +146,7 @@ function Profile() {
         <Form.Control type="email" placeholder="name@example.com" />
       </FloatingLabel> */}
           <Form.Group className="mb-2" controlId="formEmail">
-            <Form.Label>Email address</Form.Label>
+            <Form.Label className="text-muted">Email address</Form.Label>
             <Form.Control
               ref={emailRef}
               required
@@ -141,7 +156,7 @@ function Profile() {
             />
           </Form.Group>
           <Form.Group className="mb-2" controlId="formPassword">
-            <Form.Label>Update Password</Form.Label>
+            <Form.Label className="text-muted">Update Password</Form.Label>
             <Form.Control
               ref={passwordRef}
               type="password"
@@ -150,7 +165,7 @@ function Profile() {
             />
           </Form.Group>
           <Form.Group className="mb-2" controlId="formConfirmPassword">
-            <Form.Label>Confirm Password</Form.Label>
+            <Form.Label className="text-muted">Confirm Password</Form.Label>
             <Form.Control
               ref={confirmPasswordRef}
               type="password"
@@ -159,7 +174,7 @@ function Profile() {
           </Form.Group>
 
           <Form.Group className="mb-2" controlId="formPhone">
-            <Form.Label>Phone</Form.Label>
+            <Form.Label className="text-muted">Phone</Form.Label>
             <Form.Control
               ref={phoneRef}
               required
@@ -185,7 +200,7 @@ function Profile() {
           {/* Link for College ID */}
           {/* We are not updating this for now */}
           <Form.Group className="mb-3" controlId="formCollegeIdLink">
-            <Form.Label>College ID Google Drive Link</Form.Label>
+            <Form.Label className="text-muted">College ID Google Drive Link</Form.Label>
             <Form.Control
               ref={collegeIdRef}
               name="collegeID"
