@@ -89,7 +89,7 @@ const Classrooms = () => {
           <Row xs={1} md={4} className="">
             {classroomList != null && classroomList[idx].length != 0 &&
               classroomList[idx].map((classRoom, index) => (
-                <Col>
+                <Col className="mb-2">
                   <Card
                     className={styles.branchCards}
                     onClick={(e) => showClassroomCardModal(idx, index)}
