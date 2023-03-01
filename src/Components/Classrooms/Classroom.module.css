@@ -63,6 +63,7 @@
     text-decoration: none;
     overflow: hidden;
     padding: 20px 0;
+    margin:10px 0;
     border: 1px solid #ccc;
     cursor: pointer;
 }
