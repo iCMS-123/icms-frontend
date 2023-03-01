@@ -14,10 +14,10 @@ export const Basic = () => {
 
   return (
     <div>
-     <div>
-<div className="basic-left">
+     <div style = {{  display : 'flex'}} >
+    <div className="basic-left" style={{ flex : 1, border: '1px solid black', padding : '10px'}}>
 
- <Card style={{ width: '16rem' }}>
+      <Card style={{margin : '10px'}}>
       <Card.Img style={{objectFit:'contain', padding:'5px', width:'200px',margin:'0 auto',height:'175px'}} variant="top" src="https://res.cloudinary.com/abhistrike/image/upload/v1626953029/avatar-370-456322_wdwimj.png" />
       <Card.Body>
         <Card.Title>Welcome { userData.firstName || userData.user.firstName} !</Card.Title>
@@ -28,21 +28,78 @@ export const Basic = () => {
       </Card.Body>
     </Card>
 
+    {/* My students */}
+      <Card style={{ margin : '10px'}}>
+            <Card.Body>
+            <Card.Title>My Students</Card.Title>
+ {/* Student */}
 
-    <Card style={{ width: '16rem' , padding: '20px'}}>
-      <Card.Body>
-      <canvas id="myChart"></canvas>
+     <Card style={{marginBottom : '5px'}}>
+      <Card.Body style={{padding: '0px'}}>
+      <div  style={{display: 'flex', justifyContent : 'space-between', alignItems:'center',padding : '0 5px'}}>
+
+      <Card.Img style={{objectFit:'contain',display:'block', padding:'4px', width:'60px',}} variant="top" src="https://res.cloudinary.com/abhistrike/image/upload/v1626953029/avatar-370-456322_wdwimj.png" />
+      <Card.Text>
+      { userData.firstName || userData.user.firstName} { userData.lastName || userData.user.lastName}
+        </Card.Text>
+      </div>
+       
+      <div style={{display: 'flex', justifyContent : 'space-between', alignItems:'center', padding : '0 5px'}}>
+
+      <p>
+      StudentRollNo 
+        </p>  
+        <p style={{float:'right'}}>Phone</p> 
+      </div>
+
       
-         
       </Card.Body>
     </Card>
+     <Card>
+      <Card.Body style={{padding: '0px'}}>
+      <div  style={{display: 'flex', justifyContent : 'space-between', alignItems:'center',padding : '0 5px'}}>
+
+      <Card.Img style={{objectFit:'contain',display:'block', padding:'4px', width:'60px',}} variant="top" src="https://res.cloudinary.com/abhistrike/image/upload/v1626953029/avatar-370-456322_wdwimj.png" />
+      <Card.Text>
+      { userData.firstName || userData.user.firstName} { userData.lastName || userData.user.lastName}
+        </Card.Text>
+      </div>
+       
+      <div style={{display: 'flex', justifyContent : 'space-between', alignItems:'center', padding : '0 5px'}}>
+
+      <p>
+      StudentRollNo 
+        </p>  
+        <p style={{float:'right'}}>Phone</p> 
+      </div>
+
+      
+      </Card.Body>
+    </Card>
+   
+
+
+  
+  
+      </Card.Body>
+    </Card>
+
+ 
 
     {/* Graph for attendance */}
  
 </div>
 
-<div className="basic-right">
+<div className="basic-right"  style={{flex : 2}}>
 
+<Card>
+
+
+      <Card.Body>
+      
+      <h4>Attendance Overview</h4>
+      This is some text within a card body.</Card.Body>
+    </Card>
 
 </div>
 
@@ -52,3 +109,5 @@ export const Basic = () => {
     </div>
   )
 }
+
+ 
