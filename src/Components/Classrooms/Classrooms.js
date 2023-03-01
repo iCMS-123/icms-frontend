@@ -33,12 +33,11 @@ const Classrooms = (props) => {
   const modalBranchRef = useRef(null);
   const modalSectionRef = useRef(null);
   const modalClassCoordinatorRef = useRef(null);
-  
-  const branchName =
-    JSON.parse(localStorage.getItem("icmsUserInfo")).data.user.branchName || "";
-  console.log(branchName);
-
-  
+ 
+  let icmsLocalStorageData = JSON.parse(localStorage.getItem("icmsUserInfo"));
+  console.log(icmsLocalStorageData);
+  let userData = icmsLocalStorageData.data;   
+  let branchName = userData.branchName || userData.user.branchName; 
   const [error, seterror] = useState(null);
   const [success, setSuccess] = useState(false);
   const [successMessage, setSuccessMessage] = useState(false);

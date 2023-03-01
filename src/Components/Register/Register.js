@@ -70,7 +70,8 @@ if(collegeRole === "teacher"){
 }
 
 try{
-
+  
+console.log(details);
 const {data} = await axios.post(`http://localhost:8002/api/v1/${collegeRole}/register`,details);
 
 console.log(data);
@@ -80,7 +81,7 @@ localStorage.setItem('icmsUserInfo', icmsUserInfo);
 if(collegeRole === "teacher"){
   navigate("/dashboard");
 }else{
-  console.log(' i ma iun registeraiorn');
+   
   navigate("/studentdashboard")
 }
 

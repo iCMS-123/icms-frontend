@@ -10,6 +10,7 @@ import "./Dashboard.css";
 import { Basic } from "./Basic";
 import StudentsInfo from "../StudentsInfo/StudentsInfo";
 import Classrooms from "../Classrooms/Classrooms"
+import dashboardBgImage from "../../assets/images/dashboard-bg.jpg"
 
 const navLinkStyles = {
   textDecoration: 'none',
@@ -92,14 +93,18 @@ const Dashboard = () => {
           </Container>
         </Navbar>
 
+<div style={{padding: '20px',height:'100%', objectFit:'contain',backgroundRepeat:'repeatX',backgroundPosition:'center', backgroundSize:'cover',backgroundImage: `url(${dashboardBgImage})`}}>
 
-        <Routes>
+  <Routes >
           <Route index element={<Basic />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/studentsinfo" element={<StudentsInfo />} />
           <Route path="/classrooms" element={<Classrooms />} />
           <Route path="*" element={<Navigate to='/notfound' />} />
         </Routes>
+
+</div>
+      
 
       </div>
       {/* <main style={{ padding: 10 }}> Hello I am Dashboard</main> */}
