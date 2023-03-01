@@ -13,8 +13,9 @@ import { FaSearch, FaUserCheck, FaUserTimes, FaAsterisk } from "react-icons/fa";
 import styles from "./Classroom.module.css";
 import Loader1 from "../Loader/Loader-1/index";
 import axios from "axios";
+import Message from "../Message/index";
 
-const Classrooms = () => {
+const Classrooms = (props) => {
   const [loading, setLoading] = useState(false);
   // setClassroomList(classroomList);
 // classroomList.data.data.sectionData.sectionYear;
@@ -24,7 +25,8 @@ const Classrooms = () => {
     useState(false);
   const [showCreateClassroomModal, setModalCreateClassroomShow] =
     useState(false);
-
+  // For toast
+  const [show, setShow] = useState(false);
 // Refs
 
   const modalYearRef = useRef(null);
@@ -35,6 +37,11 @@ const Classrooms = () => {
   const branchName =
     JSON.parse(localStorage.getItem("icmsUserInfo")).data.user.branchName || "";
   console.log(branchName);
+
+  
+  const [error, seterror] = useState(null);
+  const [success, setSuccess] = useState(false);
+  const [successMessage, setSuccessMessage] = useState(false);
 
   useEffect(() => {
     const getClassroomsList = async () => {
@@ -56,6 +63,7 @@ const Classrooms = () => {
 
   }, []);
   let years = ["First Year", "Second Year", "Third Year", "Fourth Year"];
+  let yearWiseColors = ["info", "warning", "danger", "success"];
 
   async function showClassroomCardModal(idx, index){
     console.log(classroomList[idx][index], "classroomList[idx][index]");
@@ -99,8 +107,18 @@ const Classrooms = () => {
       let year = data.data.sectionData.sectionYear;
       classroomList[year-1].push(data.data.sectionData);
       setClassroomList(classroomList);
+      
+      console.log(data, "classroom created");
+        
+      setSuccess(true);
+      setSuccessMessage("Classroom created successfully !");
+      setTimeout(() => setSuccess(false), 3000);
+
     }catch(err){
-      alert(err.message);
+      console.log(err, "classroom not created");
+      seterror(err.msg);
+      setTimeout(() => seterror(null), 3000);
+      // alert(err.message);
     }
    
 
@@ -108,6 +126,10 @@ const Classrooms = () => {
 
   return (
     <div className="container">
+      {error && <Message variant={"danger"} style={{paddingTop : "15px"}}>{error}</Message>}
+      {success && (
+        <Message variant={"success"}>{successMessage}</Message>
+      )}
       <div id={styles.currentClassrooms}>
         {/* branch fetch logic will come here */}
         <h5 style={{ fontWeight: "bold" }} className="pt-4">
@@ -120,11 +142,12 @@ const Classrooms = () => {
         {/* Year Wise Classroom Cards */}
 
         {years.map((yr, idx) => (
-
-          <Row xs={1} md={4} className="">
+          <>
+            <h5>{yr}</h5>
+          <Row xs={1} md={4} className="" key={idx}>
             {classroomList != null && classroomList[idx].length !== 0 &&
               classroomList[idx].map((classRoom, index) => (
-                <Col className="mb-2">
+                <Col className="mb-2" key = {index}>
                   <Card
                     className={styles.branchCards}
                     onClick={(e) => showClassroomCardModal(idx, index)}
@@ -134,7 +157,7 @@ const Classrooms = () => {
                       <Badge bg="dark" style={{ position: 'absolute', top: '10px', right: '30px' }}>
                         {classRoom?.sectionBranchName?.toUpperCase() || ""}
                       </Badge>
-                      <Badge bg="dark" style={{ position: 'absolute', bottom: '10px', right: '30px' }}>
+                      <Badge bg={yearWiseColors[idx]} style={{ position: 'absolute', bottom: '10px', right: '30px' }}>
                         {yr}
                       </Badge>
                       <div className={styles.gocorner} href="#">
@@ -145,6 +168,7 @@ const Classrooms = () => {
                 </Col>
               ))}
           </Row>
+          </>
         ))}
 
         {/* Modal (for classroom details) code starts */}
@@ -257,7 +281,7 @@ const Classrooms = () => {
 
             getNotSectionHeadList();
           }}
-          variant="success"
+          variant="secondary"
         >
           Add New Classroom
         </Button>
