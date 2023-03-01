@@ -51,10 +51,16 @@ const LoginForm = () => {
   };
   return (
     <div>
-    <ICMSTitle/>
-      <h1 style={{ fontWeight: "900" }} className="mb-3 text-center">
-        Good to see you again
-      </h1>
+    {/* <ICMSTitle/> */}
+    <h3 className="sidebar-header fw-bold mb-0 py-2 mb-4 text-center">
+          <Link to={"/"}>
+          <img src='/images/icms-logo.png' alt='logo' style={{ height: '40px', filter: 'invert(1)' }} />
+          </Link>
+        </h3>
+
+      <h5 style={{ fontWeight: "600" }} className="mb-3 text-center">
+        Welcome back! Glad to see you again
+      </h5>
       <Form id="login-form" onSubmit={handleSubmit}>
         <Form.Group className="mb-2" controlId="formRoleSelection">
           <Form.Label>Role</Form.Label>
