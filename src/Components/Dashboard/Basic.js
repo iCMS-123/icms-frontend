@@ -98,7 +98,10 @@ export const Basic = () => {
       <Card.Body>
       
       <h4>Attendance Overview</h4>
-      This is some text within a card body.</Card.Body>
+      
+      <Card.Img src="https://resources.cdn.yaclass.in/24adf49a-f4f3-4706-9302-ee944efad647/pic12.svg" />
+      
+      </Card.Body>
     </Card>
 
 </div>
