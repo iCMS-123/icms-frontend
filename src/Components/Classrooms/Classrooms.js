@@ -66,7 +66,18 @@ const Classrooms = (props) => {
 
   async function showClassroomCardModal(idx, index){
     console.log(classroomList[idx][index], "classroomList[idx][index]");
-    setClassroomCardDetailsForModal(classroomList[idx][index]);
+
+    try {
+      const { data } = await axios.get(`http://localhost:8002/api/v1/section/get-section-data/${classroomList[idx][index].sectionHead}`);
+
+      if (data && data.success) {
+        console.log(data, "section data");
+        setClassroomCardDetailsForModal(data.data);
+      }
+    } catch (e) {
+      console.log(e, "e");
+    }
+
     setClassroomCardModalShow(true);
   }
 
@@ -124,7 +135,7 @@ const Classrooms = (props) => {
 }
 
   return (
-    <div className="container">
+    <div className="container" style={{position : "relative"}}>
       {error && <Message variant={"danger"} style={{paddingTop : "15px"}}>{error}</Message>}
       {success && (
         <Message variant={"success"}>{successMessage}</Message>
@@ -142,7 +153,7 @@ const Classrooms = (props) => {
 
         {years.map((yr, idx) => (
           <>
-            <h5>{yr}</h5>
+            {/* <h5>{yr}</h5> */}
           <Row xs={1} md={4} className="" key={idx}>
             {classroomList != null && classroomList[idx].length !== 0 &&
               classroomList[idx].map((classRoom, index) => (
@@ -275,12 +286,13 @@ const Classrooms = (props) => {
         <Button
           key={true}
           className="me-2 mt-4 mb-2"
+          style={{position : "absolute", top : "10px", right : "10px"}}
           onClick={() => {
             setModalCreateClassroomShow(true);
 
             getNotSectionHeadList();
           }}
-          variant="secondary"
+          variant="success"
         >
           Add New Classroom
         </Button>

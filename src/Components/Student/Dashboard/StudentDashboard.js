@@ -4,6 +4,7 @@ import { Sidebar, Menu, MenuItem } from "react-pro-sidebar";
 import { Container, Nav, Navbar } from "react-bootstrap";
 import StudentBasic from "../Basic/StudentBasic";
 import StudentProfile from "../Profile/StudentProfile";
+import "./studentDashboard.css";
 const navLinkStyles = {
   textDecoration: 'none',
   color:'white'
