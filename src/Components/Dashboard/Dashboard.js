@@ -67,8 +67,8 @@ const Dashboard = () => {
           <Menu className="dashboard-menu"  >
             <MenuItem className="menuitem" component={<Link to="" />} onClick={() => setNavTitle("Dashboard")}> Dashboard</MenuItem>
             <MenuItem className="menuitem" component={<Link to="profile" />} onClick={() => setNavTitle("Profile")}> Profile</MenuItem>
-            {icmsUserInfo.data.isSectionHead  && <MenuItem className="menuitem" component={<Link to="studentsinfo" />} onClick={() => setNavTitle("Classroom Info")}> Classroom Info</MenuItem>}
-            {icmsUserInfo.data.isHod  && <MenuItem className="menuitem" component={<Link to="classrooms" />} onClick={() => setNavTitle("Classrooms")}> Classrooms</MenuItem>}
+            {icmsUserInfo?.data.isSectionHead  && <MenuItem className="menuitem" component={<Link to="studentsinfo" />} onClick={() => setNavTitle("Classroom Info")}> Classroom Info</MenuItem>}
+            {icmsUserInfo?.data.isHod  && <MenuItem className="menuitem" component={<Link to="classrooms" />} onClick={() => setNavTitle("Classrooms")}> Classrooms</MenuItem>}
           </Menu>
         </Sidebar>
 

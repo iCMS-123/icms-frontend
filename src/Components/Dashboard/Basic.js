@@ -1,12 +1,21 @@
 import React, {useEffect} from 'react'
+import { useNavigate } from "react-router-dom";
 import { Button, Card } from "react-bootstrap";
 import useDocumentTitle from "../../Hooks/useDocumentTitle";
  
 
 export const Basic = () => {
   useDocumentTitle("Dashboard");
+  const navigate = useNavigate();
+  let userData;
   let icmsLocalStorageData = JSON.parse(localStorage.getItem("icmsUserInfo"));
-  let userData = icmsLocalStorageData.data;  
+  if(icmsLocalStorageData === null){
+    navigate("/login");
+  }else{
+
+     userData = icmsLocalStorageData?.data;  
+
+  }
   // for reference 
   // let branchName = userData.branchName || userData.user.branchName; 
    
@@ -20,7 +29,7 @@ export const Basic = () => {
       <Card style={{margin : '010px'}}>
       <Card.Img style={{objectFit:'contain', padding:'5px', width:'200px',margin:'0 auto',height:'175px'}} variant="top" src="https://res.cloudinary.com/abhistrike/image/upload/v1626953029/avatar-370-456322_wdwimj.png" />
       <Card.Body>
-        <Card.Title>Welcome { userData.firstName || userData.user.firstName} !</Card.Title>
+        <Card.Title>Welcome { userData?.firstName || userData?.user.firstName} !</Card.Title>
         <Card.Text>
           This page can give you a quick overview of your upcoming tasks and classes.
         </Card.Text>
@@ -40,7 +49,7 @@ export const Basic = () => {
 
       <Card.Img style={{objectFit:'contain',display:'block', padding:'4px', width:'60px',}} variant="top" src="https://res.cloudinary.com/abhistrike/image/upload/v1626953029/avatar-370-456322_wdwimj.png" />
       <Card.Text>
-      { userData.firstName || userData.user.firstName} { userData.lastName || userData.user.lastName}
+      { userData?.firstName || userData?.user.firstName} { userData?.lastName || userData?.user.lastName}
         </Card.Text>
       </div>
        
@@ -61,7 +70,7 @@ export const Basic = () => {
 
       <Card.Img style={{objectFit:'contain',display:'block', padding:'4px', width:'60px',}} variant="top" src="https://res.cloudinary.com/abhistrike/image/upload/v1626953029/avatar-370-456322_wdwimj.png" />
       <Card.Text>
-      { userData.firstName || userData.user.firstName} { userData.lastName || userData.user.lastName}
+      { userData?.firstName || userData?.user.firstName} { userData?.lastName || userData?.user.lastName}
         </Card.Text>
       </div>
        
