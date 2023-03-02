@@ -17,7 +17,7 @@ export const Basic = () => {
      <div style = {{  display : 'flex'}} >
     <div className="basic-left" style={{ flex : 1, padding : '0px 10px'}}>
 
-      <Card style={{margin : '10px'}}>
+      <Card style={{margin : '010px'}}>
       <Card.Img style={{objectFit:'contain', padding:'5px', width:'200px',margin:'0 auto',height:'175px'}} variant="top" src="https://res.cloudinary.com/abhistrike/image/upload/v1626953029/avatar-370-456322_wdwimj.png" />
       <Card.Body>
         <Card.Title>Welcome { userData.firstName || userData.user.firstName} !</Card.Title>
@@ -29,7 +29,7 @@ export const Basic = () => {
     </Card>
 
     {/* My students */}
-      <Card style={{ margin : '10px 0'}}>
+      <Card style={{ margin : '10px'}}>
             <Card.Body>
             <Card.Title>My Students</Card.Title>
  {/* Student */}
