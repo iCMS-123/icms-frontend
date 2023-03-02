@@ -62,7 +62,7 @@ const Register = () => {
         lastName: lastNameRef.current.value,
         branchName: branchRef.current.value,
         year: yearRef.current.value,
-        section: sectionRef.current.value,
+        sectionRef: sectionRef.current.value,
         collegeIdCard: collegeIdRef.current.value,
         admissionNumber: admissionNumberRef.current.value,
         universityRollNumber: universityRollNumberRef.current.value
