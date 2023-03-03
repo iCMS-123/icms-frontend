@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRef } from "react";
 import axios from 'axios';
 import { Button, Form, Modal, Row, Col } from "react-bootstrap";
@@ -34,6 +34,31 @@ const Register = () => {
   const handleClose = () => {
     setShow(false);
   };
+
+  const [firstYearSections, setFirstYearSections] = useState([]);
+  const [secondYearSections, setSecondYearSections] = useState([]);
+  const [thirdYearSections, setThirdYearSections] = useState([]);
+  const [fourthYearSections, setFourthYearSections] = useState([]);
+
+
+  const fetchSectionData = async () => {
+    try {
+      console.log(branchRef.current.value)
+      const sectionData = await axios.get(`http://localhost:8002/api/v1/hod/get-list-section?branchName=${branchRef.current.value}`)
+      if (sectionData) {
+        setFirstYearSections(sectionData.data.firstYear)
+        setSecondYearSections(sectionData.data.secondYear)
+        setThirdYearSections(sectionData.data.thirdYear)
+      }
+    }
+    catch (err) {
+      console.log(err)
+    }
+  }
+
+  useEffect(() => {
+    fetchSectionData();
+  }, [])
 
   function handleSubmit(e) {
     e.preventDefault();
@@ -94,15 +119,15 @@ const Register = () => {
   return (
     <div>
       {/* <ICMSTitle /> */}
-        <h3 className="sidebar-header fw-bold mb-0 py-2 mb-4 text-center">
-          <Link to={"/"}>
+      <h3 className="sidebar-header fw-bold mb-0 py-2 mb-4 text-center">
+        <Link to={"/"}>
           <img src='/images/icms-logo.png' alt='logo' style={{ height: '40px', filter: 'invert(1)' }} />
-          </Link>
-        </h3>
+        </Link>
+      </h3>
       <Form onSubmit={handleSubmit} id="reg-form">
-      <h4 style={{ fontWeight: "600" }} className="text-muted">
-        Register
-      </h4>
+        <h4 style={{ fontWeight: "600" }} className="text-muted">
+          Register
+        </h4>
         <Form.Group className="mb-2" controlId="formRoleSelection">
           <Form.Label>Role</Form.Label>
           <Form.Select onChange={() => { setCollegeRole(collegeRoleRef.current.value) }} ref={collegeRoleRef} aria-label="Default select example">
@@ -145,7 +170,7 @@ const Register = () => {
           <Col>
             <Form.Group className="mb-2" controlId="formBranchSelection">
               <Form.Label>Branch</Form.Label>
-              <Form.Select ref={branchRef} aria-label="Default select example">
+              <Form.Select onChange={fetchSectionData} ref={branchRef} aria-label="Default select example">
                 <option defaultValue value="it">
                   IT
                 </option>
@@ -178,16 +203,18 @@ const Register = () => {
         {(collegeRole === "student") && <Form.Group className="mb-2" controlId="formSectionSelection">
           <Form.Label>Section</Form.Label>
           <Form.Select ref={sectionRef} aria-label="Default select example">
-            <option defaultValue value="it-1">
-              IT-1
-            </option>
-            <option value="it-2">
-              IT-2
-            </option>
-            <option value="it-3">
-              IT-3
-            </option>
-
+            {yearRef?.current?.value === "1" && (firstYearSections.map(item => <option defaultValue value={item._id}>
+              {item.sectionName}
+            </option>))}
+            {yearRef?.current?.value === "2" && (secondYearSections.map(item => <option defaultValue value={item._id}>
+              {item.sectionName}
+            </option>))}
+            {yearRef?.current?.value === "3" && (thirdYearSections.map(item => <option defaultValue value={item._id}>
+              {item.sectionName}
+            </option>))}
+            {yearRef?.current?.value === "4" && (fourthYearSections.map(item => <option defaultValue value={item._id}>
+              {item.sectionName}
+            </option>))}
 
           </Form.Select>
         </Form.Group>}
@@ -239,9 +266,9 @@ const Register = () => {
           <h4 className="modalData"><strong>First Name</strong> :  {firstNameRef['current']?.value} </h4>
           <h4 className="modalData"><strong>Last Name</strong> : {lastNameRef['current']?.value} </h4>
           <h4 className="modalData"><strong>Email</strong> :  {emailRef['current']?.value} </h4>
-          {(collegeRole === "student") && <h4 className="modalData"><strong>Year</strong> :  {yearRef.current?.selectedOptions[0].innerText}</h4>}
-          <h4 className="modalData"><strong>Branch</strong> :  {branchRef['current']?.selectedOptions[0].innerText}</h4>
-          {(collegeRole === "student") && <h4 className="modalData"><strong>Section</strong> :  {sectionRef['current']?.selectedOptions[0].innerText}</h4>}
+          {(collegeRole === "student") && <h4 className="modalData"><strong>Year</strong> :  {yearRef.current?.selectedOptions[0]?.innerText}</h4>}
+          <h4 className="modalData"><strong>Branch</strong> :  {branchRef['current']?.selectedOptions[0]?.innerText}</h4>
+          {(collegeRole === "student") && <h4 className="modalData"><strong>Section</strong> :  {sectionRef['current']?.selectedOptions[0]?.innerText}</h4>}
           {(collegeRole === "student") && <h4 className="modalData"><strong>Admission Number</strong> :  {admissionNumberRef['current']?.value}</h4>}
           {(collegeRole === "student") && <h4 className="modalData"><strong>University Roll Number</strong> :  {universityRollNumberRef['current']?.value}</h4>}
           <h4 className="modalData"><strong>College ID</strong> : <a href={collegeIdRef['current']?.value} target="_blank" rel="noreferrer"><Button variant="info">Preview</Button></a>    </h4>
