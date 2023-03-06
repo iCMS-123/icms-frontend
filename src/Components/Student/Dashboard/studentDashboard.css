@@ -11,11 +11,6 @@
     overflow-y: auto;
   }
   
-  .dashboard-sidebar {
-    height: 100vh !important;
-    background-color: rgb(75, 60, 140);
-    height: 100%;
-  }
   
   .css-dip3t8 {
     background: none !important;
