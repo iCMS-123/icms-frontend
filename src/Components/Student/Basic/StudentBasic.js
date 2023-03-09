@@ -2,6 +2,7 @@ import React from "react";
 import "./StudentBasic.css";
 import {AiOutlineArrowRight , AiOutlineUser} from "react-icons/ai";
 import {BsSpeedometer2} from "react-icons/bs";
+import {GiTeacher} from "react-icons/gi";
 import studentWelcomeImg from "../../../assets/images/student-wave.png";
 const StudentBasic = () => {
   let icmsUserInfo = JSON.parse(localStorage.getItem("icmsUserInfo"));
@@ -27,7 +28,9 @@ const StudentBasic = () => {
         </div>
       </div>
 
-      <div className="card attendance-card">
+      <div className="main-cards-container">
+
+  <div className="card attendance-card">
         <div className="card-body text-center">
           <h5   className="card-title mb-3 d-flex align-items-center justify-content-center"><AiOutlineUser/> &nbsp;  Attendance &nbsp;&nbsp;<AiOutlineArrowRight/></h5>
           <p className="card-text">
@@ -38,7 +41,8 @@ const StudentBasic = () => {
           </p>
           </div>
       </div>
-      <div className="card attendance-card">
+   
+      <div className="card gpa-card">
         <div className="card-body text-center">
           <h5 className="card-title mb-3 d-flex align-items-center justify-content-center"><BsSpeedometer2/> &nbsp; GPA &nbsp;&nbsp;<AiOutlineArrowRight/></h5>
           <p className="card-text">
@@ -48,6 +52,21 @@ const StudentBasic = () => {
             Keep it up !
           </p>
           </div>
+      </div>
+
+       
+      <div className="card my-teachers-card">
+        <div className="card-body text-center">
+          <h5 className="card-title mb-3 d-flex align-items-center justify-content-center"><GiTeacher/> &nbsp; My Teachers &nbsp;&nbsp;<AiOutlineArrowRight/></h5>
+          <p className="card-text">
+          <span className="h1">7</span> 
+          </p>
+          <p>
+            View details
+          </p>
+          </div>
+      </div>
+
       </div>
 
 

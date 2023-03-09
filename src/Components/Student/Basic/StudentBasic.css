@@ -18,12 +18,19 @@
    
 }
 
-.attendance-card{
-    width : 25%;
+.attendance-card, .gpa-card, .my-teachers-card{
+    width : 30%;
     height: fit-content;
     padding:  10px;
     margin-top : 10px;
     margin-left: 12px;
     background-color: #f8f8fa;
     
+}
+
+.main-cards-container{
+    display: flex;
+    justify-content: space-around;
+    /* align-items: center; */
+    /* height: 100%; */
 }
