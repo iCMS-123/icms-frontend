@@ -67,6 +67,8 @@ const StudentBasic = () => {
           </div>
       </div>
 
+      {/* similarly my courses card */}
+
       </div>
 
 
