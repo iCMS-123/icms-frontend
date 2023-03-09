@@ -1,0 +1,29 @@
+.welcome-card{
+    width : 98%;
+    height: 200px;
+    margin : 0 auto;
+    margin-top : 10px;
+    background-color: #f8f8fa;
+    
+}
+.welcome-card-body{
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    height: 100%;
+}
+
+.welcome-image img{
+    width: 220px;
+   
+}
+
+.attendance-card{
+    width : 25%;
+    height: fit-content;
+    padding:  10px;
+    margin-top : 10px;
+    margin-left: 12px;
+    background-color: #f8f8fa;
+    
+}
