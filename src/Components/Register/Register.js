@@ -16,17 +16,16 @@ const Register = () => {
   useDocumentTitle("Register");
   const navigate = useNavigate();
   // Referenced Variables
-  const collegeRoleRef = useRef(null);
-  const firstNameRef = useRef(null);
-  const lastNameRef = useRef(null);
-  const emailRef = useRef(null);
-  const passwordRef = useRef(null);
-  const branchRef = useRef(null);
+  const [firstNameState, setFirstNameState] = useState(null);
+  const [lastNameState, setLastNameState] = useState(null);
+  const [emailState, setEmailState] = useState(null);
+  const [passwordState, setPasswordState] = useState(null);
+  const [branchState, setBranchState] = useState(null);
   const [collegeId, setCollegeId] = useState(null);
-  const yearRef = useRef(null);
-  const sectionRef = useRef(null);
-  const universityRollNumberRef = useRef(null);
-  const admissionNumberRef = useRef(null);
+  const [yearState, setYearsState] = useState(null);
+  const [sectionState, setSectionState] = useState(null);
+  const [universityRollNumberState, setUniversityRollNumberState] = useState(null);
+  const [admissionNumberState, setAdmissionNumberState] = useState(null);
   // let regForm = document.querySelector("#reg-form");
   // let modalForm = document.querySelector("#checkModal");
 
@@ -43,7 +42,30 @@ const Register = () => {
   const [pageNumber, setPageNumber] = useState(0);
   const [uploadedUserImages, setUploadedUserImages] = useState([]);
 
-  function handleOnUpload(error, result, widget) {
+  const [branchList, setBranchList] = useState(null);
+
+  useEffect(() => {
+    const getBranchList = async () => {
+      try {
+        const { data } = await axios.get(`http://localhost:8002/api/v1/admin/get-branch-list`);
+
+        if (data && data.success) {
+          // setSuccess(true);
+          setBranchList(data.data.branchList);
+          console.log(branchList, "Branch LIST");
+        }
+      } catch (e) {
+        console.log(e, "e");
+        seterror(e.response.data.msg);
+        setTimeout(() => seterror(null), 3000);
+      }
+    };
+
+    getBranchList();
+
+  }, []);
+
+  async function handleOnUpload(error, result, widget) {
     if (error) {
       seterror(error);
       setTimeout(() => seterror(null), 3000);
@@ -54,16 +76,16 @@ const Register = () => {
       return;
     }
     console.log(result?.info?.secure_url, "img url");
-    let currUrl = result?.info?.secure_url;
+    let currUrl = await result?.info?.secure_url;
 
-    setUploadedUserImages(uploadedUserImages => [...uploadedUserImages, currUrl])
+    await setUploadedUserImages(uploadedUserImages => [...uploadedUserImages, currUrl])
 
     setSuccess(true);
     setSuccessMessage("Your images uploaded successfully!");
     setTimeout(() => setSuccess(false), 5000);
   }
-  
-  function handleOnIdCardUpload(error, result, widget) {
+
+  async function handleOnIdCardUpload(error, result, widget) {
     if (error) {
       seterror(error);
       setTimeout(() => seterror(null), 3000);
@@ -74,8 +96,8 @@ const Register = () => {
       return;
     }
     console.log(result?.info?.secure_url, "img url");
-    let currUrl = result?.info?.secure_url;
-    setCollegeId(currUrl);
+    let currUrl = await result?.info?.secure_url;
+    await setCollegeId(currUrl);
 
     setSuccess(true);
     setSuccessMessage("ID card uploaded successfully!");
@@ -94,62 +116,66 @@ const Register = () => {
     setShow(false);
   };
 
-  const [firstYearSections, setFirstYearSections] = useState([]);
-  const [secondYearSections, setSecondYearSections] = useState([]);
-  const [thirdYearSections, setThirdYearSections] = useState([]);
-  const [fourthYearSections, setFourthYearSections] = useState([]);
+  const [sectionsAvailable, setSectionsAvailable] = useState([]);
 
-
-  const fetchSectionData = async () => {
+  const fetchSectionData = async (branchVal, yearVal) => {
     try {
-      console.log(branchRef.current.value)
-      const sectionData = await axios.get(`http://localhost:8002/api/v1/hod/get-list-section?branchName=${branchRef.current.value}`)
+      console.log(branchVal, yearVal)
+      const sectionData = await axios.get(`http://localhost:8002/api/v1/hod/get-list-section?branchName=${branchVal}`)
+      console.log(sectionData, "sectionData");
       if (sectionData) {
-        setFirstYearSections(sectionData.data.firstYear)
-        setSecondYearSections(sectionData.data.secondYear)
-        setThirdYearSections(sectionData.data.thirdYear)
+        if (yearVal == 1)
+          setSectionsAvailable(sectionData.data.firstYear)
+        else if (yearVal == 2)
+          setSectionsAvailable(sectionData.data.secondYear)
+        else if (yearVal == 3)
+          setSectionsAvailable(sectionData.data.thirdYear)
+        else if (yearVal == 4)
+          setSectionsAvailable(sectionData.data.fourthYear)
       }
     }
     catch (err) {
       console.log(err)
     }
+    console.log(sectionsAvailable, "sections available");
   }
 
   useEffect(() => {
-    fetchSectionData();
+    fetchSectionData(branchState, yearState);
+    console.log(sectionsAvailable, "sections available useEffect");
   }, [])
 
   function handleSubmit(e) {
     e.preventDefault();
     setShow(true);
-    console.log(yearRef.current?.selectedOptions[0].innerText)
+    // console.log(yearRef.current?.selectedOptions[0].innerText)
   }
 
   const onProceed = async () => {
     // make a post request
-    let collegeRole = collegeRoleRef['current']?.value;
     let details;
     if (collegeRole === "teacher") {
       details = {
-        firstName: `${firstNameRef['current']?.value}`,
-        lastName: `${lastNameRef['current']?.value}`,
-        email: `${emailRef['current']?.value}`,
-        password: `${passwordRef['current']?.value}`,
-        branchName: `${branchRef['current']?.value}`,
-        collegeIdCard: `${collegeId}`
+        firstName: firstNameState,
+        lastName: lastNameState,
+        email: emailState,
+        password: passwordState,
+        branchName: branchState,
+        collegeIdCard: collegeId
       }
     } else {
       details = {
-        email: emailRef.current.value,
-        password: passwordRef.current.value,
-        firstName: firstNameRef.current.value,
-        lastName: lastNameRef.current.value,
-        branchName: branchRef.current.value,
-        year: yearRef.current.value,
-        sectionRef: sectionRef.current.value,
+        email: emailState,
+        password: passwordState,
+        firstName: firstNameState,
+        lastName: lastNameState,
+        branchName: branchState,
+        year: yearState,
+        sectionRef: sectionState,
         collegeIdCard: collegeId,
-        admissionNumber: admissionNumberRef.current.value,
-        universityRollNumber: universityRollNumberRef.current.value
+        admissionNumber: admissionNumberState,
+        universityRollNumber: universityRollNumberState,
+        images : uploadedUserImages
       }
     }
 
@@ -177,7 +203,7 @@ const Register = () => {
 
   return (
     <div>
-      {error && <Message variant={"danger"} style={{paddingTop : "15px"}}>{error}</Message>}
+      {error && <Message variant={"danger"} style={{ paddingTop: "15px" }}>{error}</Message>}
       {success && (
         <Message variant={"success"}>{successMessage}</Message>
       )}
@@ -197,7 +223,7 @@ const Register = () => {
           <>
             <Form.Group className="mb-2" controlId="formRoleSelection">
               <Form.Label>Role</Form.Label>
-              <Form.Select onChange={() => { setCollegeRole(collegeRoleRef.current.value) }} ref={collegeRoleRef} aria-label="Default select example">
+              <Form.Select onChange={(e) => { setCollegeRole(e.target.value) }} value={collegeRole} aria-label="Default select example">
                 <option defaultValue value="student">
                   Student
                 </option>
@@ -210,7 +236,7 @@ const Register = () => {
               <Col>
                 <Form.Group className="mb-2" controlId="formFirstName">
                   <Form.Label>First Name</Form.Label>
-                  <Form.Control ref={firstNameRef} required type="text" placeholder="Enter First Name" />
+                  <Form.Control onChange={(e) => { setFirstNameState(e.target.value) }} value={firstNameState} required type="text" placeholder="Enter First Name" />
                 </Form.Group>
               </Col>
 
@@ -218,18 +244,18 @@ const Register = () => {
                 {/* Last name */}
                 <Form.Group className="mb-2" controlId="formLastName">
                   <Form.Label>Last Name</Form.Label>
-                  <Form.Control ref={lastNameRef} required type="text" placeholder="Enter Last Name" />
+                  <Form.Control onChange={(e) => { setLastNameState(e.target.value) }} value={lastNameState} required type="text" placeholder="Enter Last Name" />
                 </Form.Group>
               </Col>
             </Row>
             <Form.Group className="mb-2" controlId="formEmail">
               <Form.Label>Email address</Form.Label>
-              <Form.Control ref={emailRef} required type="email" autoComplete="username" placeholder="Enter email" />
+              <Form.Control onChange={(e) => { setEmailState(e.target.value) }} value={emailState} required type="email" autoComplete="username" placeholder="Enter email" />
             </Form.Group>
 
             <Form.Group className="mb-2" controlId="formPassword">
               <Form.Label>Password</Form.Label>
-              <Form.Control ref={passwordRef} required type="password" autoComplete="current-password" placeholder="Enter Password" />
+              <Form.Control onChange={(e) => { setPasswordState(e.target.value) }} value={passwordState} required type="password" autoComplete="current-password" placeholder="Enter Password" />
             </Form.Group>
 
             {/* Branch */}
@@ -237,11 +263,15 @@ const Register = () => {
               <Col>
                 <Form.Group className="mb-2" controlId="formBranchSelection">
                   <Form.Label>Branch</Form.Label>
-                  <Form.Select onChange={fetchSectionData} ref={branchRef} aria-label="Default select example">
-                    <option defaultValue value="it">
-                      IT
+                  <Form.Select onChange={async (e) => { await setBranchState(e.target.value); await fetchSectionData(e.target.value, yearState); }} value={branchState} aria-label="Default select example">
+                    <option defaultValue value=''>
+                      Choose branch
                     </option>
-                    <option value="cse">CSE</option>
+                    {(branchList != null) &&
+                      branchList.map((branch, index) => (
+                        <option value={branch.name}>{branch.name.toUpperCase()}</option>
+                      ))
+                    }
                   </Form.Select>
                 </Form.Group>
                 {/* year, section, collegeIdCard, admissionNumber, universityRollNumber */}
@@ -249,8 +279,11 @@ const Register = () => {
               <Col>
                 {(collegeRole === "student") && <Form.Group className="mb-2" controlId="formYearSelection">
                   <Form.Label>Year</Form.Label>
-                  <Form.Select ref={yearRef} aria-label="Default select example">
-                    <option defaultValue value="1">
+                  <Form.Select onChange={async (e) => { await setYearsState(e.target.value); await fetchSectionData(branchState, e.target.value) }} value={yearState}>
+                    <option defaultValue value=''>
+                      Choose year
+                    </option>
+                    <option value="1">
                       1st
                     </option>
                     <option value="2">
@@ -269,17 +302,15 @@ const Register = () => {
             </Row>
             {(collegeRole === "student") && <Form.Group className="mb-2" controlId="formSectionSelection">
               <Form.Label>Section</Form.Label>
-              <Form.Select ref={sectionRef} aria-label="Default select example">
-                {yearRef?.current?.value === "1" && (firstYearSections.map(item => <option defaultValue value={item._id}>
-                  {item.sectionName}
-                </option>))}
-                {yearRef?.current?.value === "2" && (secondYearSections.map(item => <option defaultValue value={item._id}>
-                  {item.sectionName}
-                </option>))}
-                {yearRef?.current?.value === "3" && (thirdYearSections.map(item => <option defaultValue value={item._id}>
-                  {item.sectionName}
-                </option>))}
-                {yearRef?.current?.value === "4" && (fourthYearSections.map(item => <option defaultValue value={item._id}>
+              {(branchState == null) && <h6 className="text-muted mb-4">Branch not selected!</h6>}
+              {(yearState == null) && <h6 className="text-muted mb-4">Year not selected!</h6>}
+              {(branchState != null && yearState != null) && (sectionsAvailable.length == 0) && <h6 className="text-muted mb-4">No Sections available for registeration in selected branch and year!</h6>}
+
+              <Form.Select style={{ display: ((sectionsAvailable.length != 0) ? '' : 'none') }} onChange={(e) => { setSectionState(e.target.value) }} value={sectionState} aria-label="Default select example">
+                <option defaultValue value=''>
+                  Choose section
+                </option>
+                {sectionsAvailable.length != 0 && (sectionsAvailable.map(item => <option defaultValue value={item._id}>
                   {item.sectionName}
                 </option>))}
 
@@ -288,15 +319,15 @@ const Register = () => {
             <Row>
               <Col>
 
-                {(collegeRole === "student") && <Form.Group className="mb-2" controlId="formUniversityRoleNumber">
-                  <Form.Label>University Role Number</Form.Label>
-                  <Form.Control ref={universityRollNumberRef} required type="text" placeholder="Enter University Role Number" />
+                {(collegeRole === "student") && <Form.Group className="mb-2" controlId="formUniversityRollNumber">
+                  <Form.Label>University Roll Number</Form.Label>
+                  <Form.Control onChange={(e) => { setUniversityRollNumberState(e.target.value) }} value={universityRollNumberState} required type="text" placeholder="Enter University Roll Number" />
                 </Form.Group>}
               </Col>
               <Col>
                 {(collegeRole === "student") && <Form.Group className="mb-2" controlId="formAdmissionNumber">
                   <Form.Label>Admission Number</Form.Label>
-                  <Form.Control ref={admissionNumberRef} required type="text" placeholder="Enter Admission Number" />
+                  <Form.Control onChange={(e) => { setAdmissionNumberState(e.target.value) }} value={admissionNumberState} required type="text" placeholder="Enter Admission Number" />
                 </Form.Group>}
                 {/* Link for College ID */}
               </Col>
@@ -402,15 +433,15 @@ const Register = () => {
         </Modal.Header>
         <Modal.Body>
 
-          <h4 className="modalData" style={{ 'textTransform': 'capitalize' }}><strong>Role</strong> :  {collegeRoleRef['current']?.selectedOptions[0].value}  </h4>
-          <h4 className="modalData"><strong>First Name</strong> :  {firstNameRef['current']?.value} </h4>
-          <h4 className="modalData"><strong>Last Name</strong> : {lastNameRef['current']?.value} </h4>
-          <h4 className="modalData"><strong>Email</strong> :  {emailRef['current']?.value} </h4>
-          {(collegeRole === "student") && <h4 className="modalData"><strong>Year</strong> :  {yearRef.current?.selectedOptions[0]?.innerText}</h4>}
-          <h4 className="modalData"><strong>Branch</strong> :  {branchRef['current']?.selectedOptions[0]?.innerText}</h4>
-          {(collegeRole === "student") && <h4 className="modalData"><strong>Section</strong> :  {sectionRef['current']?.selectedOptions[0]?.innerText}</h4>}
-          {(collegeRole === "student") && <h4 className="modalData"><strong>Admission Number</strong> :  {admissionNumberRef['current']?.value}</h4>}
-          {(collegeRole === "student") && <h4 className="modalData"><strong>University Roll Number</strong> :  {universityRollNumberRef['current']?.value}</h4>}
+          <h4 className="modalData" style={{ 'textTransform': 'capitalize' }}><strong>Role</strong> :  {collegeRole}  </h4>
+          <h4 className="modalData"><strong>First Name</strong> :  {firstNameState} </h4>
+          <h4 className="modalData"><strong>Last Name</strong> : {lastNameState} </h4>
+          <h4 className="modalData"><strong>Email</strong> :  {emailState} </h4>
+          {(collegeRole === "student") && <h4 className="modalData"><strong>Year</strong> :  {yearState}</h4>}
+          <h4 className="modalData"><strong>Branch</strong> :  {branchState}</h4>
+          {(collegeRole === "student") && <h4 className="modalData"><strong>Section</strong> :  {sectionState}</h4>}
+          {(collegeRole === "student") && <h4 className="modalData"><strong>Admission Number</strong> :  {admissionNumberState}</h4>}
+          {(collegeRole === "student") && <h4 className="modalData"><strong>University Roll Number</strong> :  {universityRollNumberState}</h4>}
           <h4 className="modalData"><strong>College ID</strong> : <a href={collegeId} target="_blank" rel="noreferrer"><Button variant="info">Preview</Button></a>    </h4>
 
 
