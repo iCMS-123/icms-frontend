@@ -86,19 +86,13 @@ const Register = () => {
     let sectionStateRes = sectionState!==null && sectionState!=='';
     let collegeIdRes =  collegeId!==null && collegeId!=='';
     res = emailRes && passwordRes && firstNameRes && lastNameRes && branchStateRes && yearStateRes && admissionNumberStateRes && universityRollNumberStateRes && sectionStateRes && collegeIdRes;
-    // console.log("emailRes",emailRes);
-    // console.log("passwordRes",passwordRes);
-    // console.log("firstNameRes",firstNameRes);
-    // console.log("lastNameRes",lastNameRes);
-    // console.log("branchStateRes",branchStateRes);
-    // console.log("yearStateRes",yearStateRes);
-    // console.log("admissionNumberStateRes",admissionNumberStateRes);
-    // console.log("universityRollNumberStateRes",universityRollNumberStateRes);
-    // console.log("sectionStateRes",sectionStateRes);
-    console.log("collegeId", collegeId);
-    console.log("collegeIdRes",collegeIdRes); 
-    console.log("res",res);
     if(pageNumber===0){
+      let nextBtn = document.querySelector(".next-btn");
+      if(res){
+        nextBtn.classList.add("btn-success");
+      }else{
+        nextBtn.classList.remove("btn-success");
+      }
       setCanGoNext(res);    
     }
 }, [firstNameState,lastNameState,emailState,passwordState,branchState,yearState,sectionState,universityRollNumberState,collegeId,admissionNumberState])
@@ -261,7 +255,7 @@ const Register = () => {
           <>
             <Form.Group className="mb-2" controlId="formRoleSelection">
               <Form.Label>Role</Form.Label>
-              <Form.Select onChange={(e) => { setCollegeRole(e.target.value) }} value={collegeRole} aria-label="Default select example">
+              <Form.Select onChange={(e) => { setCollegeRole(e.target.value) }} value={collegeRole ?? ''} aria-label="Default select example">
                 <option defaultValue value="student">
                   Student
                 </option>
@@ -274,7 +268,7 @@ const Register = () => {
               <Col>
                 <Form.Group className="mb-2" controlId="formFirstName">
                   <Form.Label>First Name</Form.Label>
-                  <Form.Control onChange={(e) => { setFirstNameState(e.target.value) }} value={firstNameState} required type="text" placeholder="Enter First Name" />
+                  <Form.Control onChange={(e) => { setFirstNameState(e.target.value) }} value={firstNameState ?? ''} required type="text" placeholder="Enter First Name" />
                 </Form.Group>
               </Col>
 
@@ -282,18 +276,18 @@ const Register = () => {
                 {/* Last name */}
                 <Form.Group className="mb-2" controlId="formLastName">
                   <Form.Label>Last Name</Form.Label>
-                  <Form.Control onChange={(e) => { setLastNameState(e.target.value) }} value={lastNameState} required type="text" placeholder="Enter Last Name" />
+                  <Form.Control onChange={(e) => { setLastNameState(e.target.value) }} value={lastNameState ?? ''} required type="text" placeholder="Enter Last Name" />
                 </Form.Group>
               </Col>
             </Row>
             <Form.Group className="mb-2" controlId="formEmail">
               <Form.Label>Email address</Form.Label>
-              <Form.Control onChange={(e) => { setEmailState(e.target.value) }} value={emailState} required type="email" autoComplete="username" placeholder="Enter email" />
+              <Form.Control onChange={(e) => { setEmailState(e.target.value) }} value={emailState ?? ''} required type="email" autoComplete="username" placeholder="Enter email" />
             </Form.Group>
 
             <Form.Group className="mb-2" controlId="formPassword">
               <Form.Label>Password</Form.Label>
-              <Form.Control onChange={(e) => { setPasswordState(e.target.value) }} value={passwordState} required type="password" autoComplete="current-password" placeholder="Enter Password" />
+              <Form.Control onChange={(e) => { setPasswordState(e.target.value) }} value={passwordState ?? ''} required type="password" autoComplete="current-password" placeholder="Enter Password" />
             </Form.Group>
 
             {/* Branch */}
@@ -301,13 +295,13 @@ const Register = () => {
               <Col>
                 <Form.Group className="mb-2" controlId="formBranchSelection">
                   <Form.Label>Branch</Form.Label>
-                  <Form.Select onChange={async (e) => { await setBranchState(e.target.value); await fetchSectionData(e.target.value, yearState); }} value={branchState} aria-label="Default select example">
+                  <Form.Select onChange={async (e) => { await setBranchState(e.target.value); await fetchSectionData(e.target.value, yearState); }} value={branchState ?? ''} aria-label="Default select example">
                     <option defaultValue value=''>
                       Choose branch
                     </option>
                     {(branchList != null) &&
                       branchList.map((branch, index) => (
-                        <option value={branch.name}>{branch.name.toUpperCase()}</option>
+                        <option key={index} value={branch?.name ?? ''}>{branch.name.toUpperCase()}</option>
                       ))
                     }
                   </Form.Select>
@@ -317,7 +311,7 @@ const Register = () => {
               <Col>
                 {(collegeRole === "student") && <Form.Group className="mb-2" controlId="formYearSelection">
                   <Form.Label>Year</Form.Label>
-                  <Form.Select onChange={async (e) => { await setYearsState(e.target.value); await fetchSectionData(branchState, e.target.value) }} value={yearState}>
+                  <Form.Select onChange={async (e) => { await setYearsState(e.target.value); await fetchSectionData(branchState, e.target.value) }} value={yearState ?? ''}>
                     <option defaultValue value=''>
                       Choose year
                     </option>
@@ -344,11 +338,11 @@ const Register = () => {
               {(yearState == null) && <h6 className="text-muted mb-4">Year not selected!</h6>}
               {(branchState != null && yearState != null) && (sectionsAvailable.length == 0) && <h6 className="text-muted mb-4">No Sections available for registeration in selected branch and year!</h6>}
 
-              <Form.Select style={{ display: ((sectionsAvailable.length != 0) ? '' : 'none') }} onChange={(e) => { setSectionState(e.target.value) }} value={sectionState} aria-label="Default select example">
+              <Form.Select style={{ display: ((sectionsAvailable.length != 0) ? '' : 'none') }} onChange={(e) => { setSectionState(e.target.value) }} value={sectionState ?? ''} aria-label="Default select example">
                 <option defaultValue value=''>
                   Choose section
                 </option>
-                {sectionsAvailable.length != 0 && (sectionsAvailable.map(item => <option defaultValue value={item._id}>
+                {sectionsAvailable.length != 0 && (sectionsAvailable.map((item,index) => <option key={index} defaultValue value={item._id ?? ''}>
                   {item.sectionName}
                 </option>))}
 
@@ -359,13 +353,13 @@ const Register = () => {
 
                 {(collegeRole === "student") && <Form.Group className="mb-2" controlId="formUniversityRollNumber">
                   <Form.Label>University Roll Number</Form.Label>
-                  <Form.Control onChange={(e) => { setUniversityRollNumberState(e.target.value) }} value={universityRollNumberState} required type="text" placeholder="Enter University Roll Number" />
+                  <Form.Control onChange={(e) => { setUniversityRollNumberState(e.target.value) }} value={universityRollNumberState ?? ''} required type="text" placeholder="Enter University Roll Number" />
                 </Form.Group>}
               </Col>
               <Col>
                 {(collegeRole === "student") && <Form.Group className="mb-2" controlId="formAdmissionNumber">
                   <Form.Label>Admission Number</Form.Label>
-                  <Form.Control onChange={(e) => { setAdmissionNumberState(e.target.value) }} value={admissionNumberState} required type="text" placeholder="Enter Admission Number" />
+                  <Form.Control onChange={(e) => { setAdmissionNumberState(e.target.value) }} value={admissionNumberState ?? ''} required type="text" placeholder="Enter Admission Number" />
                 </Form.Group>}
                 {/* Link for College ID */}
               </Col>
@@ -421,7 +415,7 @@ const Register = () => {
               <div className="mt-2 mb-4">
                 {
                   (uploadedUserImages != []) && uploadedUserImages.map((img, index) => (
-                    <div style={{ display: "inline-block", height: '150px', marginRight: '10px', position: 'relative' }}>
+                    <div key={index} style={{ display: "inline-block", height: '150px', marginRight: '10px', position: 'relative' }}>
                       <FaTimesCircle className="deleteImgBtn" onClick={(e) => removeThisImg(img)} />
                       <Image thumbnail style={{ height: '100%' }} src={img} alt="User" />
                     </div>
