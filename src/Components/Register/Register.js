@@ -380,7 +380,7 @@ const Register = () => {
                 }}
               </CloudinaryIdCardWidget>
               {
-                (collegeId !== null) && (
+                (collegeId != null) && (
                   <div style={{ display: "inline-block", height: '150px', marginRight: '10px', position: 'relative' }}>
                     <Image thumbnail style={{ height: '100%' }} src={collegeId} alt="User" />
                   </div>
