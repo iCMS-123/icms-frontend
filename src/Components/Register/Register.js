@@ -428,7 +428,7 @@ const Register = () => {
 
         {/* show modal on first click */}
         {(collegeRole === "teacher" || ((collegeRole === "student") && pageNumber == 1)) &&
-          <Button className="reg-btn" variant="primary" type="submit">
+          <Button disabled={(uploadedUserImages?.length<3)} className="reg-btn" variant="primary" type="submit">
             Register
           </Button>
         }
