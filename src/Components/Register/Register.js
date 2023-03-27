@@ -89,9 +89,9 @@ const Register = () => {
     if(pageNumber===0){
       let nextBtn = document.querySelector(".next-btn");
       if(res){
-        nextBtn.classList.add("btn-success");
+        nextBtn?.classList.add("btn-success");
       }else{
-        nextBtn.classList.remove("btn-success");
+        nextBtn?.classList.remove("btn-success");
       }
       setCanGoNext(res);    
     }
