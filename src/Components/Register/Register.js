@@ -43,7 +43,8 @@ const Register = () => {
   const [uploadedUserImages, setUploadedUserImages] = useState([]);
 
   const [branchList, setBranchList] = useState(null);
-
+// to enable and disable next button
+  const [canGoNext, setCanGoNext] = useState(false)
   useEffect(() => {
     const getBranchList = async () => {
       try {
@@ -63,7 +64,44 @@ const Register = () => {
 
     getBranchList();
 
+
+    // adding event listener to the document.
+    document.addEventListener("keyup",(e)=>{
+
+    })
+
   }, []);
+
+  useEffect(()=>{
+    let res = false;
+    // email validation
+    let emailRes = emailState!==null && emailState!=='' && emailState?.match(/^([\w.%+-]+)@([\w-]+\.)+([\w]{2,})$/i);
+    let passwordRes = passwordState!==null && passwordState!=='';
+    let firstNameRes = firstNameState!==null && firstNameState!=='';
+    let lastNameRes = lastNameState!==null && lastNameState!=='';    
+    let branchStateRes = branchState!==null && branchState!=='';
+    let yearStateRes = yearState!==null && yearState!=='';
+    let admissionNumberStateRes = admissionNumberState!==null && admissionNumberState!=='';
+    let universityRollNumberStateRes = universityRollNumberState!==null && universityRollNumberState!=='';
+    let sectionStateRes = sectionState!==null && sectionState!=='';
+    let collegeIdRes =  collegeId!==null && collegeId!=='';
+    res = emailRes && passwordRes && firstNameRes && lastNameRes && branchStateRes && yearStateRes && admissionNumberStateRes && universityRollNumberStateRes && sectionStateRes && collegeIdRes;
+    // console.log("emailRes",emailRes);
+    // console.log("passwordRes",passwordRes);
+    // console.log("firstNameRes",firstNameRes);
+    // console.log("lastNameRes",lastNameRes);
+    // console.log("branchStateRes",branchStateRes);
+    // console.log("yearStateRes",yearStateRes);
+    // console.log("admissionNumberStateRes",admissionNumberStateRes);
+    // console.log("universityRollNumberStateRes",universityRollNumberStateRes);
+    // console.log("sectionStateRes",sectionStateRes);
+    console.log("collegeId", collegeId);
+    console.log("collegeIdRes",collegeIdRes); 
+    console.log("res",res);
+    if(pageNumber===0){
+      setCanGoNext(res);    
+    }
+}, [firstNameState,lastNameState,emailState,passwordState,branchState,yearState,sectionState,universityRollNumberState,collegeId,admissionNumberState])
 
   async function handleOnUpload(error, result, widget) {
     if (error) {
@@ -348,7 +386,7 @@ const Register = () => {
                 }}
               </CloudinaryIdCardWidget>
               {
-                (collegeId != null) && (
+                (collegeId !== null) && (
                   <div style={{ display: "inline-block", height: '150px', marginRight: '10px', position: 'relative' }}>
                     <Image thumbnail style={{ height: '100%' }} src={collegeId} alt="User" />
                   </div>
@@ -401,7 +439,7 @@ const Register = () => {
           </Button>
         }
         {(collegeRole === "student") && (pageNumber == 0) &&
-          <Button className="next-btn" variant="secondary" onClick={(e) => setPageNumber(1)}>
+          <Button disabled={!canGoNext} className="next-btn" variant="secondary" onClick={(e) => setPageNumber(1)}>
             Next
           </Button>
         }
