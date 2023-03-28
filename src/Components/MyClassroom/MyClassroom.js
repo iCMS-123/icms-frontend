@@ -22,7 +22,7 @@ const MyClassroom = () => {
   const [studentsList, setStudentsList] = useState(null);
   const [verifiedStudentsList, setVerifiedStudentsList] = useState(null);
   const [unverifiedStudentsList, setUnverifiedStudentsList] = useState(null);
-  const [studentsListCopy, setStudentsListCopy] = useState(null);
+  const [studentsListCopy, setStudentsListCopy] = useState([]);
   const [filterSelected, setFilterSelected] = useState('');
 
   //For student details modal
@@ -83,7 +83,7 @@ const MyClassroom = () => {
     if (myStudentsList.length)
       setStudentsListCopy(myStudentsList);
     else
-      setStudentsListCopy(null);
+      setStudentsListCopy([]);
   }
 
   async function getStudentDetailsAndShowInModal(idx) {
@@ -100,11 +100,34 @@ const MyClassroom = () => {
     try {
         const { data } = await axios.put(`http://localhost:8002/api/v1/section/verify-section-student/${student_id}`);
         if (data && data.success) {
-            console.log(data, "verified student response");
+            console.log(data.data, "verified student response");
             setSuccess(true);
             setSuccessMessage("Student verified successfully!");
             setStudentDetailsModalShow(false); 
-            // update student list here ////
+
+            // update student list here 
+            let updatedList = unverifiedStudentsList.filter((item) => {
+              return item._id != student_id;
+            });
+
+            setUnverifiedStudentsList(updatedList)
+            setVerifiedStudentsList([...verifiedStudentsList, data.data]);
+
+            let tempList = studentsList.filter((item) => {
+              return item._id != student_id;
+            });
+            setStudentsList([...tempList, data.data]);
+
+            if (filterSelected == "verified") {
+              setStudentsListCopy([...verifiedStudentsList, data.data]);
+            }
+            else if (filterSelected == "unverified") {
+              setStudentsListCopy(updatedList);
+            }
+            else {
+              setStudentsListCopy([...tempList, data.data]);
+            }
+
             setTimeout(() => setSuccess(false), 3000);
         }
     } catch (e) {
@@ -149,14 +172,14 @@ const MyClassroom = () => {
 
           <Row>
             <Col xs={9}>
-              {(studentsListCopy == null) && <p className='mt-3' style={{ display: 'inline-block' }}>Currently there are no such registered students.</p>}
+              {(studentsListCopy == []) && <p className='mt-3' style={{ display: 'inline-block' }}>Currently there are no such registered students.</p>}
               {loadingForFilter ? (
                 <Loader1></Loader1>
               ) : ('')}
 
               <Row xs={1} md={2} className="g-4" id={styles.studentsDiv}>
 
-                {(studentsListCopy != null) &&
+                {(studentsListCopy != []) &&
 
                   studentsListCopy.map((student, index) => (
                     <Col>
