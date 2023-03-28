@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useRef } from "react";
 import axios from 'axios';
-import { Button, Form, Modal, Row, Col, Image } from "react-bootstrap";
+import { Button, Form, Modal, Row, Col, Image, Alert } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import useDocumentTitle from "../../Hooks/useDocumentTitle";
 import ICMSTitle from "../ICMSTitle/ICMSTitle";
@@ -427,6 +427,13 @@ const Register = () => {
         }
 
         {/* show modal on first click */}
+        
+        {((collegeRole === "student") && pageNumber == 1 && uploadedUserImages?.length<3) &&
+          <Alert variant='warning' >
+              Upload atleast 3 images!
+          </Alert>
+        }
+        
         {(collegeRole === "teacher" || ((collegeRole === "student") && pageNumber == 1)) &&
           <Button disabled={(uploadedUserImages?.length<3)} className="reg-btn" variant="primary" type="submit">
             Register
