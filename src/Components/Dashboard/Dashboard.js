@@ -85,7 +85,7 @@ const Dashboard = () => {
             <Navbar.Toggle aria-controls="basic-navbar-nav" />
             <Navbar.Collapse id="basic-navbar-nav">
               <Nav className="me-auto">
-                <Nav.Link as={NavLink} style={navLinkStyles} to="./harshit">Hello</Nav.Link>
+                <Nav.Link className="invisible" as={NavLink} style={navLinkStyles} to="./harshit">Hello</Nav.Link>
                 <Nav.Link onClick={handleLogout} className="btn btn-danger me-3" as={NavLink} style={{ textDecoration: 'none', color: 'white', float: 'right', position: 'absolute', right: '0px' }} to="../login">Logout</Nav.Link>
                 {/* <Nav.Link><NavLink to="heysujal" >Sujal</NavLink></Nav.Link> */}
                 {/* <Nav.Link><Link to="attendence">Attendence</Link></Nav.Link> */}

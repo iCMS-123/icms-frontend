@@ -2,9 +2,11 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { Button, Form, Modal, Card, Image, Col, Row, InputGroup, Badge } from 'react-bootstrap'
 import { FaSearch, FaUserCheck, FaUserTimes, FaAsterisk } from 'react-icons/fa';
+import CloudinaryMarkAttendanceWidget from "../CloudinaryWidget/CloudinaryMarkAttendanceWidget";
 import Loader1 from "../Loader/Loader-1/index";
 import Message from "../Message/index";
 import styles from './styles.module.css'
+import { FaTimesCircle } from "react-icons/fa"
 
 const MyClassroom = () => {
   const [sectionData, setSectionData] = useState(null);
@@ -29,6 +31,7 @@ const MyClassroom = () => {
   const [studentDetailsModalShow, setStudentDetailsModalShow] = useState(false);
   const [studentDetailsForModal, setStudentDetailsForModal] = useState(false);
   const [loadingForFilter, setLoadingForFilter] = useState(false);
+  const [uploadedGroupPhotos, setUploadedGroupPhotos] = useState([]);
 
   useEffect(() => {
     const getClassroomData = async () => {
@@ -142,6 +145,35 @@ const MyClassroom = () => {
     console.log(student_id, 'student_id for termination');
   }
 
+  async function handleOnGroupPhotoUpload(error, result, widget) {
+
+    if (error) {  
+      seterror(error);
+      setTimeout(() => seterror(null), 3000);
+      console.log(error, "img upload error");
+      widget.close({
+        quiet: true
+      });
+      return;
+    }
+    console.log(result?.info?.secure_url, "img url");
+    let currUrl = await result?.info?.secure_url;
+    await setUploadedGroupPhotos(uploadedGroupPhotos => [...uploadedGroupPhotos, currUrl]);  
+    // setShowMarkButton(true);
+    setSuccess(true);
+    setSuccessMessage("Your images uploaded successfully!");
+    setTimeout(() => setSuccess(false), 5000);
+  }
+  function removeThisImg(url) {
+    console.log("remove triggered");
+    let uploadedImgCopy = uploadedGroupPhotos.filter(img => img != url);
+    setUploadedGroupPhotos(uploadedImgCopy);
+  }
+  async function handleMarkAttendance(){
+    // logic to mark attendance
+    // a post request to backend with the list of uploaded images
+    console.log("Marking Attendance")
+  }
 
   return (
     <div>
@@ -149,6 +181,62 @@ const MyClassroom = () => {
       {success && (
         <Message variant={"success"}>{successMessage}</Message>
       )}
+      <section className="take-attendance mb-4 text-center">
+        <div>
+          <h4 className="fw-bold">Mark Attendance with a Class Group Photo!</h4> 
+          
+                
+          {/* uploaded photos preview here */}
+              <div className="mt-2 mb-4">
+                {
+                   
+                  (uploadedGroupPhotos != []) && uploadedGroupPhotos?.map((img, index) => (
+                    <div key={index} style={{ display: "inline-block", height: '150px', marginRight: '10px', position: 'relative' }}>
+                      <FaTimesCircle className="deleteImgBtn" onClick={(e) => removeThisImg(img)} />
+                      <Image thumbnail style={{ height: '100%' }} src={img} alt="User" />
+                    </div>
+                  ))
+                }
+            </div>
+             
+        
+          <div >
+          <CloudinaryMarkAttendanceWidget onUpload={handleOnGroupPhotoUpload} multipleAllowed={true}>
+                {({ open }) => {
+                  function handleOnClick(e) {
+                    e.preventDefault();
+                    open();
+                  }
+                  return (
+                    <>
+                    
+                      <div className="upload-mark-btn-container">
+                      {uploadedGroupPhotos?.length != 0 && <div className="mark-attendance-btn">
+                    <button  id="mark-btn" onClick={handleMarkAttendance} className="btn btn-lg btn-success mb-2">Click to Mark Attendance</button>            
+                    <p>It's quick, easy, and accurate!</p>  
+
+                     <h4 className="fw-bolder mb-3">OR</h4>            
+                    </div>}
+                      <div className="upload-group-photo-btn">
+                    <button  id="upload-btn" onClick={handleOnClick} className="btn btn-lg btn-success mb-2">Upload {uploadedGroupPhotos?.length !== 0 && <span>More</span>} Photos</button>            
+                    <p>The more the photos, the better the accuracy!</p>
+                     
+                    </div>
+                    
+                    </div>
+                    
+                    </>
+
+                  )
+                }}
+                
+              </CloudinaryMarkAttendanceWidget>
+              
+          </div>
+        </div>
+
+        
+      </section>
       <section className="student-count">
         {(sectionData != null) && <>
           <h5>
@@ -181,8 +269,8 @@ const MyClassroom = () => {
 
                 {(studentsListCopy != []) &&
 
-                  studentsListCopy.map((student, index) => (
-                    <Col>
+                  studentsListCopy?.map((student, index) => (
+                    <Col key={index}>
                       <Card>
                         <Card.Body>
                           <div style={{ display: 'flex', }}>
