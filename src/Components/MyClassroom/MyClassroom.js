@@ -211,7 +211,7 @@ const MyClassroom = () => {
                     <>
                     
                       <div className="upload-mark-btn-container">
-                      {uploadedGroupPhotos?.length != 0 && <div className="mark-attendance-btn">
+                      {uploadedGroupPhotos?.length !== 0 && <div className="mark-attendance-btn">
                     <button  id="mark-btn" onClick={handleMarkAttendance} className="btn btn-lg btn-success mb-2">Click to Mark Attendance</button>            
                     <p>It's quick, easy, and accurate!</p>  
 
