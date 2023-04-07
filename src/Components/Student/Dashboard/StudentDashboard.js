@@ -5,17 +5,20 @@ import { Container, Nav, Navbar } from "react-bootstrap";
 import StudentBasic from "../Basic/StudentBasic";
 import StudentProfile from "../Profile/StudentProfile";
 import "./studentDashboard.css";
+import Support from "../Support/Support";
+import { useState } from "react";
 const navLinkStyles = {
   textDecoration: 'none',
   color:'white'
 }
 
 const StudentDashboard = () => {
+  const [navTitle, setNavTitle] = useState("Dashboard");
+
   const navigate = useNavigate();
   useDocumentTitle("Dashboard");
   const icmsUserInfo =  JSON.parse(localStorage.getItem("icmsUserInfo"));
-  console.log(icmsUserInfo);
-  
+  // console.log(icmsUserInfo);
   const handleLogout = (event)=> {
     event.preventDefault();
     localStorage.removeItem("icmsUserInfo");
@@ -35,13 +38,17 @@ const StudentDashboard = () => {
 
         <Sidebar className="dashboard-sidebar">
           <Menu className="dashboard-menu">
-            <MenuItem className="menuitem" component={<Link to="" />}>
+            <MenuItem className="menuitem" onClick={() => setNavTitle("Dashboard")} component={<Link to="" />}>
               {" "}
               Dashboard
             </MenuItem>
-            <MenuItem className="menuitem" component={<Link to="profile" />}>
+            <MenuItem className="menuitem" onClick={() => setNavTitle("Profile")} component={<Link to="profile" />}>
               {" "}
               Profile
+            </MenuItem>
+            <MenuItem className="menuitem" onClick={() => setNavTitle("Support")} component={<Link to="support" />}>
+              {" "}
+              Support
             </MenuItem>
           </Menu>
         </Sidebar>
@@ -53,20 +60,15 @@ const StudentDashboard = () => {
         <Navbar className="common-navbar" expand="lg">
           <Container className="common-navbar-container">
             <Navbar.Brand as={NavLink} to="./">
-              React
+            {navTitle}
             </Navbar.Brand>
             <Navbar.Toggle aria-controls="basic-navbar-nav" />
             <Navbar.Collapse id="basic-navbar-nav">
               <Nav className="me-auto">
-                <Nav.Link as={NavLink} style={navLinkStyles} to="./heysujal">
+                <Nav.Link className="invisible" as={NavLink} style={navLinkStyles} to="./heysujal">
                   Hello
                 </Nav.Link>
-                <Nav.Link as={NavLink} style={navLinkStyles} to="./aman">
-                  Hello
-                </Nav.Link>
-                <Nav.Link as={NavLink} style={navLinkStyles} to="./harshit">
-                  Hello
-                </Nav.Link>
+               
                 <Nav.Link
                   onClick={handleLogout}
                   className="btn btn-danger me-3"
@@ -92,6 +94,7 @@ const StudentDashboard = () => {
   <Route>
     <Route index element={<StudentBasic/>} />
     <Route path="/profile" element={<StudentProfile />} />
+    <Route path="/support" element={<Support />} />
     <Route path="*" element={<Navigate to = '/notfound' /> } />
   </Route>
 </Routes>
