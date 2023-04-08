@@ -6,7 +6,6 @@ import { useNavigate } from "react-router-dom";
 import useDocumentTitle from "../../../Hooks/useDocumentTitle";
 import "./StudentProfile.css"
 import CloudinaryUploadWidget from "../../CloudinaryWidget/CloudinaryUploadWidget";
-import { FaTimesCircle } from "react-icons/fa"
 import Message from "../../Message/index";
 
 function StudentProfile() {
@@ -140,7 +139,7 @@ function StudentProfile() {
       }
       // console.log(updatedDetails)
       try {
-        const response = await axios.put("http://localhost:8002/api/v1/teacher/update", updatedDetails);
+        const response = await axios.put("http://localhost:8002/api/v1/student/update-student", updatedDetails);
         console.log(response);
         localStorage.setItem("icmsUserInfo", JSON.stringify(response.data));
         if (response.data.success) {
