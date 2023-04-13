@@ -1,36 +1,55 @@
 import React from 'react'
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { Button, Form } from "react-bootstrap"
 import "./Support.css"
 import axios from "axios";
+import Message from "../../Message";
 
 const Support = () => {
     let icmsLocalStorageData = JSON.parse(localStorage.getItem("icmsUserInfo"));
-    console.log(icmsLocalStorageData);
+    // A check for fault here if student profile is updated
     let userData = icmsLocalStorageData.data;
-    console.log(userData);
+    // console.log(userData);
     let userID = userData.user._id;
-    console.log(userID);
+    // state variables
+    const [success, setSuccess] = useState(false);
+    const [successMessage, setSuccessMessage] = useState(false);
+
+    const formRef = useRef(null);
     const issueTitleRef = useRef(null);
     const issueTypeRef = useRef(null);
     const priorityRef = useRef(null);
     const issueDescriptionRef = useRef(null);
+    
     const handleSubmit = async (event) => {
         event.preventDefault();
-        const { data } = await axios.post("http://localhost:8080/api/v1/student/support", {
+        try{
+            const { data } = await axios.post("http://localhost:8002/api/v1/student/support", {
+            issueTitle: issueTitleRef["current"]?.value,
             studentId: userID,
             issueMsg: issueDescriptionRef["current"]?.value,
             typeOfIssue: issueTypeRef["current"]?.value,
             priority: priorityRef["current"]?.value
         })
+        // console.log(data.data);
+        formRef.current.reset();
+        setSuccess(true);
+        setSuccessMessage("Ticket created successfully !");
+        setTimeout(() => setSuccess(false), 3000);
 
-        console.log(data);
+        }catch(err){
+            console.log(err);
+        }
+        
 
     }
     return (
         <div>
            <section className="ticker-form-container">
-                <Form id="support-form" onSubmit={handleSubmit}>
+           {success && (
+        <Message variant={"success"}>{successMessage}</Message>
+      )}
+                <Form ref={formRef} id="support-form" onSubmit={handleSubmit}>
                 <h3>Create a ticket</h3>
                 <Form.Group className="mb-2" controlId="formIssueTitle">
                 <Form.Label>Enter title of Issue</Form.Label>
