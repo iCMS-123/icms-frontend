@@ -5,7 +5,7 @@ import { FaSearch, FaUserCheck, FaUserTimes, FaAsterisk } from 'react-icons/fa';
 import CloudinaryMarkAttendanceWidget from "../CloudinaryWidget/CloudinaryMarkAttendanceWidget";
 import Loader1 from "../Loader/Loader-1/index";
 import Message from "../Message/index";
-import styles from './styles.module.css'
+import styles from './styles.css'
 import { FaTimesCircle } from "react-icons/fa"
 
 const MyClassroom = () => {
@@ -18,7 +18,7 @@ const MyClassroom = () => {
   const [successMessage, setSuccessMessage] = useState(false);
 
   const currUser = JSON.parse(localStorage.getItem("icmsUserInfo")).data._id;
-  console.log(currUser);
+  // console.log(currUser);
 
   // For students list
   const [studentsList, setStudentsList] = useState(null);
@@ -26,12 +26,25 @@ const MyClassroom = () => {
   const [unverifiedStudentsList, setUnverifiedStudentsList] = useState(null);
   const [studentsListCopy, setStudentsListCopy] = useState([]);
   const [filterSelected, setFilterSelected] = useState('');
-
+  const [issuesData, setIssuesData] = useState([]); // for issues data
   //For student details modal
   const [studentDetailsModalShow, setStudentDetailsModalShow] = useState(false);
   const [studentDetailsForModal, setStudentDetailsForModal] = useState(false);
   const [loadingForFilter, setLoadingForFilter] = useState(false);
   const [uploadedGroupPhotos, setUploadedGroupPhotos] = useState([]);
+  // For issue Modal
+  const [showIssueModal, setShowIssueModal] = useState(false);
+  const [issueModalData, setIssueModalData] = useState({});
+  const handleIssueModalClose = () => setShowIssueModal(false);
+  const handleIssueModalShow = () => setShowIssueModal(true);
+
+  function handleIssueModal(studentID) {
+     const target = issuesData.find((obj)=>{
+      return obj._id == studentID;
+    })
+    setIssueModalData(target);
+    handleIssueModalShow(true);
+  }
 
   useEffect(() => {
     const getClassroomData = async () => {
@@ -44,8 +57,8 @@ const MyClassroom = () => {
           setStudentsListCopy(data.data.sectionStudents);
           setVerifiedStudentsList(data.data.verifiedStudents);
           setUnverifiedStudentsList(data.data.unverifiedStudents);
-
-          console.log(data, "Classroom Data");
+          setIssuesData(data.data.sectionIssues); // for issues data
+          // console.log(data, "Classroom Data");
         }
       } catch (e) {
         console.log(e, "e");
@@ -101,44 +114,44 @@ const MyClassroom = () => {
     console.log(student_id, 'student_id for verification');
 
     try {
-        const { data } = await axios.put(`http://localhost:8002/api/v1/section/verify-section-student/${student_id}`);
-        if (data && data.success) {
-            console.log(data.data, "verified student response");
-            setSuccess(true);
-            setSuccessMessage("Student verified successfully!");
-            setStudentDetailsModalShow(false); 
+      const { data } = await axios.put(`http://localhost:8002/api/v1/section/verify-section-student/${student_id}`);
+      if (data && data.success) {
+        console.log(data.data, "verified student response");
+        setSuccess(true);
+        setSuccessMessage("Student verified successfully!");
+        setStudentDetailsModalShow(false);
 
-            // update student list here 
-            let updatedList = unverifiedStudentsList.filter((item) => {
-              return item._id != student_id;
-            });
+        // update student list here 
+        let updatedList = unverifiedStudentsList.filter((item) => {
+          return item._id != student_id;
+        });
 
-            setUnverifiedStudentsList(updatedList)
-            setVerifiedStudentsList([...verifiedStudentsList, data.data]);
+        setUnverifiedStudentsList(updatedList)
+        setVerifiedStudentsList([...verifiedStudentsList, data.data]);
 
-            let tempList = studentsList.filter((item) => {
-              return item._id != student_id;
-            });
-            setStudentsList([...tempList, data.data]);
+        let tempList = studentsList.filter((item) => {
+          return item._id != student_id;
+        });
+        setStudentsList([...tempList, data.data]);
 
-            if (filterSelected == "verified") {
-              setStudentsListCopy([...verifiedStudentsList, data.data]);
-            }
-            else if (filterSelected == "unverified") {
-              setStudentsListCopy(updatedList);
-            }
-            else {
-              setStudentsListCopy([...tempList, data.data]);
-            }
-
-            setTimeout(() => setSuccess(false), 3000);
+        if (filterSelected == "verified") {
+          setStudentsListCopy([...verifiedStudentsList, data.data]);
         }
+        else if (filterSelected == "unverified") {
+          setStudentsListCopy(updatedList);
+        }
+        else {
+          setStudentsListCopy([...tempList, data.data]);
+        }
+
+        setTimeout(() => setSuccess(false), 3000);
+      }
     } catch (e) {
-        console.log(e, "e");
-        seterror(e.response.data.msg);
-        setTimeout(() => seterror(null), 3000);
+      console.log(e, "e");
+      seterror(e.response.data.msg);
+      setTimeout(() => seterror(null), 3000);
     }
-}
+  }
 
   async function terminateAccount(student_id) {
     //function to terminate student's account
@@ -147,7 +160,7 @@ const MyClassroom = () => {
 
   async function handleOnGroupPhotoUpload(error, result, widget) {
 
-    if (error) {  
+    if (error) {
       seterror(error);
       setTimeout(() => seterror(null), 3000);
       console.log(error, "img upload error");
@@ -158,7 +171,7 @@ const MyClassroom = () => {
     }
     console.log(result?.info?.secure_url, "img url");
     let currUrl = await result?.info?.secure_url;
-    await setUploadedGroupPhotos(uploadedGroupPhotos => [...uploadedGroupPhotos, currUrl]);  
+    await setUploadedGroupPhotos(uploadedGroupPhotos => [...uploadedGroupPhotos, currUrl]);
     // setShowMarkButton(true);
     setSuccess(true);
     setSuccessMessage("Your images uploaded successfully!");
@@ -169,14 +182,81 @@ const MyClassroom = () => {
     let uploadedImgCopy = uploadedGroupPhotos.filter(img => img != url);
     setUploadedGroupPhotos(uploadedImgCopy);
   }
-  async function handleMarkAttendance(){
+  async function handleMarkAttendance() {
     // logic to mark attendance
     // a post request to backend with the list of uploaded images
     console.log("Marking Attendance")
   }
 
+  function getStudentName(studentID) {
+    console.log(studentID);
+    console.log(verifiedStudentsList, "verifiedStudentsList");
+    for (let i = 0; i < verifiedStudentsList.length; i++) {
+      if (verifiedStudentsList[i]._id == studentID) {
+        return verifiedStudentsList[i].firstName + " " + verifiedStudentsList[i].lastName;
+      }
+    }
+  }
+
   return (
     <div>
+      {/* Issues */}
+      <h4>Active Issues</h4>
+      <section className="active-issues-section">
+        <div className="active-issues-container" >
+
+          {
+            issuesData.map((issue, idx) => {
+
+              return <div key={idx} className="card issue-card">
+                <div className="card-body">
+                <Badge style={{float:'right'}} bg={(issue.priority == 1 && "danger") || (issue.priority == 2 && "primary") || (issue.priority == 3 && "warning")}>{(issue.priority == 1 && "High") || (issue.priority == 2 && "Low") || (issue.priority == 3 && "Medium")}</Badge>
+                  <div className="d-flex justify-content-between mt-3">
+                    <div className="d-flex align-items-center">
+                      <img
+
+                        src="https://res.cloudinary.com/abhistrike/image/upload/v1626953029/avatar-370-456322_wdwimj.png"
+                        alt="profile"
+                        className="rounded-circle"
+                        style={{ width: "60px", height: "60px" }}
+                      />
+                      <div className="ms-3">
+                        <p className="mb-0">  {getStudentName(issue.issueSubmittedByStudent) || 'Full Name'}</p>
+                      </div>
+                    </div>
+                  </div>
+                  <h5 className="card-title"> {issue.issueTitle || 'title to be added'}</h5>
+                  <p className="card-text">
+                    {issue.issueMsg.slice(0,50) + '...'  }   </p>
+                  <a href="#" className="btn btn-primary" onClick={() => { handleIssueModal(issue._id) }}>
+                    View Issue
+                  </a>
+
+
+                </div>
+              </div>
+            })
+          }
+
+        </div>
+
+        {/* View Issue Card Modal*/}
+
+        <Modal show={showIssueModal} onHide={handleIssueModalClose}>
+          <Modal.Header closeButton>
+            <Modal.Title>{issueModalData.issueTitle || 'Title'}</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <h6>Submitted By : {getStudentName(issueModalData.issueSubmittedByStudent)}</h6>
+            <p>Description : {issueModalData.issueMsg || 'Issue Description' }</p>
+            
+            
+            </Modal.Body>
+
+        </Modal>
+      </section>
+
+      {/* Attendance */}
       {error && <Message variant={"danger"} style={{ paddingTop: "15px" }}>{error}</Message>}
       {success && (
         <Message variant={"success"}>{successMessage}</Message>
@@ -203,55 +283,55 @@ const MyClassroom = () => {
           
                 
           {/* uploaded photos preview here */}
-              <div className="mt-2 mb-4">
-                {
-                   
-                  (uploadedGroupPhotos != []) && uploadedGroupPhotos?.map((img, index) => (
-                    <div key={index} style={{ display: "inline-block", height: '150px', marginRight: '10px', position: 'relative' }}>
-                      <FaTimesCircle className="deleteImgBtn" onClick={(e) => removeThisImg(img)} />
-                      <Image thumbnail style={{ height: '100%' }} src={img} alt="User" />
-                    </div>
-                  ))
-                }
-            </div>
-             
-        
+          <div className="mt-2 mb-4">
+            {
+
+              (uploadedGroupPhotos != []) && uploadedGroupPhotos?.map((img, index) => (
+                <div key={index} style={{ display: "inline-block", height: '150px', marginRight: '10px', position: 'relative' }}>
+                  <FaTimesCircle className="deleteImgBtn" onClick={(e) => removeThisImg(img)} />
+                  <Image thumbnail style={{ height: '100%' }} src={img} alt="User" />
+                </div>
+              ))
+            }
+          </div>
+
+
           <div >
-          <CloudinaryMarkAttendanceWidget onUpload={handleOnGroupPhotoUpload} multipleAllowed={true}>
-                {({ open }) => {
-                  function handleOnClick(e) {
-                    e.preventDefault();
-                    open();
-                  }
-                  return (
-                    <>
-                    
-                      <div className="upload-mark-btn-container">
+            <CloudinaryMarkAttendanceWidget onUpload={handleOnGroupPhotoUpload} multipleAllowed={true}>
+              {({ open }) => {
+                function handleOnClick(e) {
+                  e.preventDefault();
+                  open();
+                }
+                return (
+                  <>
+
+                    <div className="upload-mark-btn-container">
                       {uploadedGroupPhotos?.length !== 0 && <div className="mark-attendance-btn">
-                    <button  id="mark-btn" onClick={handleMarkAttendance} className="btn btn-lg btn-success mb-2">Click to Mark Attendance</button>            
-                    <p>It's quick, easy, and accurate!</p>  
+                        <button id="mark-btn" onClick={handleMarkAttendance} className="btn btn-lg btn-success mb-2">Click to Mark Attendance</button>
+                        <p>It's quick, easy, and accurate!</p>
 
-                     <h4 className="fw-bolder mb-3">OR</h4>            
-                    </div>}
+                        <h4 className="fw-bolder mb-3">OR</h4>
+                      </div>}
                       <div className="upload-group-photo-btn">
-                    <button  id="upload-btn" onClick={handleOnClick} className="btn btn-lg btn-success mb-2">Upload {uploadedGroupPhotos?.length !== 0 && <span>More</span>} Photos</button>            
-                    <p>The more the photos, the better the accuracy!</p>
-                     
-                    </div>
-                    
-                    </div>
-                    
-                    </>
+                        <button id="upload-btn" onClick={handleOnClick} className="btn btn-lg btn-success mb-2">Upload {uploadedGroupPhotos?.length !== 0 && <span>More</span>} Photos</button>
+                        <p>The more the photos, the better the accuracy!</p>
 
-                  )
-                }}
-                
-              </CloudinaryMarkAttendanceWidget>
-              
+                      </div>
+
+                    </div>
+
+                  </>
+
+                )
+              }}
+
+            </CloudinaryMarkAttendanceWidget>
+
           </div>
         </div>
 
-        
+
       </section>
 
         {/* second sec starts */}
@@ -314,7 +394,7 @@ const MyClassroom = () => {
                     <div id='left-section' style={{ width: '30%', background: 'linear-gradient(90deg, #1CB5E0 0%, #000851 100%)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
                       <h5>
                         <Badge bg="secondary" style={{ marginBottom: '20px' }}>
-                          {yearMap[studentDetailsForModal.year-1]}
+                          {yearMap[studentDetailsForModal.year - 1]}
                         </Badge>
                       </h5>
                       <Image src={studentDetailsForModal.profileImg} roundedCircle={true} style={{ height: "100px", width: '100px' }} className="mb-3" />
@@ -390,7 +470,7 @@ const MyClassroom = () => {
 
                 </Modal.Body>
                 <Modal.Footer>
-                  { (!studentDetailsForModal.isVerified) &&
+                  {(!studentDetailsForModal.isVerified) &&
                     <Button variant="success" onClick={e => setStudentVerified(studentDetailsForModal._id)}>Verify Account</Button>
                   }
                   <Button variant="dark" onClick={e => terminateAccount(studentDetailsForModal._id)}>Terminate Account</Button>
