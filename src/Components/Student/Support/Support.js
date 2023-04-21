@@ -57,6 +57,8 @@ const Support = () => {
                   ref={issueTitleRef}
                   required
                   type="text"
+                  
+                  placeholder='Enter Title breifly describing the issue'
                 />
               </Form.Group>
                     <Form.Group className="mb-2" controlId="formIssueTypeSelection">
