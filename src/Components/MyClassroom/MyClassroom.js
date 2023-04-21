@@ -181,9 +181,25 @@ const MyClassroom = () => {
       {success && (
         <Message variant={"success"}>{successMessage}</Message>
       )}
+      <section className="student-count">
+        {(sectionData != null) && <>
+          <h5>
+            <strong className="text-muted">
+              {sectionData.sectionName.toUpperCase()}
+            </strong>
+            <Badge bg="success" style={{ float: 'right', margin: '0 10px' }}>
+              {yearMap[sectionData.sectionYear - 1]}
+            </Badge>
+            <Badge bg="dark" style={{ float: 'right', margin: '0 10px' }}>
+              {sectionData.sectionBranchName.toUpperCase() || ""}
+            </Badge>
+          </h5>
+        </>}
+
+
       <section className="take-attendance mb-4 text-center">
         <div>
-          <h4 className="fw-bold">Mark Attendance with a Class Group Photo!</h4> 
+          <h4 className="text-muted">Mark Attendance with a Class Group Photo!</h4> 
           
                 
           {/* uploaded photos preview here */}
@@ -237,21 +253,6 @@ const MyClassroom = () => {
 
         
       </section>
-      <section className="student-count">
-        {(sectionData != null) && <>
-          <h5>
-            <strong className="text-muted">
-              {sectionData.sectionName.toUpperCase()}
-            </strong>
-            <Badge bg="success" style={{ float: 'right', margin: '0 10px' }}>
-              {yearMap[sectionData.sectionYear - 1]}
-            </Badge>
-            <Badge bg="dark" style={{ float: 'right', margin: '0 10px' }}>
-              {sectionData.sectionBranchName.toUpperCase() || ""}
-            </Badge>
-          </h5>
-        </>}
-
 
         {/* second sec starts */}
         <div id={styles.currentStudents}>
