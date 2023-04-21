@@ -5,7 +5,8 @@ import { FaSearch, FaUserCheck, FaUserTimes, FaAsterisk } from 'react-icons/fa';
 import CloudinaryMarkAttendanceWidget from "../CloudinaryWidget/CloudinaryMarkAttendanceWidget";
 import Loader1 from "../Loader/Loader-1/index";
 import Message from "../Message/index";
-import styles from './styles.css'
+import styles from './styles.module.css'
+import './styles.css'
 import { FaTimesCircle } from "react-icons/fa"
 
 const MyClassroom = () => {
@@ -96,7 +97,7 @@ const MyClassroom = () => {
     })
 
     console.log(myStudentsList, "myStudentsList");
-    if (myStudentsList.length)
+    if (myStudentsList?.length)
       setStudentsListCopy(myStudentsList);
     else
       setStudentsListCopy([]);
@@ -191,7 +192,7 @@ const MyClassroom = () => {
   function getStudentName(studentID) {
     console.log(studentID);
     console.log(verifiedStudentsList, "verifiedStudentsList");
-    for (let i = 0; i < verifiedStudentsList.length; i++) {
+    for (let i = 0; i < verifiedStudentsList?.length; i++) {
       if (verifiedStudentsList[i]._id == studentID) {
         return verifiedStudentsList[i].firstName + " " + verifiedStudentsList[i].lastName;
       }
@@ -200,62 +201,7 @@ const MyClassroom = () => {
 
   return (
     <div>
-      {/* Issues */}
-      <h4>Active Issues</h4>
-      <section className="active-issues-section">
-        <div className="active-issues-container" >
-
-          {
-            issuesData.map((issue, idx) => {
-
-              return <div key={idx} className="card issue-card">
-                <div className="card-body">
-                <Badge style={{float:'right'}} bg={(issue.priority == 1 && "danger") || (issue.priority == 2 && "primary") || (issue.priority == 3 && "warning")}>{(issue.priority == 1 && "High") || (issue.priority == 2 && "Low") || (issue.priority == 3 && "Medium")}</Badge>
-                  <div className="d-flex justify-content-between mt-3">
-                    <div className="d-flex align-items-center">
-                      <img
-
-                        src="https://res.cloudinary.com/abhistrike/image/upload/v1626953029/avatar-370-456322_wdwimj.png"
-                        alt="profile"
-                        className="rounded-circle"
-                        style={{ width: "60px", height: "60px" }}
-                      />
-                      <div className="ms-3">
-                        <p className="mb-0">  {getStudentName(issue.issueSubmittedByStudent) || 'Full Name'}</p>
-                      </div>
-                    </div>
-                  </div>
-                  <h5 className="card-title"> {issue.issueTitle || 'title to be added'}</h5>
-                  <p className="card-text">
-                    {issue.issueMsg.slice(0,50) + '...'  }   </p>
-                  <a href="#" className="btn btn-primary" onClick={() => { handleIssueModal(issue._id) }}>
-                    View Issue
-                  </a>
-
-
-                </div>
-              </div>
-            })
-          }
-
-        </div>
-
-        {/* View Issue Card Modal*/}
-
-        <Modal show={showIssueModal} onHide={handleIssueModalClose}>
-          <Modal.Header closeButton>
-            <Modal.Title>{issueModalData.issueTitle || 'Title'}</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <h6>Submitted By : {getStudentName(issueModalData.issueSubmittedByStudent)}</h6>
-            <p>Description : {issueModalData.issueMsg || 'Issue Description' }</p>
-            
-            
-            </Modal.Body>
-
-        </Modal>
-      </section>
-
+      
       {/* Attendance */}
       {error && <Message variant={"danger"} style={{ paddingTop: "15px" }}>{error}</Message>}
       {success && (
@@ -275,7 +221,7 @@ const MyClassroom = () => {
             </Badge>
           </h5>
         </>}
-
+</section>
 
       <section className="take-attendance mb-4 text-center">
         <div>
@@ -334,8 +280,65 @@ const MyClassroom = () => {
 
       </section>
 
+      {/* Issues */}
+      <h4>Active Issues</h4>
+      <section className="active-issues-section">
+        <div className="active-issues-container" >
+
+          {
+            issuesData.map((issue, idx) => {
+
+              return <div key={idx} className="card issue-card">
+                <div className="card-body">
+                <Badge style={{float:'right'}} bg={(issue.priority == 1 && "danger") || (issue.priority == 2 && "primary") || (issue.priority == 3 && "warning")}>{(issue.priority == 1 && "High") || (issue.priority == 2 && "Low") || (issue.priority == 3 && "Medium")}</Badge>
+                  <div className="d-flex justify-content-between mt-3">
+                    <div className="d-flex align-items-center">
+                      <img
+
+                        src="https://res.cloudinary.com/abhistrike/image/upload/v1626953029/avatar-370-456322_wdwimj.png"
+                        alt="profile"
+                        className="rounded-circle"
+                        style={{ width: "60px", height: "60px" }}
+                      />
+                      <div className="ms-3">
+                        <p className="mb-0">  {getStudentName(issue.issueSubmittedByStudent) || 'Full Name'}</p>
+                      </div>
+                    </div>
+                  </div>
+                  <h5 className="card-title"> {issue.issueTitle || 'title to be added'}</h5>
+                  <p className="card-text">
+                    {issue.issueMsg.slice(0,50) + '...'  }   </p>
+                  <a href="#" className="btn btn-primary" onClick={() => { handleIssueModal(issue._id) }}>
+                    View Issue
+                  </a>
+
+
+                </div>
+              </div>
+            })
+          }
+
+        </div>
+
+        {/* View Issue Card Modal*/}
+
+        <Modal show={showIssueModal} onHide={handleIssueModalClose}>
+          <Modal.Header closeButton>
+            <Modal.Title>{issueModalData.issueTitle || 'Title'}</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <h6>Submitted By : {getStudentName(issueModalData.issueSubmittedByStudent)}</h6>
+            <p>Description : {issueModalData.issueMsg || 'Issue Description' }</p>
+            
+            
+            </Modal.Body>
+
+        </Modal>
+      </section>
+
+
         {/* second sec starts */}
-        <div id={styles.currentStudents}>
+        <div id={styles.currentStudents} className="pb-5 mb-5">
           {/* branch fetch logic will come here */}
           <h5 className="mb-2 mt-3">Students Enrolled</h5>
 
@@ -524,7 +527,6 @@ const MyClassroom = () => {
         {/* students list ends */}
 
 
-      </section>
     </div>
   );
 };

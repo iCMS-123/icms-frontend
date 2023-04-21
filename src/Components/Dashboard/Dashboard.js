@@ -9,7 +9,7 @@ import Profile from "../Profile/Profile";
 import "./Dashboard.css";
 import { Basic } from "./Basic";
 import MyClassroom from "../MyClassroom/MyClassroom";
-import Classrooms from "../Classrooms/Classrooms"
+import MyBranch from "../MyBranch/MyBranch"
 import dashboardBgImage from "../../assets/images/dashboard-bg.jpg"
 
 const navLinkStyles = {
@@ -68,7 +68,7 @@ const Dashboard = () => {
             <MenuItem className="menuitem" component={<Link to="" />} onClick={() => setNavTitle("Dashboard")}> Dashboard</MenuItem>
             <MenuItem className="menuitem" component={<Link to="profile" />} onClick={() => setNavTitle("Profile")}> Profile</MenuItem>
             {icmsUserInfo?.data.isSectionHead  && <MenuItem className="menuitem" component={<Link to="MyClassroom" />} onClick={() => setNavTitle("My Classroom")}> My Classroom </MenuItem>}
-            {icmsUserInfo?.data.isHod  && <MenuItem className="menuitem" component={<Link to="classrooms" />} onClick={() => setNavTitle("Classrooms")}> Classrooms</MenuItem>}
+            {icmsUserInfo?.data.isHod  && <MenuItem className="menuitem" component={<Link to="MyBranch" />} onClick={() => setNavTitle("My Branch")}> My Branch</MenuItem>}
           </Menu>
         </Sidebar>
 
@@ -100,7 +100,7 @@ const Dashboard = () => {
           <Route index element={<Basic />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/MyClassroom" element={<MyClassroom />} />
-          <Route path="/classrooms" element={<Classrooms />} />
+          <Route path="/MyBranch" element={<MyBranch />} />
           <Route path="*" element={<Navigate to='/notfound' />} />
         </Routes>
 
