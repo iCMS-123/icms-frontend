@@ -25,7 +25,7 @@ const Support = () => {
         event.preventDefault();
         try{
             const { data } = await axios.post("http://localhost:8002/api/v1/student/support", {
-            issueTitle: issueTitleRef["current"]?.value,
+            title: issueTitleRef["current"]?.value,
             studentId: userID,
             issueMsg: issueDescriptionRef["current"]?.value,
             typeOfIssue: issueTypeRef["current"]?.value,
