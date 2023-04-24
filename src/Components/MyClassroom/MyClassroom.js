@@ -199,6 +199,20 @@ const MyClassroom = () => {
     }
   }
 
+  function handleIssueStatusModal(decision){
+    handleIssueModalClose();
+    if(decision===true){
+      // alert("Resolved!");
+      setSuccess(true);
+      setSuccessMessage("Issue Resolved!");
+      setTimeout(() => setSuccess(false), 5000);
+    }else{
+      // alert("Rejected!");
+      seterror("Issue Rejected!");
+      setTimeout(() => seterror(null), 3000);
+    }
+  }
+
   return (
     <div>
       
@@ -332,8 +346,14 @@ const MyClassroom = () => {
             
             
             </Modal.Body>
+            <Modal.Footer style={{display: 'flex', justifyContent:'space-between'}}>
+          <Button onClick={()=>{handleIssueStatusModal(true)}} variant="success">Resolve</Button>
+          <Button onClick={()=>{handleIssueStatusModal(false)}} variant="danger">Reject</Button>
+        </Modal.Footer>
 
         </Modal>
+
+       
       </section>
 
 
