@@ -5,7 +5,7 @@ const ICMSTitle = () => {
   return (
     <div>
       <Link to="/" className="home-link">
-        <div className="h1 text-center mt-2">
+        <div className="h3 text-center mt-2">
           iCMS - Innovative College Management System
         </div>
       </Link>
