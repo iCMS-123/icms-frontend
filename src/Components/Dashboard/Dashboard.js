@@ -12,6 +12,7 @@ import MyClassroom from "../MyClassroom/MyClassroom";
 import MyBranch from "../MyBranch/MyBranch"
 import Resources from "../Resources/Resources"
 import dashboardBgImage from "../../assets/images/dashboard-bg.jpg"
+import MyTask from "../Teacher/task";
 
 const navLinkStyles = {
   textDecoration: 'none',
@@ -24,7 +25,7 @@ const Dashboard = () => {
   const [navTitle, setNavTitle] = useState("Dashboard");
   const icmsUserInfo = JSON.parse(localStorage.getItem("icmsUserInfo"));
   console.log(icmsUserInfo);
-    
+
 
   const [error, seterror] = useState(null);
   const [success, setSuccess] = useState(false);
@@ -62,15 +63,16 @@ const Dashboard = () => {
       <div className="dashboard-left">
 
         <Sidebar className="dashboard-sidebar">
-        <h3 className="sidebar-header fw-bold mb-0 py-2 text-center">
-          <img src='/images/icms-logo.png' alt='logo' style={{ height: '40px', filter: 'invert(1)' }} />
-        </h3>
+          <h3 className="sidebar-header fw-bold mb-0 py-2 text-center">
+            <img src='/images/icms-logo.png' alt='logo' style={{ height: '40px', filter: 'invert(1)' }} />
+          </h3>
           <Menu className="dashboard-menu"  >
             <MenuItem className="menuitem" component={<Link to="" />} onClick={() => setNavTitle("Dashboard")}> Dashboard</MenuItem>
             <MenuItem className="menuitem" component={<Link to="profile" />} onClick={() => setNavTitle("Profile")}> Profile</MenuItem>
-            {icmsUserInfo?.data.isSectionHead  && <MenuItem className="menuitem" component={<Link to="MyClassroom" />} onClick={() => setNavTitle("My Classroom")}> My Classroom </MenuItem>}
-            {icmsUserInfo?.data.isHod  && <MenuItem className="menuitem" component={<Link to="MyBranch" />} onClick={() => setNavTitle("My Branch")}> My Branch</MenuItem>}
-            {icmsUserInfo?.data.isHod  && <MenuItem className="menuitem" component={<Link to="Resources" />} onClick={() => setNavTitle("Resources")}> Resources</MenuItem>}
+            <MenuItem className="menuitem" component={<Link to="MyTask" />} onClick={() => setNavTitle("MyTask")}> MyTask</MenuItem>
+            {icmsUserInfo?.data.isSectionHead && <MenuItem className="menuitem" component={<Link to="MyClassroom" />} onClick={() => setNavTitle("My Classroom")}> My Classroom </MenuItem>}
+            {icmsUserInfo?.data.isHod && <MenuItem className="menuitem" component={<Link to="MyBranch" />} onClick={() => setNavTitle("My Branch")}> My Branch</MenuItem>}
+            {icmsUserInfo?.data.isHod && <MenuItem className="menuitem" component={<Link to="Resources" />} onClick={() => setNavTitle("Resources")}> Resources</MenuItem>}
           </Menu>
         </Sidebar>
 
@@ -96,19 +98,20 @@ const Dashboard = () => {
           </Container>
         </Navbar>
 
-<div style={{padding: '20px',height:'100%', objectFit:'contain',backgroundRepeat:'repeatX',backgroundPosition:'center', backgroundSize:'cover',backgroundImage: `url(${dashboardBgImage})`}}>
+        <div style={{ padding: '20px', height: '100%', objectFit: 'contain', backgroundRepeat: 'repeatX', backgroundPosition: 'center', backgroundSize: 'cover', backgroundImage: `url(${dashboardBgImage})` }}>
 
-  <Routes >
-          <Route index element={<Basic />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/MyClassroom" element={<MyClassroom />} />
-          <Route path="/MyBranch" element={<MyBranch />} />
-          <Route path="/Resources" element={<Resources />} />
-          <Route path="*" element={<Navigate to='/notfound' />} />
-        </Routes>
+          <Routes >
+            <Route index element={<Basic />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/MyClassroom" element={<MyClassroom />} />
+            <Route path="/MyBranch" element={<MyBranch />} />
+            <Route path="/Resources" element={<Resources />} />
+            <Route path="/MyTask" element={<MyTask />} />
+            <Route path="*" element={<Navigate to='/notfound' />} />
+          </Routes>
 
-</div>
-      
+        </div>
+
 
       </div>
       {/* <main style={{ padding: 10 }}> Hello I am Dashboard</main> */}

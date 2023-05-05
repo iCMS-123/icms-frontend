@@ -1,0 +1,41 @@
+
+/* Flex Box Css */
+.flex{
+    display: flex !important;
+}
+.flex-column{
+    flex-direction: column !important;
+}
+.flex-row{
+    flex-direction: row !important;
+}
+.items-center{
+    align-items: center;
+}
+.content-center{
+    justify-content: center;
+}
+
+
+/* width */
+.w-100{
+    width:100%;
+}
+.w-50{
+    width:50%;
+}
+
+
+/* input fields */
+.input-field-input{
+  padding: 1rem;
+  border-radius: 0.3rem;
+  border:1px solid black;
+}
+.input-field-textarea{
+    padding: 1rem;
+    border-radius: 0.3rem;
+    border:1px solid black;
+  }
+
+
