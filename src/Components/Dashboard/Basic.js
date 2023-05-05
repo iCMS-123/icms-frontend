@@ -2,6 +2,7 @@ import React, {useEffect} from 'react'
 import { useNavigate } from "react-router-dom";
 import { Button, Card } from "react-bootstrap";
 import useDocumentTitle from "../../Hooks/useDocumentTitle";
+import { Link } from "react-router-dom";
  
 
 export const Basic = () => {
@@ -26,12 +27,12 @@ export const Basic = () => {
      <div style = {{  display : 'flex'}} >
     <div className="basic-left" style={{ flex : 1, padding : '0px 10px'}}>
 
-      <Card style={{margin : '010px'}}>
+      <Card style={{margin : '0 10px'}}>
       <Card.Img style={{objectFit:'contain', padding:'5px', width:'200px',margin:'0 auto',height:'175px'}} variant="top" src="https://res.cloudinary.com/abhistrike/image/upload/v1626953029/avatar-370-456322_wdwimj.png" />
       <Card.Body>
-        <Card.Title>Welcome { userData?.firstName || userData?.user.firstName} !</Card.Title>
+        <Card.Title>Welcome back <strong>{ userData?.firstName || userData?.user.firstName}</strong> !</Card.Title>
         <Card.Text>
-          This page can give you a quick overview of your upcoming tasks and classes.
+          Let's quickly catch up with your <Link to="MyBranch" className='text-muted'>active issues</Link> and classes updates. 
         </Card.Text>
          
       </Card.Body>
@@ -101,6 +102,16 @@ export const Basic = () => {
 
 <div className="basic-right"  style={{flex : 2}}>
 
+<Card className='mb-3'>
+
+
+      <Card.Body>
+      <h4>Notifications</h4>
+      
+      <p>You are all caught up! There are currently no new notifications.</p>
+      
+      </Card.Body>
+    </Card>
 <Card>
 
 

@@ -295,13 +295,13 @@ const MyClassroom = () => {
                     <div className="d-flex align-items-center">
                       <img
 
-                        src="https://res.cloudinary.com/abhistrike/image/upload/v1626953029/avatar-370-456322_wdwimj.png"
+                        src={issue.issueSubmittedByStudent?.profileImg || 'https://res.cloudinary.com/abhistrike/image/upload/v1626953029/avatar-370-456322_wdwimj.png'}
                         alt="profile"
                         className="rounded-circle"
                         style={{ width: "60px", height: "60px" }}
                       />
                       <div className="ms-3">
-                        <p className="mb-0">  {getStudentName(issue.issueSubmittedByStudent) || 'Full Name'}</p>
+                        <p className="mb-0">  {issue.issueSubmittedByStudent?.firstName + " " + issue.issueSubmittedByStudent?.lastName || 'Full Name'}</p>
                       </div>
                     </div>
                   </div>
@@ -327,7 +327,7 @@ const MyClassroom = () => {
             <Modal.Title>{issueModalData.issueTitle || 'Title'}</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            <h6>Submitted By : {getStudentName(issueModalData.issueSubmittedByStudent)}</h6>
+            <h6>Submitted By : {issueModalData.issueSubmittedByStudent?.firstName + " " + issueModalData.issueSubmittedByStudent?.lastName || 'Full Name'}</h6>
             <p>Description : {issueModalData.issueMsg || 'Issue Description' }</p>
             
             
