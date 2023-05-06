@@ -1,10 +1,11 @@
 import axios from "axios";
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { Button, Form } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import useDocumentTitle from "../../Hooks/useDocumentTitle";
 import "./Login.css";
 import ICMSTitle from "../ICMSTitle/ICMSTitle";
+import Message from "../Message/index";
 
 const LoginForm = () => {
   useDocumentTitle("Login");
@@ -13,6 +14,11 @@ const LoginForm = () => {
   const emailRef = useRef(null);
   const passwordRef = useRef(null);
   const collegeRoleRef = useRef(null);
+  
+  // For toast
+  const [error, seterror] = useState(null);
+  const [success, setSuccess] = useState(false);
+  const [successMessage, setSuccessMessage] = useState(false);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -29,7 +35,8 @@ const LoginForm = () => {
       console.log('i am here');
       if(data.success===false)
       {
-        alert("Email or Password is wrong");
+        seterror("Email or Password is wrong !");
+        setTimeout(() => seterror(false), 5000);
       }else{
         let icmsUserInfo = JSON.stringify(data);
         if(icmsUserInfo){
@@ -47,10 +54,16 @@ const LoginForm = () => {
       
     } catch (err) {
       console.log(err);
+      seterror(err);
+      setTimeout(() => seterror(false), 5000);
     }
   };
   return (
     <div>
+      {error && <Message variant={"danger"} style={{ paddingTop: "15px" }}>{error}</Message>}
+      {success && (
+        <Message variant={"success"}>{successMessage}</Message>
+      )}
     {/* <ICMSTitle/> */}
     <h3 className="sidebar-header fw-bold mb-0 py-2 mb-4 text-center">
           <Link to={"/"}>
