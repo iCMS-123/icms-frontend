@@ -8,7 +8,7 @@ import ICMSTitle from "../ICMSTitle/ICMSTitle";
 import Message from "../Message/index";
 
 const LoginForm = () => {
-  useDocumentTitle("Login");
+  useDocumentTitle("Login");  
   const navigate = useNavigate();
   // Refs
   const emailRef = useRef(null);

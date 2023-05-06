@@ -201,7 +201,7 @@ const Resources = () => {
                                     ||
                                     ((currentResourceType == 'video') &&
                                             <div style={{ display: "inline-block", height: '150px', marginRight: '10px', position: 'relative' }}>
-                                                <FaTimesCircle className="deleteImgBtn" onClick={(e) => removeThisImg(img)} />
+                                                {/* <FaTimesCircle className="deleteImgBtn" onClick={(e) => removeThisImg(img)} /> */}
                                                 <Image thumbnail style={{ height: '100%' }} src='/images/videoSnip.png' alt="User" />
                                             </div>)
                                 )
