@@ -21,7 +21,7 @@ const MyTask = () => {
             }
             const assignedUserId = icmsUserInfo?.data?._id
             const savedTaskData = await axios.put(`${BASE_URL}/teacher/create-task/${assignedUserId}`, payload)
-            console.log('saved', savedTaskData)
+            console.log('saved', savedTaskData,taskList)
             setTaskList([...taskList, payload])
             titleRef.current.value = ''
             descRef.current.value = ''
@@ -30,7 +30,7 @@ const MyTask = () => {
         catch (err) {
             console.log(err)
         }
-    }, [titleRef, descRef, deadLineRef])
+    }, [titleRef, descRef, deadLineRef,taskList])
     const fetchTaskList = async () => {
         try {
             const { data } = await axios.get(`${BASE_URL}/teacher/fetch-task-list/${userId}`)
