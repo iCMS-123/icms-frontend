@@ -1,49 +1,14 @@
-.welcome-card{
-    width : 98%;
-    height: 200px;
-    margin : 0 auto;
-    margin-top : 10px;
-    background-color: #f8f8fa;
-    
-}
-.welcome-card-body{
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    height: 100%;
-}
-
-.welcome-image img{
-    width: 220px;
-   
-}
-
-.attendance-card, .my-teachers-card{
-    width : 25%;
-    height: fit-content;
-    padding:  10px;
-    margin-top : 10px;
-    background-color: #f8f8fa;
-}
-
-.updates-card{
-    width : 45%;
-    height: fit-content;
-    padding:  10px;
-    margin-top : 10px;
-    background-color: #f8f8fa;
-}
-
-.main-cards-container{
-    display: flex;
-    justify-content: space-around;
-    /* align-items: center; */
-    /* height: 100%; */
-}
-
 
 * {
     transition: all 0.3s ease-out;
+}
+
+.updatesContainer{
+    width : 95%;
+    height: fit-content;
+    padding:  10px;
+    margin : 10px auto;
+    background-color: #f8f8fa;
 }
 
 .gocorner {

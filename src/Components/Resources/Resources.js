@@ -174,7 +174,7 @@ const Resources = () => {
                                         <Image thumbnail style={{ height: '100%' }} src='/images/wordSnip.png' alt="User" />
                                     </div>)
                             ||
-                            ((resource.resourceType == 'image') &&
+                            ((resource.resourceType == 'img') &&
                                     <div key={index} style={{ display: "inline-block", height: '150px', marginRight: '10px', position: 'relative' }}>
                                     <FaTimesCircle className="deleteImgBtn" onClick={(e) => removeThisRes(resource)} />
                                         <Image thumbnail style={{ height: '100%' }} src={resource.resourceLink} alt="User" />
@@ -252,7 +252,7 @@ const Resources = () => {
                                                 <Image thumbnail style={{ height: '100%' }} src='/images/wordSnip.png' alt="User" />
                                             </div>)
                                     ||
-                                    ((currentResourceType == 'image') &&
+                                    ((currentResourceType == 'img') &&
                                             <div style={{ display: "inline-block", height: '150px', marginRight: '10px', position: 'relative' }}>
                                                 <Image thumbnail style={{ height: '100%' }} src={currentResourceUrl} alt="User" />
                                             </div>)

@@ -229,6 +229,8 @@ const Register = () => {
 
     } catch (e) {
       console.log(e);
+      seterror(e.response.data.msg);
+      setTimeout(() => seterror(null), 3000);
     }
   };
 

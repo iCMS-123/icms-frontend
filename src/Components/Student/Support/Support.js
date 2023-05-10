@@ -20,47 +20,47 @@ const Support = () => {
     const issueTypeRef = useRef(null);
     const priorityRef = useRef(null);
     const issueDescriptionRef = useRef(null);
-    
+
     const handleSubmit = async (event) => {
         event.preventDefault();
-        try{
+        try {
             const { data } = await axios.post("http://localhost:8002/api/v1/student/support", {
-            title: issueTitleRef["current"]?.value,
-            studentId: userID,
-            issueMsg: issueDescriptionRef["current"]?.value,
-            typeOfIssue: issueTypeRef["current"]?.value,
-            priority: priorityRef["current"]?.value
-        })
-        // console.log(data.data);
-        formRef.current.reset();
-        setSuccess(true);
-        setSuccessMessage("Ticket created successfully !");
-        setTimeout(() => setSuccess(false), 3000);
+                title: issueTitleRef["current"]?.value,
+                studentId: userID,
+                issueMsg: issueDescriptionRef["current"]?.value,
+                typeOfIssue: issueTypeRef["current"]?.value,
+                priority: priorityRef["current"]?.value
+            })
+            // console.log(data.data);
+            formRef.current.reset();
+            setSuccess(true);
+            setSuccessMessage("Ticket created successfully !");
+            setTimeout(() => setSuccess(false), 3000);
 
-        }catch(err){
+        } catch (err) {
             console.log(err);
         }
-        
+
 
     }
     return (
         <div>
-           <section className="ticker-form-container">
-           {success && (
-        <Message variant={"success"}>{successMessage}</Message>
-      )}
+            <section className="ticker-form-container">
+                {success && (
+                    <Message variant={"success"}>{successMessage}</Message>
+                )}
                 <Form ref={formRef} id="support-form" onSubmit={handleSubmit}>
-                <h3>Create a ticket</h3>
-                <Form.Group className="mb-2" controlId="formIssueTitle">
-                <Form.Label>Enter title of Issue</Form.Label>
-                <Form.Control
-                  ref={issueTitleRef}
-                  required
-                  type="text"
-                  
-                  placeholder='Enter Title breifly describing the issue'
-                />
-              </Form.Group>
+                    <h3>Create a ticket</h3>
+                    <Form.Group className="mb-2" controlId="formIssueTitle">
+                        <Form.Label>Enter title of Issue</Form.Label>
+                        <Form.Control
+                            ref={issueTitleRef}
+                            required
+                            type="text"
+
+                            placeholder='Enter Title breifly describing the issue'
+                        />
+                    </Form.Group>
                     <Form.Group className="mb-2" controlId="formIssueTypeSelection">
                         <Form.Label>Select Type of Issue</Form.Label>
                         <Form.Select ref={issueTypeRef} aria-label="Default select example">

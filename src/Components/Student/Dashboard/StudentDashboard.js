@@ -4,6 +4,7 @@ import { Sidebar, Menu, MenuItem } from "react-pro-sidebar";
 import { Container, Nav, Navbar } from "react-bootstrap";
 import StudentBasic from "../Basic/StudentBasic";
 import StudentProfile from "../Profile/StudentProfile";
+import StudentUpdates from "../Updates/StudentUpdates";
 import "./studentDashboard.css";
 import Support from "../Support/Support";
 import { useState } from "react";
@@ -50,6 +51,10 @@ const StudentDashboard = () => {
               {" "}
               Support
             </MenuItem>
+            <MenuItem className="menuitem" onClick={() => setNavTitle("Updates")} component={<Link to="student-updates" />}>
+              {" "}
+              Updates
+            </MenuItem>
           </Menu>
         </Sidebar>
       </div>
@@ -95,6 +100,7 @@ const StudentDashboard = () => {
     <Route index element={<StudentBasic/>} />
     <Route path="/profile" element={<StudentProfile />} />
     <Route path="/support" element={<Support />} />
+    <Route path="/student-updates" element={<StudentUpdates />} />
     <Route path="*" element={<Navigate to = '/notfound' /> } />
   </Route>
 </Routes>
