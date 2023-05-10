@@ -6,9 +6,10 @@
 .updatesContainer{
     width : 95%;
     height: fit-content;
-    padding:  10px;
+    /* padding:  10px; */
     margin : 10px auto;
-    background-color: #f8f8fa;
+    border: none;
+    /* background-color: #f8f8fa; */
 }
 
 .gocorner {

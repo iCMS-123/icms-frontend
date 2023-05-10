@@ -436,7 +436,12 @@ const Register = () => {
           </Alert>
         }
         
-        {(collegeRole === "teacher" || ((collegeRole === "student") && pageNumber == 1)) &&
+        {(collegeRole === "teacher") &&
+          <Button className="reg-btn" variant="primary" type="submit">
+            Register
+          </Button>
+        }
+        {((collegeRole === "student") && pageNumber == 1) &&
           <Button disabled={(uploadedUserImages?.length<3)} className="reg-btn" variant="primary" type="submit">
             Register
           </Button>

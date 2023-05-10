@@ -168,9 +168,29 @@ const MyBranch = (props) => {
       setTimeout(() => seterror(null), 3000);
       // alert(err.message);
     }
-
-
   }
+
+  
+  const submitUpdateSectionHeadForm = async () => {
+    try {
+        const { data } = await axios.post(`${url}/api/v1/admin/update-section-data`, {
+            sectionId: sectionId,
+            id: sectionHeadIdForUpdate
+        });
+        console.log(data, "ddaattaa");
+        if (data && data.success) {
+            setClassroomCardModalShow(false)
+            let otherSections = sectionData.filter((item) => item._id !== data.data._id);
+            setBranchList([...otherBranches, data.data.sectionData])
+            setSuccessMessage("Classroom Head updated successfully!")
+            setSuccess(true);
+        }
+    } catch (e) {
+        console.log(e, "e");
+        seterror(e.response.data.msg);
+        setTimeout(() => seterror(null), 3000);
+    }
+};
 
   return (
     <div className="container" style={{ position: "relative" }}>
@@ -311,6 +331,27 @@ const MyBranch = (props) => {
                       </p>
                     </Col>
                   </Row>
+                  
+                  <Col>
+                  
+                  <Form onSubmit={e => submitUpdateSectionHeadForm}>
+                  <Form.Group
+                    className="mb-2"
+                    controlId="modalFormCoordinatorSelection"
+                  >
+                    <Form.Label>Update class coordinator</Form.Label>
+                    {(!notSectionHeadList.length) && <p className="text-muted">No teacher available currently!</p>}
+                    <Form.Select ref={modalClassCoordinatorRef} style={{ display: (notSectionHeadList.length) ? '' : 'none' }} aria-label="Default select example">
+
+                      {notSectionHeadList?.map((option, index) => (
+                        <option key={index} value={option._id}>
+                          {option.firstName + " " + option.lastName}
+                        </option>
+                      ))}
+                    </Form.Select>
+                  </Form.Group>
+                  </Form>
+                </Col>
                 </div>
               </div>
             </div>
