@@ -33,6 +33,8 @@ const MyClassroom = () => {
   const [studentsListCopy, setStudentsListCopy] = useState([]);
   const [filterSelected, setFilterSelected] = useState('');
   const [issuesData, setIssuesData] = useState([]); // for issues data
+  const [activeIssues, setActiveIssues] = useState([]);
+  const [resolvedIssues, setResolvedIssues] = useState([]);
   //For student details modal
   const [studentDetailsModalShow, setStudentDetailsModalShow] = useState(false);
   const [studentDetailsForModal, setStudentDetailsForModal] = useState(false);
@@ -62,7 +64,10 @@ const MyClassroom = () => {
           setStudentsListCopy(data.data.sectionStudents);
           setVerifiedStudentsList(data.data.verifiedStudents);
           setUnverifiedStudentsList(data.data.unverifiedStudents);
-          setIssuesData(data.data.sectionIssues); // for issues data
+          let allIssues = data.data.sectionIssues;
+          setIssuesData(allIssues); // for issues data    
+          setActiveIssues(allIssues.filter((issue)=>!issue.isAttended))
+          setResolvedIssues(allIssues.filter((issue)=>issue.isAttended))
           // console.log(data, "Classroom Data");
         }
       } catch (e) {
@@ -312,11 +317,11 @@ const MyClassroom = () => {
       <h4>Active Issues</h4>
       <section className="active-issues-section">
         <div className="active-issues-container" >
-
+          {activeIssues?.length < 1 && <p>No active issues, Hurray!</p>}
           {
-            issuesData.map((issue, idx) => {
+            activeIssues?.map((issue, idx) => {
 
-              return !issue.isAttended &&  <div key={idx} className="card issue-card">
+              return <div key={idx} className="card issue-card">
                 <div className="card-body">
                   <Badge style={{ float: 'right' }} bg={(issue.priority == 1 && "danger") || (issue.priority == 2 && "primary") || (issue.priority == 3 && "warning")}>{(issue.priority == 1 && "High") || (issue.priority == 2 && "Low") || (issue.priority == 3 && "Medium")}</Badge>
                   <div className="d-flex justify-content-between mt-3">
@@ -373,11 +378,11 @@ const MyClassroom = () => {
       <h4>Resolved Issues</h4>
       <section className="active-issues-section">
         <div className="active-issues-container" >
-
+          {resolvedIssues?.length < 1 && <p>No resolved issue, checkout active issues</p>}
           {
-            issuesData.map((issue, idx) => {
+            resolvedIssues?.map((issue, idx) => {
 
-              return issue.isAttended && <div key={idx} className="card issue-card">
+              return <div key={idx} className="card issue-card">
                 <div className="card-body">
                   <div className="d-flex justify-content-between">
                   <Badge bg="success">Resolved</Badge>
