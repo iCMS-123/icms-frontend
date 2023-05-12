@@ -4,7 +4,6 @@ import { Button, Card } from "react-bootstrap";
 import useDocumentTitle from "../../Hooks/useDocumentTitle";
 import { Link } from "react-router-dom";
  
-
 export const Basic = () => {
   useDocumentTitle("Dashboard");
   const navigate = useNavigate();
@@ -13,9 +12,7 @@ export const Basic = () => {
   if(icmsLocalStorageData === null){
     navigate("/login");
   }else{
-
      userData = icmsLocalStorageData?.data;  
-
   }
   // for reference 
   // let branchName = userData.branchName || userData.user.branchName; 

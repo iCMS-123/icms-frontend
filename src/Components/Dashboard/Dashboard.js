@@ -11,6 +11,7 @@ import { Basic } from "./Basic";
 import MyClassroom from "../MyClassroom/MyClassroom";
 import MyBranch from "../MyBranch/MyBranch"
 import Resources from "../Resources/Resources"
+import MarkAttendance from "../MarkAttendance/MarkAttendance"
 import dashboardBgImage from "../../assets/images/dashboard-bg.jpg"
 
 const navLinkStyles = {
@@ -71,6 +72,7 @@ const Dashboard = () => {
             {icmsUserInfo?.data.isSectionHead  && <MenuItem className="menuitem" component={<Link to="MyClassroom" />} onClick={() => setNavTitle("My Classroom")}> My Classroom </MenuItem>}
             {icmsUserInfo?.data.isHod  && <MenuItem className="menuitem" component={<Link to="MyBranch" />} onClick={() => setNavTitle("My Branch")}> My Branch</MenuItem>}
             {icmsUserInfo?.data.isSectionHead  && <MenuItem className="menuitem" component={<Link to="Resources" />} onClick={() => setNavTitle("Resources")}> Resources</MenuItem>}
+            {icmsUserInfo?.data.isSectionHead  && <MenuItem className="menuitem" component={<Link to="MarkAttendance" />} onClick={() => setNavTitle("Mark Attendance")}> Mark Attendance</MenuItem>}
           </Menu>
         </Sidebar>
 
@@ -104,6 +106,7 @@ const Dashboard = () => {
           <Route path="/MyClassroom" element={<MyClassroom />} />
           <Route path="/MyBranch" element={<MyBranch />} />
           <Route path="/Resources" element={<Resources />} />
+          <Route path="/MarkAttendance" element={<MarkAttendance />} />
           <Route path="*" element={<Navigate to='/notfound' />} />
         </Routes>
 
