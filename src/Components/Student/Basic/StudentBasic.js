@@ -72,7 +72,7 @@ const StudentBasic = () => {
           </div>
         </div>
 
-        <div className="card my-teachers-card">
+        {/* <div className="card my-teachers-card">
           <div className="card-body text-center">
             <h5 className="card-title mb-3 d-flex align-items-center justify-content-center"><GiTeacher /> &nbsp; My Teachers &nbsp;&nbsp;<AiOutlineArrowRight /></h5>
             <p className="card-text">
@@ -82,7 +82,7 @@ const StudentBasic = () => {
               View details
             </p>
           </div>
-        </div>
+        </div> */}
 
 
         <div className="card updates-card">

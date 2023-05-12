@@ -102,3 +102,9 @@
 .branchCards:hover .goarrow {
     opacity: 1;
 }
+
+#unverifiedBox{
+    padding: 15px;
+    min-height: 200px;
+    padding-bottom: 3rem;
+}

@@ -20,8 +20,7 @@ const StudentUpdates = () => {
         const getStudentUpdatesList = async () => {
             try {
                 let studentID = JSON.parse(localStorage.getItem("icmsUserInfo")).data.user._id;
-                // const { data } = await axios.get(`http://localhost:8002/api/v1/student/fetch-updates/${studentID}`);
-                const { data } = await axios.get(`http://localhost:8002/api/v1/student/fetch-updates/6419ef7901e5b63cf6c04a0d`);
+                const { data } = await axios.get(`http://localhost:8002/api/v1/student/fetch-updates/${studentID}`);
 
                 if (data && data.success) {
                     console.log(data, "student updates data");
