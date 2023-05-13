@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { Button, Form, Modal, Card, Image, Col, Row, InputGroup, Badge } from 'react-bootstrap'
-import { FaSearch, FaUserCheck, FaUserTimes, FaAsterisk, FaRegCalendarAlt } from 'react-icons/fa';
+import { Button, Form, Modal, Card, Image, Col, Row, InputGroup, Badge, Table } from 'react-bootstrap'
+import { FaSearch, FaUserCheck, FaUserTimes, FaAsterisk, FaRegCalendarAlt, FaUsers } from 'react-icons/fa';
 import CloudinaryMarkAttendanceWidget from "../CloudinaryWidget/CloudinaryMarkAttendanceWidget";
 import Loader1 from "../Loader/Loader-1/index";
 import Message from "../Message/index";
@@ -16,6 +16,7 @@ const MarkAttendance = () => {
     let userID = userData._id;
     console.log(userID);
     const [sectionData, setSectionData] = useState(null);
+    const [sectionStudents, setSectionStudents] = useState([]);
     let yearMap = ["First Year", "Second Year", "Third Year", "Fourth Year"];
 
     // For toast
@@ -31,9 +32,46 @@ const MarkAttendance = () => {
     // For Manual Attendance
     let todaysDate = moment().format('YYYY-MM-DD');
     const [selectedDate, setSelectedDate] = useState(todaysDate);
+    const [fetchedAttendanceData, setFetchedAttendanceData] = useState([]);
+    const [currentAttendance, setCurrentAttendance] = useState([]);
 
     function selectedDateChanged(e) {
         setSelectedDate(moment(e.target.value).format('YYYY-MM-DD'));
+        setSectionStudents(sectionStudents => [...sectionStudents, ...sectionStudents]);
+    }
+    async function fetchAttendanceForSelectedDate() {
+        console.log(('' + new Date(selectedDate)).slice(0, 15), "choosen date");
+        const sectionId = JSON.parse(localStorage.getItem("icmsUserInfo")).data.sectionHeadRef;
+        // const sectionId = "64006b64a96106bdcef99406";
+        try {
+            const { data } = await axios.get(`http://localhost:8002/api/v1/section/fetch-attendance-date?sectionId=${sectionId}&date=${('' + new Date(selectedDate)).slice(0, 15)}`);
+
+            if (data && data.success) {
+                console.log(data.data, "fetched attendance data");
+                setFetchedAttendanceData(data.data);
+                if (data.data.length == 0)
+                    setCurrentAttendance([]);
+                else
+                    setCurrentAttendance(data.data[0].presentStudents);
+                setSectionStudents(sectionStudents => [...sectionStudents]);
+            }
+        } catch (e) {
+            console.log(e, "e");
+        }
+    }
+
+    useEffect(() => {
+        fetchAttendanceForSelectedDate();
+    }, [selectedDate])
+
+    function unmarkThisStudent(id) {
+        console.log(id, "unmark called");
+        setCurrentAttendance(currentAttendance.filter(item => item != id));
+    }
+
+    function markThisStudent(id) {
+        console.log(id, "mark called");
+        setCurrentAttendance(currentAttendance => [...currentAttendance, id]);
     }
 
     useEffect(() => {
@@ -43,6 +81,7 @@ const MarkAttendance = () => {
 
                 if (data && data.success) {
                     setSectionData(data.data);
+                    setSectionStudents(data.data.verifiedStudents);
                 }
             } catch (e) {
                 console.log(e, "e");
@@ -86,7 +125,27 @@ const MarkAttendance = () => {
     async function uploadUpdatedAttendance() {
         // logic to mark attendance manually
         // a post request to backend with the list of selected students
-        console.log("Marking Attendance manually")
+        console.log(currentAttendance, "Marking Attendance manually")
+        const sectionId = JSON.parse(localStorage.getItem("icmsUserInfo")).data.sectionHeadRef;
+        try {
+            let { data } = await axios.post("http://localhost:8002/api/v1/section/upload-section-attendance", {
+                date: ('' + new Date(selectedDate)).slice(0, 15),
+                presentStudents: currentAttendance,
+                sectionId: sectionId
+            });
+
+            console.log(data, "manual attendance submitted");
+            fetchAttendanceForSelectedDate();
+
+            setSuccess(true);
+            setSuccessMessage("Your updated attendance submitted successfully!");
+            setTimeout(() => setSuccess(false), 3000);
+
+        } catch (err) {
+            console.log(err, "Updated attendance not submitted! Please retry.");
+            seterror(err.msg);
+            setTimeout(() => seterror(null), 3000);
+        }
     }
 
     return (
@@ -170,23 +229,6 @@ const MarkAttendance = () => {
 
             </section>
 
-            <div className={styles.attendanceStats}>
-                <h6>Today's Attendance Statistics</h6>
-                {
-                    false && <h6 className="text-muted mt-3">You have not marked today's Attendance! <span style={{ textDecoration: 'underline', cursor: 'pointer', color: 'green' }} onClick={e => setSelectedDate(moment().format('YYYY-MM-DD'))}>Let's do this</span>. </h6>
-                }
-
-                {
-                    true && (
-                        <>
-                            Nothing
-                        </>
-                    )
-                }
-
-            </div>
-
-
             {/* Manual Attendance section starts */}
             <section className={styles.manualAttendance}>
                 <h5 className="mb-2 mt-3">Manual Attendance</h5>
@@ -208,32 +250,102 @@ const MarkAttendance = () => {
                     </InputGroup>
                 </Form.Group>
 
-                <div className={styles.studentsListBox}>
+                <div className={styles.attendanceStats}>
+                    <h6>Selected Date's Attendance Statistics</h6>
+                    {
+                        (fetchedAttendanceData.length == 0) && <h6 className="text-info mt-3">You have not marked attendance for selected date! <span style={{ textDecoration: 'underline', cursor: 'pointer', color: 'green' }} onClick={e => setSelectedDate(moment().format('YYYY-MM-DD'))}>Let's do this</span>. </h6>
+                    }
 
-                    <Form.Check
-                        type="checkbox"
-                        label={`Student 1`}
-                    />
-                    <Form.Check
-                        type="checkbox"
-                        label={`Student 2`}
-                    />
-                    <Form.Check
-                        type="checkbox"
-                        label={`Student 3`}
-                    />
-                    <Form.Check
-                        type="checkbox"
-                        label={`Student 4`}
-                    />
-                    <Form.Check
-                        type="checkbox"
-                        label={`Student 5`}
-                    />
+                    {
+                        (fetchedAttendanceData.length != 0) &&
+                        <>
+                            <p className="mt-2 text-success">You have already marked attendance for selected date! You can still update it.</p>
+                            <Badge bg="dark" style={{ position: 'absolute', top: '15px', right: '15px' }}>
+                                {fetchedAttendanceData[0].date}
+                            </Badge>
+                            <span>
+                                <h6><FaUsers className="me-2" />Total Students Marked Present</h6>
+                                <p className="ms-4">{fetchedAttendanceData[0].presentStudents.length}</p>
+                            </span>
+
+                        </>
+                    }
 
                 </div>
 
-                <Button variant="dark" className="mt-4 float-end" 
+                <div className={styles.studentsListBox}>
+                    <Table striped>
+                        <thead>
+                            <tr>
+                                <th>Status</th>
+                                <th>Student Name</th>
+                                <th>Roll Number</th>
+                                <th>Email</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            {
+                                (sectionStudents?.length != 0) && sectionStudents?.map((student, index) => {
+                                    if (currentAttendance.includes(student._id))
+                                        return (
+                                            <>
+                                                <tr>
+                                                    <td>
+                                                    <Form.Check
+                                                    key={index}
+                                                    type="checkbox"
+                                                    checked
+                                                    onChange={(e) => {
+                                                        if (e.target.checked)
+                                                            markThisStudent(e.target.id);
+                                                        else
+                                                            unmarkThisStudent(e.target.id);
+                                                    }}
+                                                    id={`${student._id}`}
+                                                />
+                                                    </td>
+                                                    <td>{student.firstName + " " + student.lastName}</td>
+                                                    <td>{student.universityRollNumber}</td>
+                                                    <td>{student.email}</td>
+                                                </tr>
+                                                
+                                            </>
+                                        )
+                                    else
+                                        return (
+                                            <>
+                                                <tr>
+                                                    <td>
+                                                    <Form.Check
+                                                    key={index}
+                                                    type="checkbox"
+                                                    onChange={(e) => {
+                                                        if (e.target.checked)
+                                                            markThisStudent(e.target.id);
+                                                        else
+                                                            unmarkThisStudent(e.target.id);
+                                                    }}
+                                                    id={`${student._id}`}
+                                                />
+                                                    </td>
+                                                    <td>{student.firstName + " " + student.lastName}</td>
+                                                    <td>{student.universityRollNumber}</td>
+                                                    <td>{student.email}</td>
+                                                </tr>
+                                                
+                                            </>
+                                        )
+                                })
+                            }
+
+
+                        </tbody>
+                    </Table>
+
+                </div>
+
+                <Button variant="dark" className="mt-4 float-end"
                     onClick={e => uploadUpdatedAttendance()}
                 >
                     Save Now
