@@ -37,23 +37,19 @@ const MarkAttendance = () => {
 
     function selectedDateChanged(e) {
         setSelectedDate(moment(e.target.value).format('YYYY-MM-DD'));
-        setSectionStudents(sectionStudents => [...sectionStudents, ...sectionStudents]);
     }
     async function fetchAttendanceForSelectedDate() {
-        console.log(('' + new Date(selectedDate)).slice(0, 15), "choosen date");
         const sectionId = JSON.parse(localStorage.getItem("icmsUserInfo")).data.sectionHeadRef;
         // const sectionId = "64006b64a96106bdcef99406";
         try {
             const { data } = await axios.get(`http://localhost:8002/api/v1/section/fetch-attendance-date?sectionId=${sectionId}&date=${('' + new Date(selectedDate)).slice(0, 15)}`);
 
             if (data && data.success) {
-                console.log(data.data, "fetched attendance data");
                 setFetchedAttendanceData(data.data);
-                if (data.data.length == 0)
+                if (data.data.length == 0) 
                     setCurrentAttendance([]);
-                else
+                else 
                     setCurrentAttendance(data.data[0].presentStudents);
-                setSectionStudents(sectionStudents => [...sectionStudents]);
             }
         } catch (e) {
             console.log(e, "e");
@@ -61,33 +57,33 @@ const MarkAttendance = () => {
     }
 
     useEffect(() => {
-        fetchAttendanceForSelectedDate();
+        getClassroomData();
     }, [selectedDate])
 
     function unmarkThisStudent(id) {
-        console.log(id, "unmark called");
         setCurrentAttendance(currentAttendance.filter(item => item != id));
     }
 
     function markThisStudent(id) {
-        console.log(id, "mark called");
         setCurrentAttendance(currentAttendance => [...currentAttendance, id]);
     }
 
-    useEffect(() => {
-        const getClassroomData = async () => {
-            try {
-                const { data } = await axios.get(`http://localhost:8002/api/v1/section/get-section-data/${currUser}`);
+    const getClassroomData = async () => {
+        try {
+            const { data } = await axios.get(`http://localhost:8002/api/v1/section/get-section-data/${currUser}`);
 
-                if (data && data.success) {
-                    setSectionData(data.data);
-                    setSectionStudents(data.data.verifiedStudents);
-                }
-            } catch (e) {
-                console.log(e, "e");
+            if (data && data.success) {
+                setSectionData(data.data);
+                setSectionStudents(data.data.verifiedStudents);
+
+                fetchAttendanceForSelectedDate();
             }
-        };
+        } catch (e) {
+            console.log(e, "e");
+        }
+    };
 
+    useEffect(() => {
         getClassroomData();
     }, []);
 
@@ -111,7 +107,6 @@ const MarkAttendance = () => {
     }
 
     function removeThisImg(url) {
-        console.log("remove triggered");
         let uploadedImgCopy = uploadedGroupPhotos.filter(img => img != url);
         setUploadedGroupPhotos(uploadedImgCopy);
     }
@@ -292,24 +287,24 @@ const MarkAttendance = () => {
                                             <>
                                                 <tr>
                                                     <td>
-                                                    <Form.Check
-                                                    key={index}
-                                                    type="checkbox"
-                                                    checked
-                                                    onChange={(e) => {
-                                                        if (e.target.checked)
-                                                            markThisStudent(e.target.id);
-                                                        else
-                                                            unmarkThisStudent(e.target.id);
-                                                    }}
-                                                    id={`${student._id}`}
-                                                />
+                                                        <Form.Check
+                                                            key={index}
+                                                            type="checkbox"
+                                                            checked
+                                                            onChange={(e) => {
+                                                                if (e.target.checked)
+                                                                    markThisStudent(e.target.id);
+                                                                else
+                                                                    unmarkThisStudent(e.target.id);
+                                                            }}
+                                                            id={`${student._id}`}
+                                                        />
                                                     </td>
                                                     <td>{student.firstName + " " + student.lastName}</td>
                                                     <td>{student.universityRollNumber}</td>
                                                     <td>{student.email}</td>
                                                 </tr>
-                                                
+
                                             </>
                                         )
                                     else
@@ -317,23 +312,23 @@ const MarkAttendance = () => {
                                             <>
                                                 <tr>
                                                     <td>
-                                                    <Form.Check
-                                                    key={index}
-                                                    type="checkbox"
-                                                    onChange={(e) => {
-                                                        if (e.target.checked)
-                                                            markThisStudent(e.target.id);
-                                                        else
-                                                            unmarkThisStudent(e.target.id);
-                                                    }}
-                                                    id={`${student._id}`}
-                                                />
+                                                        <Form.Check
+                                                            key={index}
+                                                            type="checkbox"
+                                                            onChange={(e) => {
+                                                                if (e.target.checked)
+                                                                    markThisStudent(e.target.id);
+                                                                else
+                                                                    unmarkThisStudent(e.target.id);
+                                                            }}
+                                                            id={`${student._id}`}
+                                                        />
                                                     </td>
                                                     <td>{student.firstName + " " + student.lastName}</td>
                                                     <td>{student.universityRollNumber}</td>
                                                     <td>{student.email}</td>
                                                 </tr>
-                                                
+
                                             </>
                                         )
                                 })
