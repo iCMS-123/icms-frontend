@@ -9,6 +9,7 @@ import styles from './styles.module.css'
 import './styles.css'
 import { FaTimesCircle } from "react-icons/fa"
 
+
 const MyClassroom = () => {
   let icmsLocalStorageData = JSON.parse(localStorage.getItem("icmsUserInfo"));
   let userData = icmsLocalStorageData.data;
@@ -40,6 +41,8 @@ const MyClassroom = () => {
   const [studentDetailsForModal, setStudentDetailsForModal] = useState(false);
   const [loadingForFilter, setLoadingForFilter] = useState(false);
   const [uploadedGroupPhotos, setUploadedGroupPhotos] = useState([]);
+  // For attendance
+  const [sectionAttendance, setSectionAttendance] = useState([]);
   // For issue Modal
   const [showIssueModal, setShowIssueModal] = useState(false);
   const [issueModalData, setIssueModalData] = useState({});
@@ -64,6 +67,7 @@ const MyClassroom = () => {
           setStudentsListCopy(data.data.sectionStudents);
           setVerifiedStudentsList(data.data.verifiedStudents);
           setUnverifiedStudentsList(data.data.unverifiedStudents);
+          setSectionAttendance(data.data.sectionAttendance)
           let allIssues = data.data.sectionIssues;
           setIssuesData(allIssues); // for issues data    
           setActiveIssues(allIssues.filter((issue)=>!issue.isAttended))
@@ -244,7 +248,7 @@ const MyClassroom = () => {
         {(sectionData != null) && <>
           <h5>
             <strong className="text-muted">
-              {sectionData.sectionName.toUpperCase()}
+              {sectionData.sectionName.toUpperCase()} (Total Students : {verifiedStudentsList?.length})
             </strong>
             <Badge bg="success" style={{ float: 'right', margin: '0 10px' }}>
               {yearMap[sectionData.sectionYear - 1]}

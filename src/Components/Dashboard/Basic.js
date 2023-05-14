@@ -1,133 +1,195 @@
-import React, {useEffect} from 'react'
+import React, { useEffect, useState } from 'react'
 import { useNavigate } from "react-router-dom";
 import { Button, Card } from "react-bootstrap";
 import useDocumentTitle from "../../Hooks/useDocumentTitle";
 import { Link } from "react-router-dom";
- 
+import axios from 'axios';
+import moment from 'moment/moment';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+import { Line } from 'react-chartjs-2';
+
 export const Basic = () => {
+  // For attendance
+  const [attendanceCountLabels, setAttendanceCountLabels] = useState([]);
+  const [dateLabels, setDateLabels] = useState([]);
   useDocumentTitle("Dashboard");
   const navigate = useNavigate();
   let userData;
   let icmsLocalStorageData = JSON.parse(localStorage.getItem("icmsUserInfo"));
-  if(icmsLocalStorageData === null){
+  if (icmsLocalStorageData === null) {
     navigate("/login");
-  }else{
-     userData = icmsLocalStorageData?.data;  
+  } else {
+    userData = icmsLocalStorageData?.data;
   }
+  let currUser = userData._id;
   // for reference 
   // let branchName = userData.branchName || userData.user.branchName; 
-   
- 
 
+  useEffect(() => {
+    const getClassroomData = async () => {
+      try {
+        const { data } = await axios.get(`http://localhost:8002/api/v1/section/get-section-data/${currUser}`);
+
+        if (data && data.success) {
+          let attendanceData = data.data.sectionAttendance;
+          attendanceData = attendanceData.sort((a, b) => moment(a.date).diff(moment(b.date)));
+          let temp1 = [];
+          let temp2 = [];
+          attendanceData.map((item, idx) => {
+            temp1.push(item.date);
+            temp2.push(item.presentStudents.length);
+          })
+          setDateLabels(temp1);
+          setAttendanceCountLabels(temp2);
+        }
+      } catch (e) {
+        console.log(e, "e");
+      }
+    };
+    getClassroomData();
+
+  }, []);
+
+  // Chart.js code
+  // for chartjs
+  ChartJS.register(
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    Title,
+    Tooltip,
+    Legend
+  );
+
+  const lastFiveDaysOptions = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'top',
+      },
+      title: {
+        display: true,
+        text: 'Attendance of last five days',
+      },
+    },
+  };
+  const lastFiveDaysLabels = dateLabels.slice(-5);
+  const lastFiveDaysData = {
+    labels: lastFiveDaysLabels,
+    datasets: [
+      {
+        label: 'Number of students',
+        data: attendanceCountLabels.slice(-5),
+        borderColor: 'rgb(255, 99, 132)',
+        backgroundColor: 'rgba(255, 99, 132, 0.5)',
+      },
+    ],
+  };
+  const allTimeOptions = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'top',
+      },
+      title: {
+        display: true,
+        text: 'Attendance of All time',
+      },
+    },
+  };
+  const allTimeLabels = dateLabels;
+  const alltimeData = {
+    labels: allTimeLabels,
+    datasets: [
+      {
+        label: 'Number of students',
+        data: attendanceCountLabels,
+        borderColor: "rgba(0, 191, 160, 1)",
+        backgroundColor: "rgba(0, 191, 160, 0.5)",
+      },
+    ],
+  };
   return (
     <div>
-     <div style = {{  display : 'flex'}} >
-    <div className="basic-left" style={{ flex : 1, padding : '0px 10px'}}>
 
-      <Card style={{margin : '0 10px'}}>
-      <Card.Img style={{objectFit:'contain', padding:'5px', width:'200px',margin:'0 auto',height:'175px'}} variant="top" src="https://res.cloudinary.com/abhistrike/image/upload/v1626953029/avatar-370-456322_wdwimj.png" />
-      <Card.Body>
-        <Card.Title>Welcome back <strong>{ userData?.firstName || userData?.user.firstName}</strong> !</Card.Title>
-        <Card.Text>
-          Let's quickly catch up with your <Link to="MyBranch" className='text-muted'>active issues</Link> and classes updates. 
-        </Card.Text>
-         
-      </Card.Body>
-    </Card>
+      <div style={{ display: 'flex' }} >
+        <div className="basic-left" style={{ flex: 1, padding: '0px 10px' }}>
 
-    {/* My students */}
-      <Card style={{ margin : '10px'}}>
+          <Card style={{ margin: '0 10px' }}>
+            <Card.Img style={{ objectFit: 'contain', padding: '5px', width: '200px', margin: '0 auto', height: '175px' }} variant="top" src="https://res.cloudinary.com/abhistrike/image/upload/v1626953029/avatar-370-456322_wdwimj.png" />
             <Card.Body>
-            <Card.Title>My Students</Card.Title>
- {/* Student */}
+              <Card.Title className='text-center'>Welcome back <strong>{userData?.firstName || userData?.user.firstName}</strong> !</Card.Title>
+              <Card.Text>
+                Start your day by marking attendance or by checking active issues if any.
+              </Card.Text>
 
-     <Card style={{marginBottom : '5px'}}>
-      <Card.Body style={{padding: '0px'}}>
-      <div  style={{display: 'flex', justifyContent : 'space-between', alignItems:'center',padding : '0 5px'}}>
-
-      <Card.Img style={{objectFit:'contain',display:'block', padding:'4px', width:'60px',}} variant="top" src="https://res.cloudinary.com/abhistrike/image/upload/v1626953029/avatar-370-456322_wdwimj.png" />
-      <Card.Text>
-      { userData?.firstName || userData?.user.firstName} { userData?.lastName || userData?.user.lastName}
-        </Card.Text>
-      </div>
-       
-      <div style={{display: 'flex', justifyContent : 'space-between', alignItems:'center', padding : '0 5px'}}>
-
-      <p>
-      StudentRollNo 
-        </p>  
-        <p style={{float:'right'}}>Phone</p> 
-      </div>
-
-      
-      </Card.Body>
-    </Card>
-     <Card>
-      <Card.Body style={{padding: '0px'}}>
-      <div  style={{display: 'flex', justifyContent : 'space-between', alignItems:'center',padding : '0 5px'}}>
-
-      <Card.Img style={{objectFit:'contain',display:'block', padding:'4px', width:'60px',}} variant="top" src="https://res.cloudinary.com/abhistrike/image/upload/v1626953029/avatar-370-456322_wdwimj.png" />
-      <Card.Text>
-      { userData?.firstName || userData?.user.firstName} { userData?.lastName || userData?.user.lastName}
-        </Card.Text>
-      </div>
-       
-      <div style={{display: 'flex', justifyContent : 'space-between', alignItems:'center', padding : '0 5px'}}>
-
-      <p>
-      StudentRollNo 
-        </p>  
-        <p style={{float:'right'}}>Phone</p> 
-      </div>
-
-      
-      </Card.Body>
-    </Card>
-   
+            </Card.Body>
+          </Card>
 
 
-  
-  
-      </Card.Body>
-    </Card>
-
- 
-
-    {/* Graph for attendance */}
- 
-</div>
-
-<div className="basic-right"  style={{flex : 2}}>
-
-<Card className='mb-3'>
 
 
-      <Card.Body>
-      <h4>Notifications</h4>
-      
-      <p>You are all caught up! There are currently no new notifications.</p>
-      
-      </Card.Body>
-    </Card>
-<Card>
+          {/* Graph for attendance */}
+
+        </div>
+
+        <div className="basic-right" style={{ flex: 2 }}>
+
+          <Card className='mb-3'>
+
+
+            <Card.Body>
+              <h4>Notifications</h4>
+
+              <p>You are all caught up! There are currently no new notifications.</p>
+
+            </Card.Body>
+          </Card>
+          <Card className='mb-3'>
+
+
+            <Card.Body>
+
+              <Line options={lastFiveDaysOptions} data={lastFiveDaysData} />
+            </Card.Body>
+          </Card>
+          <Card className='mb-3'>
+
+
+            <Card.Body>
+
+              <Line options={allTimeOptions} data={alltimeData} />
+            </Card.Body>
+          </Card>
+
+          {/* <Card>
 
 
       <Card.Body>
       
-      <h4>Attendance Overview</h4>
+     
       
       <Card.Img src="https://resources.cdn.yaclass.in/24adf49a-f4f3-4706-9302-ee944efad647/pic12.svg" />
       
       </Card.Body>
-    </Card>
+    </Card> */}
 
-</div>
+        </div>
 
 
-</div>
-   
+      </div>
+
     </div>
   )
 }
 
- 
