@@ -107,13 +107,13 @@ export const Basic = () => {
       },
     },
   };
-  const allTimeLabels = dateLabels;
+  const allTimeLabels = dateLabels.slice(-30);
   const alltimeData = {
     labels: allTimeLabels,
     datasets: [
       {
         label: 'Number of students',
-        data: attendanceCountLabels,
+        data: attendanceCountLabels.slice(-30),
         borderColor: "rgba(0, 191, 160, 1)",
         backgroundColor: "rgba(0, 191, 160, 0.5)",
       },
