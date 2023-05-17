@@ -8,7 +8,7 @@ import Message from "../Message/index";
 import styles from './styles.module.css'
 import './styles.css'
 import { FaTimesCircle } from "react-icons/fa"
-
+import moment from "moment"
 
 const MyClassroom = () => {
   let icmsLocalStorageData = JSON.parse(localStorage.getItem("icmsUserInfo"));
@@ -70,8 +70,8 @@ const MyClassroom = () => {
           setSectionAttendance(data.data.sectionAttendance)
           let allIssues = data.data.sectionIssues;
           setIssuesData(allIssues); // for issues data    
-          setActiveIssues(allIssues.filter((issue)=>!issue.isAttended))
-          setResolvedIssues(allIssues.filter((issue)=>issue.isAttended))
+          setActiveIssues(allIssues.filter((issue) => !issue.isAttended))
+          setResolvedIssues(allIssues.filter((issue) => issue.isAttended))
           // console.log(data, "Classroom Data");
         }
       } catch (e) {
@@ -199,7 +199,48 @@ const MyClassroom = () => {
   async function handleMarkAttendance() {
     // logic to mark attendance
     // a post request to backend with the list of uploaded images
-    console.log("Marking Attendance")
+    console.log(`attandanceAtModel${new Date().toDateString()}`)
+    if(localStorage.getItem(`attandanceAtModel${new Date().toDateString()}`)){
+      seterror("You have already requested for marking attendance! You can only update it via manual marking.");
+      setTimeout(() => seterror(null), 3000);
+      return 
+    }
+
+    const sectionId = JSON.parse(localStorage.getItem("icmsUserInfo")).data.sectionHeadRef;
+    const current_timestamp = Date.now();
+
+    try {
+      axios.post("http://localhost:8002/api/v1/task/create-task", {
+        sectionId: sectionId,
+        taskId: current_timestamp,
+        date: new Date().toDateString()
+      })
+      .then((res) => {
+        if(res.data.success){
+            console.log(res, "response");
+             axios.post("https://2be3-34-170-221-184.ngrok-free.app/mark_attendance", {
+              "sectionId": sectionId,
+              "activityTimeStamp": current_timestamp,
+              "date": new Date().toDateString(),
+              "image-links" : uploadedGroupPhotos
+          });
+          
+          setSuccessMessage("Images uploaded for marking attendance successfully!")
+          setSuccess(true);
+          setTimeout(() => setSuccess(false), 3000);
+
+          localStorage.setItem(`attandanceAtModel${new Date().toDateString()}`, true);
+        }
+        else{
+          seterror("Request not processed! Try again!");
+          setTimeout(() => seterror(null), 3000);
+        }
+      })
+    } catch (err) {
+      console.log(err, "Request not processed! Try again!");
+      seterror(err.msg);
+      setTimeout(() => seterror(null), 3000);
+    }
   }
 
   function getStudentName(studentID) {
@@ -389,8 +430,8 @@ const MyClassroom = () => {
               return <div key={idx} className="card issue-card">
                 <div className="card-body">
                   <div className="d-flex justify-content-between">
-                  <Badge bg="success">Resolved</Badge>
-                  <Badge bg={(issue.priority == 1 && "danger") || (issue.priority == 2 && "primary") || (issue.priority == 3 && "warning")}>{(issue.priority == 1 && "High") || (issue.priority == 2 && "Low") || (issue.priority == 3 && "Medium")}</Badge>
+                    <Badge bg="success">Resolved</Badge>
+                    <Badge bg={(issue.priority == 1 && "danger") || (issue.priority == 2 && "primary") || (issue.priority == 3 && "warning")}>{(issue.priority == 1 && "High") || (issue.priority == 2 && "Low") || (issue.priority == 3 && "Medium")}</Badge>
                   </div>
                   <div className="d-flex justify-content-between mt-3">
                     <div className="d-flex align-items-center">
@@ -420,8 +461,8 @@ const MyClassroom = () => {
           }
 
         </div>
-{/* Same modal is being used to show details of resolved issues */}
-  </section>
+        {/* Same modal is being used to show details of resolved issues */}
+      </section>
 
 
       {/* second sec starts */}
