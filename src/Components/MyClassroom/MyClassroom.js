@@ -13,9 +13,9 @@ import moment from "moment"
 const MyClassroom = () => {
   let icmsLocalStorageData = JSON.parse(localStorage.getItem("icmsUserInfo"));
   let userData = icmsLocalStorageData.data;
-  console.log(userData);
+  // console.log(userData);
   let userID = userData._id;
-  console.log(userID);
+  // console.log(userID);
   const [sectionData, setSectionData] = useState(null);
   let yearMap = ["First Year", "Second Year", "Third Year", "Fourth Year"];
 
@@ -138,9 +138,13 @@ const MyClassroom = () => {
     }
   }
 
-  function handleIssueModal(index) {
-    const target = issuesData[index];
-    console.log(target);
+  function handleIssueModal(index, isActive) {
+    let target;
+    if(isActive){
+      target = activeIssues[index];
+    }else{
+      target = resolvedIssues[index];
+    }
     setIssueModalData(target);
     handleIssueModalShow(true);
   }
@@ -201,7 +205,7 @@ const MyClassroom = () => {
       return ((student.firstName + " " + student.lastName).toUpperCase().indexOf(filter.toUpperCase()) > -1)
     })
 
-    console.log(myStudentsList, "myStudentsList");
+    // console.log(myStudentsList, "myStudentsList");
     if (myStudentsList?.length)
       setStudentsListCopy(myStudentsList);
     else
@@ -209,8 +213,8 @@ const MyClassroom = () => {
   }
 
   async function getStudentDetailsAndShowInModal(idx) {
-    console.log('getStudentDetailsAndShowInModal');
-    console.log(studentsListCopy, "studentsListCopy");
+    // console.log('getStudentDetailsAndShowInModal');
+    // console.log(studentsListCopy, "studentsListCopy");
     setStudentDetailsForModal(studentsListCopy[idx]);
     setStudentDetailsModalShow(true);
   }
@@ -264,16 +268,6 @@ const MyClassroom = () => {
     console.log(student_id, 'student_id for termination');
   }
 
-  function getStudentName(studentID) {
-    console.log(studentID);
-    console.log(verifiedStudentsList, "verifiedStudentsList");
-    for (let i = 0; i < verifiedStudentsList?.length; i++) {
-      if (verifiedStudentsList[i]._id == studentID) {
-        return verifiedStudentsList[i].firstName + " " + verifiedStudentsList[i].lastName;
-      }
-    }
-  }
-
   async function handleIssueStatusModal(decision) {
     try {
       const { data } = await axios.put(`http://localhost:8002/api/v1/section/resolve-issue/${userID}`, {
@@ -290,9 +284,11 @@ const MyClassroom = () => {
           setTimeout(() => seterror(null), 3000);
         }
       }
-      console.log(data.data.issues, 'heloo');
-      setIssuesData(data.data.issues);
-    } catch (err) {
+      let allIssues = data.data.issues;
+      setIssuesData(allIssues);
+      setActiveIssues(allIssues.filter((issue) => !issue.isAttended))
+      setResolvedIssues(allIssues.filter((issue) => issue.isAttended))
+      } catch (err) {
       console.log(error);
     }
     handleIssueModalClose();
@@ -373,7 +369,7 @@ const MyClassroom = () => {
                   <h5 className="card-title"> {issue.title || 'title to be added'}</h5>
                   <p className="card-text">
                     {issue.issueMsg.slice(0, 50) + '...'}   </p>
-                  <a href="#" className="btn btn-primary" onClick={() => { handleIssueModal(idx) }}>
+                  <a href="#" className="btn btn-primary" onClick={() => { handleIssueModal(idx, 1) }}>
                     View Issue
                   </a>
 
@@ -437,7 +433,7 @@ const MyClassroom = () => {
                   <h5 className="card-title"> {issue.title || 'title to be added'}</h5>
                   <p className="card-text">
                     {issue.issueMsg.slice(0, 50) + '...'}   </p>
-                  <a href="#" className="btn btn-primary" onClick={() => { handleIssueModal(idx) }}>
+                  <a href="#" className="btn btn-primary" onClick={() => { handleIssueModal(idx, 0) }}>
                     View Issue
                   </a>
 
