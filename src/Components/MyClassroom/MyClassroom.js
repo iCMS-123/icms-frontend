@@ -40,7 +40,6 @@ const MyClassroom = () => {
   const [studentDetailsModalShow, setStudentDetailsModalShow] = useState(false);
   const [studentDetailsForModal, setStudentDetailsForModal] = useState(false);
   const [loadingForFilter, setLoadingForFilter] = useState(false);
-  const [uploadedGroupPhotos, setUploadedGroupPhotos] = useState([]);
   // For attendance
   const [sectionAttendance, setSectionAttendance] = useState([]);
   // For issue Modal
@@ -48,6 +47,96 @@ const MyClassroom = () => {
   const [issueModalData, setIssueModalData] = useState({});
   const handleIssueModalClose = () => setShowIssueModal(false);
   const handleIssueModalShow = () => setShowIssueModal(true);
+
+  // for model training
+  const [modelTrainBtnShow, setModelTrainBtnShow] = useState(true);
+  const [remainingTrainTime, setRemainingTrainTime] = useState(0);
+  const [lastTrainTime, setLastTrainTime] = useState("More than an hour back");
+  const [lastSuccessfulTrainTime, setLastSuccessfulTrainTime] = useState("No Information");
+
+  useEffect(() => {
+    let sectionId = JSON.parse(localStorage.getItem("icmsUserInfo")).data?.sectionHeadRef;
+    const trainingData = Number(localStorage.getItem(`trainingData${sectionId}`));
+    console.log(trainingData + 3600000 - Date.now(), "see you in hell");
+    if (trainingData) {
+      setLastTrainTime(new Date(trainingData).toUTCString());
+      if (trainingData + 3600000 > Date.now()) {
+        console.log("greater toh hai");
+        setModelTrainBtnShow(false);
+        setRemainingTrainTime((trainingData + 3600000 - Date.now()) % 60);
+      }
+      else{
+        setModelTrainBtnShow(true);
+        setRemainingTrainTime(0);
+      }
+    }
+  }, [])
+
+  async function handleTrainAttendanceModel() {
+    // logic to train attendance model
+    // a post request to backend with the list of students details
+    let sectionId = JSON.parse(localStorage.getItem("icmsUserInfo")).data?.sectionHeadRef;
+    console.log(`trainingData${sectionId}`)
+
+    const current_timestamp = Date.now();
+
+    const trainingData = Number(localStorage.getItem(`trainingData${sectionId}`));
+    if (trainingData && trainingData + 3600000 > current_timestamp) {
+      seterror("You have already requested for training attendance model! You can only request again after 60 minutes only if request fails.");
+      setTimeout(() => seterror(null), 3000);
+      
+      setModelTrainBtnShow(false);
+      setRemainingTrainTime(60);
+      return
+    }
+
+    if(! window.confirm("You must ensure that your class strength is full. Do you wish to continue?"))
+      return;
+
+    let payload = {
+      'sectionId': sectionId,
+      'persons': []
+    }
+
+    sectionData.verifiedStudents.map(student => {
+      student.sampleImages = student.sampleImages.filter(img =>
+        img != undefined)
+
+      payload['persons'].push({
+        "id": student._id,
+        "image_links": student.sampleImages
+      })
+    })
+
+    console.log(payload, "payload");
+
+    try {
+      axios.post(`http://localhost:8002/api/v1/section/train-attendance/${sectionId}`)
+        .then((res) => {
+          if (res.data.success) {
+            console.log(res, "response");
+            axios.post("https://bfab-34-73-92-165.ngrok-free.app/train_model",
+              payload
+            );
+
+            setSuccessMessage("Images uploaded for training attendance model successfully!")
+            setSuccess(true);
+            setTimeout(() => setSuccess(false), 3000);
+
+            localStorage.setItem(`trainingData${sectionId}`, current_timestamp);
+            setLastTrainTime(new Date(current_timestamp).toUTCString());
+          }
+          else {
+            seterror("Request not processed! Try again!");
+            setTimeout(() => seterror(null), 3000);
+          }
+        })
+    } catch (err) {
+      console.log(err, "Request not processed! Try again!");
+      seterror(err.msg);
+      setTimeout(() => seterror(null), 3000);
+    }
+  }
 
   function handleIssueModal(index) {
     const target = issuesData[index];
@@ -68,6 +157,9 @@ const MyClassroom = () => {
           setVerifiedStudentsList(data.data.verifiedStudents);
           setUnverifiedStudentsList(data.data.unverifiedStudents);
           setSectionAttendance(data.data.sectionAttendance)
+          if (data.data?.sectionAttendanceStatus) 
+            setLastSuccessfulTrainTime(new Date(Number(data.data?.lastAttendanceRequest)).toUTCString());
+
           let allIssues = data.data.sectionIssues;
           setIssuesData(allIssues); // for issues data    
           setActiveIssues(allIssues.filter((issue) => !issue.isAttended))
@@ -172,77 +264,6 @@ const MyClassroom = () => {
     console.log(student_id, 'student_id for termination');
   }
 
-  async function handleOnGroupPhotoUpload(error, result, widget) {
-
-    if (error) {
-      seterror(error);
-      setTimeout(() => seterror(null), 3000);
-      console.log(error, "img upload error");
-      widget.close({
-        quiet: true
-      });
-      return;
-    }
-    console.log(result?.info?.secure_url, "img url");
-    let currUrl = await result?.info?.secure_url;
-    await setUploadedGroupPhotos(uploadedGroupPhotos => [...uploadedGroupPhotos, currUrl]);
-    // setShowMarkButton(true);
-    setSuccess(true);
-    setSuccessMessage("Your images uploaded successfully!");
-    setTimeout(() => setSuccess(false), 5000);
-  }
-  function removeThisImg(url) {
-    console.log("remove triggered");
-    let uploadedImgCopy = uploadedGroupPhotos.filter(img => img != url);
-    setUploadedGroupPhotos(uploadedImgCopy);
-  }
-  async function handleMarkAttendance() {
-    // logic to mark attendance
-    // a post request to backend with the list of uploaded images
-    console.log(`attandanceAtModel${new Date().toDateString()}`)
-    if(localStorage.getItem(`attandanceAtModel${new Date().toDateString()}`)){
-      seterror("You have already requested for marking attendance! You can only update it via manual marking.");
-      setTimeout(() => seterror(null), 3000);
-      return 
-    }
-
-    const sectionId = JSON.parse(localStorage.getItem("icmsUserInfo")).data.sectionHeadRef;
-    const current_timestamp = Date.now();
-
-    try {
-      axios.post("http://localhost:8002/api/v1/task/create-task", {
-        sectionId: sectionId,
-        taskId: current_timestamp,
-        date: new Date().toDateString()
-      })
-      .then((res) => {
-        if(res.data.success){
-            console.log(res, "response");
-             axios.post("https://2be3-34-170-221-184.ngrok-free.app/mark_attendance", {
-              "sectionId": sectionId,
-              "activityTimeStamp": current_timestamp,
-              "date": new Date().toDateString(),
-              "image-links" : uploadedGroupPhotos
-          });
-          
-          setSuccessMessage("Images uploaded for marking attendance successfully!")
-          setSuccess(true);
-          setTimeout(() => setSuccess(false), 3000);
-
-          localStorage.setItem(`attandanceAtModel${new Date().toDateString()}`, true);
-        }
-        else{
-          seterror("Request not processed! Try again!");
-          setTimeout(() => seterror(null), 3000);
-        }
-      })
-    } catch (err) {
-      console.log(err, "Request not processed! Try again!");
-      seterror(err.msg);
-      setTimeout(() => seterror(null), 3000);
-    }
-  }
-
   function getStudentName(studentID) {
     console.log(studentID);
     console.log(verifiedStudentsList, "verifiedStudentsList");
@@ -289,73 +310,39 @@ const MyClassroom = () => {
         {(sectionData != null) && <>
           <h5>
             <strong className="text-muted">
-              {sectionData.sectionName.toUpperCase()} (Total Students : {verifiedStudentsList?.length})
+              {sectionData?.sectionName?.toUpperCase()} (Total Verified Students : {verifiedStudentsList?.length})
             </strong>
             <Badge bg="success" style={{ float: 'right', margin: '0 10px' }}>
               {yearMap[sectionData.sectionYear - 1]}
             </Badge>
             <Badge bg="dark" style={{ float: 'right', margin: '0 10px' }}>
-              {sectionData.sectionBranchName.toUpperCase() || ""}
+              {sectionData?.sectionBranchName?.toUpperCase() || ""}
             </Badge>
           </h5>
         </>}
       </section>
 
       <section className="take-attendance mb-4 text-center">
-        <div>
-          <h4 className="text-muted">Mark Attendance with a Class Group Photo!</h4>
-
-
-          {/* uploaded photos preview here */}
-          <div className="mt-2 mb-4">
-            {
-
-              (uploadedGroupPhotos != []) && uploadedGroupPhotos?.map((img, index) => (
-                <div key={index} style={{ display: "inline-block", height: '150px', marginRight: '10px', position: 'relative' }}>
-                  <FaTimesCircle className="deleteImgBtn" onClick={(e) => removeThisImg(img)} />
-                  <Image thumbnail style={{ height: '100%' }} src={img} alt="User" />
-                </div>
-              ))
-            }
-          </div>
-
-
-          <div >
-            <CloudinaryMarkAttendanceWidget onUpload={handleOnGroupPhotoUpload} multipleAllowed={true}>
-              {({ open }) => {
-                function handleOnClick(e) {
-                  e.preventDefault();
-                  open();
-                }
-                return (
-                  <>
-
-                    <div className="upload-mark-btn-container">
-                      {uploadedGroupPhotos?.length !== 0 && <div className="mark-attendance-btn">
-                        <button id="mark-btn" onClick={handleMarkAttendance} className="btn btn-lg btn-success mb-2">Click to Mark Attendance</button>
-                        <p>It's quick, easy, and accurate!</p>
-
-                        <h4 className="fw-bolder mb-3">OR</h4>
-                      </div>}
-                      <div className="upload-group-photo-btn">
-                        <button id="upload-btn" onClick={handleOnClick} className="btn btn-lg btn-success mb-2">Upload {uploadedGroupPhotos?.length !== 0 && <span>More</span>} Photos</button>
-                        <p>The more the photos, the better the accuracy!</p>
-
-                      </div>
-
-                    </div>
-
-                  </>
-
-                )
-              }}
-
-            </CloudinaryMarkAttendanceWidget>
-
-          </div>
-        </div>
-
-
+        <h4 className="text-muted">Train Attendance Marking System for your Section Students Now</h4>
+        {modelTrainBtnShow
+          &&
+          <Button variant="dark" className="mt-2 mb-3" onClick={() => handleTrainAttendanceModel()}>
+            Train Now
+          </Button>
+        }
+        {!modelTrainBtnShow
+          &&
+          <Button variant="danger" disabled className="mt-2 mb-3">
+            Train After {remainingTrainTime} minutes
+          </Button>
+        }
+        <p>You can do this operation only once every 60 minutes! Please be wise with this.</p>
+        <Badge bg="success" style={{ float: 'right', margin: '0 10px' }}>
+          Last Successfully Trained at : {lastSuccessfulTrainTime}
+        </Badge>
+        <Badge bg="info" style={{ float: 'right', margin: '0 10px' }}>
+          Last Request at : {lastTrainTime}
+        </Badge>
       </section>
 
       {/* Issues */}
@@ -494,7 +481,7 @@ const MyClassroom = () => {
 
                           <Image src={student.profileImg} rounded={true} style={{ height: "90px", width: 'auto' }} className="me-3" />
                           <span style={{ display: 'flex', flexDirection: 'column' }}>
-                            <b className="text-muted">{student.branchName.toUpperCase()}</b>
+                            <b className="text-muted">{student?.branchName?.toUpperCase()}</b>
                             <b className="mb-2">{student.firstName + " " + student.lastName}</b>
                             <Button variant="outline-info" size="sm"
                               onClick={e => getStudentDetailsAndShowInModal(index)}

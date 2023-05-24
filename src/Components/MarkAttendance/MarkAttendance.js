@@ -34,6 +34,7 @@ const MarkAttendance = () => {
     const [selectedDate, setSelectedDate] = useState(todaysDate);
     const [fetchedAttendanceData, setFetchedAttendanceData] = useState([]);
     const [currentAttendance, setCurrentAttendance] = useState([]);
+    const [todaysAttendanceUploaded, setTodaysAttendanceUploaded] = useState(false);
 
     function selectedDateChanged(e) {
         setSelectedDate(moment(e.target.value).format('YYYY-MM-DD'));
@@ -46,9 +47,9 @@ const MarkAttendance = () => {
 
             if (data && data.success) {
                 setFetchedAttendanceData(data.data);
-                if (data.data.length == 0) 
+                if (data.data.length == 0)
                     setCurrentAttendance([]);
-                else 
+                else
                     setCurrentAttendance(data.data[0].presentStudents);
             }
         } catch (e) {
@@ -111,10 +112,76 @@ const MarkAttendance = () => {
         setUploadedGroupPhotos(uploadedImgCopy);
     }
 
+    async function fetchTodaysAttendanceStatus() {
+        const sectionId = JSON.parse(localStorage.getItem("icmsUserInfo")).data.sectionHeadRef;
+        try {
+            // URL to be updated after api created
+            const { data } = await axios.get(`http://localhost:8002/api/v1/section/fetch-attendance-date?sectionId=${sectionId}&date=${new Date().toDateString()}`);
+
+            if (data && data.success) {
+                if (data.data.length == 0)
+                    todaysAttendanceUploaded(false);
+                else
+                    todaysAttendanceUploaded(true);
+            }
+        } catch (e) {
+            console.log(e, "e");
+        }
+    }
+
     async function handleMarkAttendance() {
         // logic to mark attendance
         // a post request to backend with the list of uploaded images
-        console.log("Marking Attendance")
+
+        const sectionId = JSON.parse(localStorage.getItem("icmsUserInfo")).data.sectionHeadRef;
+        const current_timestamp = Date.now();
+
+        console.log(`attandanceAtModel${sectionId}`)
+        const testingData = Number(localStorage.getItem(`attandanceAtModel${sectionId}`));
+        if (testingData && testingData + 3600000 > current_timestamp) {
+            seterror("You have already requested for marking attendance! You can only request again after 60 minutes only if request fails.");
+            setTimeout(() => seterror(null), 3000);
+            return 
+        }
+
+        try {
+            axios.post("http://localhost:8002/api/v1/task/create-task", {
+                sectionId: sectionId,
+                taskId: current_timestamp,
+                date: new Date().toDateString()
+            })
+                .then((res) => {
+                    console.log(res, "response");
+                    if (res.data.success) {
+                        axios.post("https://bfab-34-73-92-165.ngrok-free.app/mark_attendance", {
+                            "sectionId": sectionId,
+                            "activityTimeStamp": current_timestamp,
+                            "date": new Date().toDateString(),
+                            "image-links": uploadedGroupPhotos
+                        });
+                        setTodaysAttendanceUploaded(true)
+                        setUploadedGroupPhotos([])
+                        setSuccessMessage("Images uploaded for marking attendance successfully!")
+                        setSuccess(true);
+                        setTimeout(() => setSuccess(false), 3000);
+
+                        localStorage.setItem(`attandanceAtModel${sectionId}`, current_timestamp);
+                    }
+                    else {
+                        console.log(res.data?.error, "error from backend");
+                        seterror("Request not processed! Try again!");
+                        setTimeout(() => seterror(null), 3000);
+                    }
+                }).catch((err) => {
+                    console.log(err.response?.data?.error, "Error from create-task endpoint");
+                    seterror(err.response?.data?.error);
+                    setTimeout(() => seterror(null), 3000);
+                });
+        } catch (err) {
+            console.log(err, "Request not processed! Try again!");
+            seterror(err.msg);
+            setTimeout(() => seterror(null), 3000);
+        }
     }
 
     async function uploadUpdatedAttendance() {
@@ -155,72 +222,78 @@ const MarkAttendance = () => {
                 {(sectionData != null) && <>
                     <h5>
                         <strong className="text-muted">
-                            {sectionData.sectionName.toUpperCase()}
+                            {sectionData.sectionName?.toUpperCase()}
                         </strong>
                         <Badge bg="success" style={{ float: 'right', margin: '0 10px' }}>
                             {yearMap[sectionData.sectionYear - 1]}
                         </Badge>
                         <Badge bg="dark" style={{ float: 'right', margin: '0 10px' }}>
-                            {sectionData.sectionBranchName.toUpperCase() || ""}
+                            {sectionData.sectionBranchName?.toUpperCase() || ""}
                         </Badge>
                     </h5>
                 </>}
             </section>
 
             <section className="take-attendance mb-4 text-center">
-                <div>
-                    <h4 className="text-muted">Mark Attendance with a Class Group Photo!</h4>
+                {!todaysAttendanceUploaded &&
+                    <div>
+                        <h4 className="text-muted">Mark Attendance with a Class Group Photo!</h4>
 
 
-                    {/* uploaded photos preview here */}
-                    <div className="mt-2 mb-4">
-                        {
+                        {/* uploaded photos preview here */}
+                        <div className="mt-2 mb-4">
+                            {
 
-                            (uploadedGroupPhotos != []) && uploadedGroupPhotos?.map((img, index) => (
-                                <div key={index} style={{ display: "inline-block", height: '150px', marginRight: '10px', position: 'relative' }}>
-                                    <FaTimesCircle className="deleteImgBtn" onClick={(e) => removeThisImg(img)} />
-                                    <Image thumbnail style={{ height: '100%' }} src={img} alt="User" />
-                                </div>
-                            ))
-                        }
-                    </div>
+                                (uploadedGroupPhotos != []) && uploadedGroupPhotos?.map((img, index) => (
+                                    <div key={index} style={{ display: "inline-block", height: '150px', marginRight: '10px', position: 'relative' }}>
+                                        <FaTimesCircle className="deleteImgBtn" onClick={(e) => removeThisImg(img)} />
+                                        <Image thumbnail style={{ height: '100%' }} src={img} alt="User" />
+                                    </div>
+                                ))
+                            }
+                        </div>
 
 
-                    <div >
-                        <CloudinaryMarkAttendanceWidget onUpload={handleOnGroupPhotoUpload} multipleAllowed={true}>
-                            {({ open }) => {
-                                function handleOnClick(e) {
-                                    e.preventDefault();
-                                    open();
-                                }
-                                return (
-                                    <>
+                        <div >
+                            <CloudinaryMarkAttendanceWidget onUpload={handleOnGroupPhotoUpload} multipleAllowed={true}>
+                                {({ open }) => {
+                                    function handleOnClick(e) {
+                                        e.preventDefault();
+                                        open();
+                                    }
+                                    return (
+                                        <>
 
-                                        <div className="upload-mark-btn-container">
-                                            {uploadedGroupPhotos?.length !== 0 && <div className="mark-attendance-btn">
-                                                <button id="mark-btn" onClick={handleMarkAttendance} className="btn btn-lg btn-success mb-2">Click to Mark Attendance</button>
-                                                <p>It's quick, easy, and accurate!</p>
+                                            <div className="upload-mark-btn-container">
+                                                {uploadedGroupPhotos?.length !== 0 && <div className="mark-attendance-btn">
+                                                    <button id="mark-btn" onClick={handleMarkAttendance} className="btn btn-lg btn-success mb-2">Click to Mark Attendance</button>
+                                                    <p>It's quick, easy, and accurate!</p>
 
-                                                <h4 className="fw-bolder mb-3">OR</h4>
-                                            </div>}
-                                            <div className="upload-group-photo-btn">
-                                                <button id="upload-btn" onClick={handleOnClick} className="btn btn-lg btn-success mb-2">Upload {uploadedGroupPhotos?.length !== 0 && <span>More</span>} Photos</button>
-                                                <p>The more the photos, the better the accuracy!</p>
+                                                    <h4 className="fw-bolder mb-3">OR</h4>
+                                                </div>}
+                                                <div className="upload-group-photo-btn">
+                                                    <button id="upload-btn" onClick={handleOnClick} className="btn btn-lg btn-success mb-2">Upload {uploadedGroupPhotos?.length !== 0 && <span>More</span>} Photos</button>
+                                                    <p>The more the photos, the better the accuracy!</p>
+
+                                                </div>
 
                                             </div>
 
-                                        </div>
+                                        </>
 
-                                    </>
+                                    )
+                                }}
 
-                                )
-                            }}
+                            </CloudinaryMarkAttendanceWidget>
 
-                        </CloudinaryMarkAttendanceWidget>
-
+                        </div>
                     </div>
-                </div>
-
+                }
+                {todaysAttendanceUploaded &&
+                    <h6 className="text-muted">
+                        You have already uploaded images for marking today's attendance! Please wait for response. It may take upto 5 to 10 minutes.
+                    </h6>
+                }
 
             </section>
 

@@ -38,6 +38,16 @@ const Resources = () => {
     const [currentResourceUrl, setCurrentResourceUrl] = useState(null);
     const [currentResourceType, setCurrentResourceType] = useState('pdf');
 
+    function resetResourcesForm(){
+        resourceName.current.value = null
+        resourceDescription.current.value = null
+        resourcePriority.current.value = null
+        resourceType.current.value = null
+        setResourcesArray([])
+        setCurrentResourceUrl(null)
+        setCurrentResourceType('pdf')
+    }
+
     async function handleOnUpload(error, result, widget) {
         if (error) {
             seterror(error);
@@ -101,6 +111,8 @@ const Resources = () => {
           });
        
           console.log(data, "resource submitted");
+
+          resetResourcesForm();
     
           setSuccess(true);
           setSuccessMessage("Your shared resource submitted successfully !");
