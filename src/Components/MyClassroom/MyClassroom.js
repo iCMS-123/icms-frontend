@@ -52,18 +52,25 @@ const MyClassroom = () => {
   const [modelTrainBtnShow, setModelTrainBtnShow] = useState(true);
   const [remainingTrainTime, setRemainingTrainTime] = useState(0);
   const [lastTrainTime, setLastTrainTime] = useState("More than an hour back");
-  const [lastSuccessfulTrainTime, setLastSuccessfulTrainTime] = useState("No Information");
+  const [lastSuccessfulTrainTime, setLastSuccessfulTrainTime] = useState("No Information saved yet!");
+
+  function millisToMinutesAndSeconds(millis) {
+    var minutes = Math.floor(millis / 60000);
+    var seconds = ((millis % 60000) / 1000).toFixed(0);
+    return minutes + ":" + (seconds < 10 ? '0' : '') + seconds;
+  }
 
   useEffect(() => {
     let sectionId = JSON.parse(localStorage.getItem("icmsUserInfo")).data?.sectionHeadRef;
     const trainingData = Number(localStorage.getItem(`trainingData${sectionId}`));
-    console.log(trainingData + 3600000 - Date.now(), "see you in hell");
+    console.log(trainingData + 3600000 - moment().valueOf(), "see you in hell");
     if (trainingData) {
       setLastTrainTime(new Date(trainingData).toUTCString());
-      if (trainingData + 3600000 > Date.now()) {
+      if (trainingData + 3600000 > moment().valueOf()) {
         console.log("greater toh hai");
         setModelTrainBtnShow(false);
-        setRemainingTrainTime((trainingData + 3600000 - Date.now()) % 60);
+        // setRemainingTrainTime((trainingData + 3600000 - moment().valueOf()) % 60); 
+        setRemainingTrainTime(millisToMinutesAndSeconds(trainingData + 3600000 - moment().valueOf())); 
       }
       else{
         setModelTrainBtnShow(true);
@@ -78,7 +85,8 @@ const MyClassroom = () => {
     let sectionId = JSON.parse(localStorage.getItem("icmsUserInfo")).data?.sectionHeadRef;
     console.log(`trainingData${sectionId}`)
 
-    const current_timestamp = Date.now();
+    const current_timestamp = moment().valueOf();
+    console.log(moment().valueOf() , "moment value");
 
     const trainingData = Number(localStorage.getItem(`trainingData${sectionId}`));
     if (trainingData && trainingData + 3600000 > current_timestamp) {
@@ -115,7 +123,7 @@ const MyClassroom = () => {
         .then((res) => {
           if (res.data.success) {
             console.log(res, "response");
-            axios.post("https://bfab-34-73-92-165.ngrok-free.app/train_model",
+            axios.post("https://7258-34-90-13-120.ngrok-free.app/train_model",
               payload
             );
 
