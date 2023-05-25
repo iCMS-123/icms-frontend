@@ -79,7 +79,7 @@ export const Basic = () => {
       },
       title: {
         display: true,
-        text: 'Attendance of last five days',
+        text: 'Attendance of last week',
       },
     },
   };
@@ -103,7 +103,7 @@ export const Basic = () => {
       },
       title: {
         display: true,
-        text: 'Attendance of All time',
+        text: 'Attendance of last 30 days',
       },
     },
   };

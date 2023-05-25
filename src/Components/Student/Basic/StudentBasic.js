@@ -7,15 +7,116 @@ import studentWelcomeImg from "../../../assets/images/student-wave.png";
 import axios from 'axios';
 import { Button, Card, Badge, Image } from "react-bootstrap";
 import { Link } from "react-router-dom";
+import moment from 'moment/moment';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+import { Line } from 'react-chartjs-2';
 
 const StudentBasic = () => {
   let icmsUserInfo = JSON.parse(localStorage.getItem("icmsUserInfo"));
   let userData = icmsUserInfo.data;
   console.log(userData);
-
+  const [attendanceCountLabels, setAttendanceCountLabels] = useState([]);
+  const [dateLabels, setDateLabels] = useState([]);
   const [updatesData, setUpdatesData] = useState([]);
   let priorityMap = ["Low", "Mid", "High"];
   let priorityColorsMap = ["info", "warning", "Danger"];
+
+  // for getting attendance
+  useEffect(() => {
+    const getClassroomData = async () => {
+      try {
+        // use get attendance by student ID
+        const { data } = await axios.get(`http://localhost:8002/api/v1/section/get-section-data/64006a28a96106bdcef993d6`);
+
+        if (data && data.success) {
+          let attendanceData = data.data.sectionAttendance;
+          attendanceData = attendanceData.sort((a, b) => moment(a.date).diff(moment(b.date)));
+          let temp1 = [];
+          let temp2 = [];
+          attendanceData.map((item, idx) => {
+            temp1.push(item.date);
+            temp2.push(item.presentStudents.length);
+          })
+          setDateLabels(temp1);
+          setAttendanceCountLabels(temp2);
+        }
+      } catch (e) {
+        console.log(e, "e");
+      }
+    };
+    getClassroomData();
+
+  }, []);
+
+   // Chart.js code
+  // for chartjs
+  ChartJS.register(
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    Title,
+    Tooltip,
+    Legend
+  );
+
+  const lastFiveDaysOptions = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'top',
+      },
+      title: {
+        display: true,
+        text: 'Attendance of last week',
+      },
+    },
+  };
+  const lastFiveDaysLabels = dateLabels.slice(-5);
+  const lastFiveDaysData = {
+    labels: lastFiveDaysLabels,
+    datasets: [
+      {
+        label: 'Number of students',
+        data: attendanceCountLabels.slice(-5),
+        borderColor: 'rgb(255, 99, 132)',
+        backgroundColor: 'rgba(255, 99, 132, 0.5)',
+      },
+    ],
+  };
+  const allTimeOptions = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'top',
+      },
+      title: {
+        display: true,
+        text: 'Attendance of last 30 days',
+      },
+    },
+  };
+  const allTimeLabels = dateLabels.slice(-30);
+  const alltimeData = {
+    labels: allTimeLabels,
+    datasets: [
+      {
+        label: 'Number of students',
+        data: attendanceCountLabels.slice(-30),
+        borderColor: "rgba(0, 191, 160, 1)",
+        backgroundColor: "rgba(0, 191, 160, 0.5)",
+      },
+    ],
+  };
 
   useEffect(() => {
     const getStudentUpdatesList = async () => {
@@ -59,18 +160,19 @@ const StudentBasic = () => {
       </div>
 
       <div className="main-cards-container">
-
-        <div className="card attendance-card">
-          <div className="card-body text-center">
-            <h5 className="card-title mb-3 d-flex align-items-center justify-content-center"><AiOutlineUser /> &nbsp;  Attendance &nbsp;&nbsp;<AiOutlineArrowRight /></h5>
-            <p className="card-text">
-              <span className="h1">90% ( 18/20 )</span>
-            </p>
-            <p>
-              Total Sessions Done
-            </p>
+        <div className="cards-left-container">
+          <div className="card attendance-card">
+          <div className="card-body">
+            <Line options={lastFiveDaysOptions} data={lastFiveDaysData} />
           </div>
         </div>
+        <div className="card attendance-card">
+          <div className="card-body">
+          <Line options={allTimeOptions} data={alltimeData} />
+          </div>
+        </div>
+        </div>
+        
 
         {/* <div className="card my-teachers-card">
           <div className="card-body text-center">
