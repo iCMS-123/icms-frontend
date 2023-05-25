@@ -134,7 +134,7 @@ const MarkAttendance = () => {
         // a post request to backend with the list of uploaded images
 
         const sectionId = JSON.parse(localStorage.getItem("icmsUserInfo")).data.sectionHeadRef;
-        const current_timestamp = Date.now();
+        const current_timestamp = moment().valueOf();
 
         console.log(`attandanceAtModel${sectionId}`)
         const testingData = Number(localStorage.getItem(`attandanceAtModel${sectionId}`));
@@ -153,7 +153,7 @@ const MarkAttendance = () => {
                 .then((res) => {
                     console.log(res, "response");
                     if (res.data.success) {
-                        axios.post("https://bfab-34-73-92-165.ngrok-free.app/mark_attendance", {
+                        axios.post("https://7258-34-90-13-120.ngrok-free.app/mark_attendance", {
                             "sectionId": sectionId,
                             "activityTimeStamp": current_timestamp,
                             "date": new Date().toDateString(),
