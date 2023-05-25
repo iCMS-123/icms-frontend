@@ -5,7 +5,7 @@ import { BsSpeedometer2 } from "react-icons/bs";
 import { GiTeacher } from "react-icons/gi";
 import studentWelcomeImg from "../../../assets/images/student-wave.png";
 import axios from 'axios';
-import { Button, Card, Badge, Image } from "react-bootstrap";
+import { Card, Badge, Image } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import moment from 'moment/moment';
 import {
@@ -24,38 +24,19 @@ const StudentBasic = () => {
   let icmsUserInfo = JSON.parse(localStorage.getItem("icmsUserInfo"));
   let userData = icmsUserInfo.data;
   console.log(userData);
+  let subjectsAttendanceData = userData.attendanceData;
+  // sort all the attendance data by date
+  subjectsAttendanceData.forEach((subject)=>{
+    subject.subjectAttendance = subject.subjectAttendance.sort((a, b) => moment(a.date).diff(moment(b.date)));
+  })
+  const [activeSubject, setActiveSubject] = useState(subjectsAttendanceData[0].subjectName);
   const [attendanceCountLabels, setAttendanceCountLabels] = useState([]);
   const [dateLabels, setDateLabels] = useState([]);
   const [updatesData, setUpdatesData] = useState([]);
   let priorityMap = ["Low", "Mid", "High"];
   let priorityColorsMap = ["info", "warning", "Danger"];
 
-  // for getting attendance
-  useEffect(() => {
-    const getClassroomData = async () => {
-      try {
-        // use get attendance by student ID
-        const { data } = await axios.get(`http://localhost:8002/api/v1/section/get-section-data/64006a28a96106bdcef993d6`);
-
-        if (data && data.success) {
-          let attendanceData = data.data.sectionAttendance;
-          attendanceData = attendanceData.sort((a, b) => moment(a.date).diff(moment(b.date)));
-          let temp1 = [];
-          let temp2 = [];
-          attendanceData.map((item, idx) => {
-            temp1.push(item.date);
-            temp2.push(item.presentStudents.length);
-          })
-          setDateLabels(temp1);
-          setAttendanceCountLabels(temp2);
-        }
-      } catch (e) {
-        console.log(e, "e");
-      }
-    };
-    getClassroomData();
-
-  }, []);
+ 
 
    // Chart.js code
   // for chartjs
@@ -77,7 +58,7 @@ const StudentBasic = () => {
       },
       title: {
         display: true,
-        text: 'Attendance of last week',
+        text: `Attendance of last 5 days of ${activeSubject}` ,
       },
     },
   };
@@ -93,32 +74,23 @@ const StudentBasic = () => {
       },
     ],
   };
-  const allTimeOptions = {
-    responsive: true,
-    plugins: {
-      legend: {
-        position: 'top',
-      },
-      title: {
-        display: true,
-        text: 'Attendance of last 30 days',
-      },
-    },
-  };
-  const allTimeLabels = dateLabels.slice(-30);
-  const alltimeData = {
-    labels: allTimeLabels,
-    datasets: [
-      {
-        label: 'Number of students',
-        data: attendanceCountLabels.slice(-30),
-        borderColor: "rgba(0, 191, 160, 1)",
-        backgroundColor: "rgba(0, 191, 160, 0.5)",
-      },
-    ],
-  };
-
+   
+  function updateLineChart(index) {
+    setActiveSubject(subjectsAttendanceData[index].subjectName);
+    let attendanceData = subjectsAttendanceData[index].subjectAttendance;
+    let temp1 = [];
+    let temp2 = [];
+    attendanceData.forEach((item, idx) => {
+      temp1.push(item.date);
+      temp2.push(item.status);
+    })
+    setDateLabels(temp1);
+    setAttendanceCountLabels(temp2);
+  }
+ 
   useEffect(() => {
+    // for setting first subject for chart
+    updateLineChart(0);
     const getStudentUpdatesList = async () => {
       try {
         let studentID = JSON.parse(localStorage.getItem("icmsUserInfo")).data.user._id;
@@ -163,12 +135,23 @@ const StudentBasic = () => {
         <div className="cards-left-container">
           <div className="card attendance-card">
           <div className="card-body">
+          <h4>Subjects</h4>
+          {subjectsAttendanceData.map((subject, ind) => {
+          return (
+            <button
+              key={ind}
+              onClick={(e) => {
+                updateLineChart(ind);
+              }}
+              type="button"
+              className="btn btn-dark mx-1 mb-2"
+            >
+              {subject.subjectName} {`(${subject.subjectCode})`}
+            </button>
+          );
+      })}
+           
             <Line options={lastFiveDaysOptions} data={lastFiveDaysData} />
-          </div>
-        </div>
-        <div className="card attendance-card">
-          <div className="card-body">
-          <Line options={allTimeOptions} data={alltimeData} />
           </div>
         </div>
         </div>

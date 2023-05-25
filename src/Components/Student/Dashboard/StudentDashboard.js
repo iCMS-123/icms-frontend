@@ -5,6 +5,7 @@ import { Container, Nav, Navbar } from "react-bootstrap";
 import StudentBasic from "../Basic/StudentBasic";
 import StudentProfile from "../Profile/StudentProfile";
 import StudentUpdates from "../Updates/StudentUpdates";
+import StudentAttendance from "../Attendance/StudentAttendance"
 import "./studentDashboard.css";
 import Support from "../Support/Support";
 import { useState } from "react";
@@ -55,6 +56,10 @@ const StudentDashboard = () => {
               {" "}
               Updates
             </MenuItem>
+            <MenuItem className="menuitem" onClick={() => setNavTitle("Attendance")} component={<Link to="attendance" />}>
+              {" "}
+              Attendance
+            </MenuItem>
           </Menu>
         </Sidebar>
       </div>
@@ -101,6 +106,7 @@ const StudentDashboard = () => {
     <Route path="/profile" element={<StudentProfile />} />
     <Route path="/support" element={<Support />} />
     <Route path="/student-updates" element={<StudentUpdates />} />
+    <Route path="/attendance" element={<StudentAttendance />} />
     <Route path="*" element={<Navigate to = '/notfound' /> } />
   </Route>
 </Routes>
