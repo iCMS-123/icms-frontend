@@ -26,7 +26,7 @@ const StudentBasic = () => {
   console.log(userData);
   let subjectsAttendanceData = userData.attendanceData;
   // sort all the attendance data by date
-  subjectsAttendanceData.forEach((subject)=>{
+  subjectsAttendanceData?.forEach((subject)=>{
     subject.subjectAttendance = subject.subjectAttendance.sort((a, b) => moment(a.date).diff(moment(b.date)));
   })
   const [activeSubject, setActiveSubject] = useState(subjectsAttendanceData[0].subjectName);
@@ -80,7 +80,7 @@ const StudentBasic = () => {
     let attendanceData = subjectsAttendanceData[index].subjectAttendance;
     let temp1 = [];
     let temp2 = [];
-    attendanceData.forEach((item, idx) => {
+    attendanceData?.forEach((item, idx) => {
       temp1.push(item.date);
       temp2.push(item.status);
     })
