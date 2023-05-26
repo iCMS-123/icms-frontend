@@ -12,6 +12,7 @@ import MyClassroom from "../MyClassroom/MyClassroom";
 import MyBranch from "../MyBranch/MyBranch"
 import Resources from "../Resources/Resources"
 import MarkAttendance from "../MarkAttendance/MarkAttendance"
+import ManageSubjects from "../ManageSubjects/ManageSubjects"
 import dashboardBgImage from "../../assets/images/dashboard-bg.jpg"
 
 const navLinkStyles = {
@@ -68,11 +69,12 @@ const Dashboard = () => {
         </h3>
           <Menu className="dashboard-menu"  >
             <MenuItem className="menuitem" component={<Link to="" />} onClick={() => setNavTitle("Dashboard")}> Dashboard</MenuItem>
-            <MenuItem className="menuitem" component={<Link to="profile" />} onClick={() => setNavTitle("Profile")}> Profile</MenuItem>
             {icmsUserInfo?.data.isSectionHead  && <MenuItem className="menuitem" component={<Link to="MyClassroom" />} onClick={() => setNavTitle("My Classroom")}> My Classroom </MenuItem>}
             {icmsUserInfo?.data.isHod  && <MenuItem className="menuitem" component={<Link to="MyBranch" />} onClick={() => setNavTitle("My Branch")}> My Branch</MenuItem>}
-            {icmsUserInfo?.data.isSectionHead  && <MenuItem className="menuitem" component={<Link to="Resources" />} onClick={() => setNavTitle("Resources")}> Resources</MenuItem>}
             {icmsUserInfo?.data.isSectionHead  && <MenuItem className="menuitem" component={<Link to="MarkAttendance" />} onClick={() => setNavTitle("Mark Attendance")}> Mark Attendance</MenuItem>}
+            {icmsUserInfo?.data.isSectionHead  && <MenuItem className="menuitem" component={<Link to="ManageSubjects" />} onClick={() => setNavTitle("Manage Subjects")}> Manage Subjects</MenuItem>}
+            {icmsUserInfo?.data.isSectionHead  && <MenuItem className="menuitem" component={<Link to="Resources" />} onClick={() => setNavTitle("Resources")}> Resources</MenuItem>}
+            <MenuItem className="menuitem" component={<Link to="profile" />} onClick={() => setNavTitle("Profile")}> Profile</MenuItem>
           </Menu>
         </Sidebar>
 
@@ -107,6 +109,7 @@ const Dashboard = () => {
           <Route path="/MyBranch" element={<MyBranch />} />
           <Route path="/Resources" element={<Resources />} />
           <Route path="/MarkAttendance" element={<MarkAttendance />} />
+          <Route path="/ManageSubjects" element={<ManageSubjects />} />
           <Route path="*" element={<Navigate to='/notfound' />} />
         </Routes>
 
