@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useRef } from "react";
-import { Button, Form, Image, Toast, ToastContainer, Row, Col } from "react-bootstrap";
+import { Button, Form, Image, Toast, ToastContainer, Row, Col, Badge } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import useDocumentTitle from "../../Hooks/useDocumentTitle";
 import "./Profile.css";
@@ -19,17 +19,18 @@ function Profile() {
   const passwordRef = useRef(null);
   const confirmPasswordRef = useRef(null);
   const [fullName, setFullName] = useState("");
+  const [hodStatus, setHodStatus] = useState(false);
+  const [sectionHeadStatus, setSectionHeadStatus] = useState(false);
   const navigate = useNavigate();
   // For toast
   const [show, setShow] = useState(false);
 
   useEffect(() => {
     let icmsLocalStorageData = JSON.parse(localStorage.getItem("icmsUserInfo"));
-    if(icmsLocalStorageData == null)
-    {
+    if (icmsLocalStorageData == null) {
       navigate("../login");
-    }else{
-      let userData = icmsLocalStorageData.data;     
+    } else {
+      let userData = icmsLocalStorageData.data;
       console.log(userData);
       // console.log(icmsLocalStorageData);
       firstNameRef.current.value = userData.firstName || userData.user.firstName;
@@ -38,13 +39,15 @@ function Profile() {
       collegeIdRef.current.value = userData.collegeIdCard || userData.user.collegeIdCard;
       profileImgRef.current.src = userData.profileImg || userData.user.profileImg;
       phoneRef.current.value = userData.mobileNumber || userData.user.mobileNumber || "";
+      setSectionHeadStatus(userData.isSectionHead || userData.user.isSectionHead)
+      setHodStatus(userData.isHod || userData.user.isHod)
 
-      if(userData.user)
+      if (userData.user)
         setFullName(userData.user?.firstName + " " + userData.user?.lastName);
-        else
+      else
         setFullName(userData?.firstName + " " + userData?.lastName);
     }
-    
+
     // eslint-disable-next-line
   }, []);
 
@@ -53,89 +56,100 @@ function Profile() {
     e.preventDefault();
     let passwordValue = passwordRef.current.value;
     let confirmPasswordValue = confirmPasswordRef.current.value;
-     
-    // both values are present(not NULL)
-    if(passwordValue !== confirmPasswordValue){
-        // console.log("Password and Confirm Password do not match!");
-        alert("Password and Confirm Password do not match!");
-    }
-    else{   
-    
-    // Getting userID  
-    
-    let icmsLocalStorageData = JSON.parse(localStorage.getItem("icmsUserInfo"));
-    let userData = icmsLocalStorageData.data;
-    console.log(userData);
-  
-    let userID = userData._id;
-    console.log(userID);
-    const updatedDetails = {
-          userId :  userID,
-          firstName :  firstNameRef.current.value,
-          lastName : lastNameRef.current.value,
-          mobileNumber : phoneRef.current.value,
-          password : passwordRef.current.value,
-          // profileImg : profileImgRef["current"].src,
 
+    // both values are present(not NULL)
+    if (passwordValue !== confirmPasswordValue) {
+      // console.log("Password and Confirm Password do not match!");
+      alert("Password and Confirm Password do not match!");
     }
-    // console.log(updatedDetails)
-    try {
-      const response = await axios.put("http://localhost:8002/api/v1/teacher/update", updatedDetails);
-      console.log(response);
-      localStorage.setItem("icmsUserInfo", JSON.stringify(response.data));  
-      if(response.data.success){
-        // show toast
-        setShow(true)
-      }   
-    } catch(err) {
+    else {
+
+      // Getting userID  
+
+      let icmsLocalStorageData = JSON.parse(localStorage.getItem("icmsUserInfo"));
+      let userData = icmsLocalStorageData.data;
+      console.log(userData);
+
+      let userID = userData._id;
+      console.log(userID);
+      const updatedDetails = {
+        userId: userID,
+        firstName: firstNameRef.current.value,
+        lastName: lastNameRef.current.value,
+        mobileNumber: phoneRef.current.value,
+        password: passwordRef.current.value,
+        // profileImg : profileImgRef["current"].src,
+
+      }
+      // console.log(updatedDetails)
+      try {
+        const response = await axios.put("http://localhost:8002/api/v1/teacher/update", updatedDetails);
+        console.log(response);
+        localStorage.setItem("icmsUserInfo", JSON.stringify(response.data));
+        if (response.data.success) {
+          // show toast
+          setShow(true)
+        }
+      } catch (err) {
         console.log(err);
+      }
     }
   }
-}
 
   return (
     <div className="profile-section">
       <div id="profile-img">
+        {
+          hodStatus && <Badge bg="dark" style={{ float: 'right', margin: '10px' }}>
+          HOD
+        </Badge>
+        }
+        {
+          sectionHeadStatus && <Badge bg="dark" style={{ float: 'right', margin: '10px' }}>
+          Section Head
+        </Badge>
+        }
+        
         <Image
           className="img img-fluid"
           src=""
           ref={profileImgRef}
-          thumbnail = "true"
+          thumbnail="true"
           alt="profile-img"
         />
         <h6 className="mt-4">{fullName}</h6>
       </div>
       <div className="profile-details">
         <Form onSubmit={updateProfile} id="update-profile-form">
-        <h6 className="fw-bold">Personal Details</h6>
+          <h6 className="fw-bold">Personal Details</h6>
           {/* First Name */}
           <Row>
             <Col>
-          <Form.Group className="mb-2" controlId="formFirstName">
-            <Form.Label className="text-muted">First Name</Form.Label>
-            <Form.Control
-              ref={firstNameRef}
-              required
-              type="text"
-              placeholder="Enter First Name"
-            />
-          </Form.Group>
-          </Col>
+              <Form.Group className="mb-2" controlId="formFirstName">
+                <Form.Label className="text-muted">First Name</Form.Label>
+                <Form.Control
+                  ref={firstNameRef}
+                  required
+                  type="text"
+                  placeholder="Enter First Name"
+                />
+              </Form.Group>
+            </Col>
 
-          <Col>
-          {/* Last name */}
-          <Form.Group className="mb-2" controlId="formLastName">
-            <Form.Label className="text-muted">Last Name</Form.Label>
-            <Form.Control
-              ref={lastNameRef}
-              required
-              type="text"
-              placeholder="Enter Last Name"
-            />
+            <Col>
+              {/* Last name */}
+              <Form.Group className="mb-2" controlId="formLastName">
+                <Form.Label className="text-muted">Last Name</Form.Label>
+                <Form.Control
+                  ref={lastNameRef}
+                  required
+                  type="text"
+                  placeholder="Enter Last Name"
+                />
 
-            
-          </Form.Group>
-          </Col>
+
+              </Form.Group>
+            </Col>
           </Row>
 
           {/* <FloatingLabel
@@ -212,13 +226,13 @@ function Profile() {
           <Button className="save-btn" variant="success" type="submit">
             Save
           </Button>
-                  {/* Profile Details Updated Successfully */}   
-     <ToastContainer style={{top:'150px', right:'0px'}} className="p-3">  
-      <Toast className = {'text-white'} bg = {'success'} onClose={() => setShow(false)} show={show} delay={3000} autohide>    
-       
-        <Toast.Body>Profile Updated Successfully !</Toast.Body>
-      </Toast>
-     </ToastContainer>
+          {/* Profile Details Updated Successfully */}
+          <ToastContainer style={{ top: '150px', right: '0px' }} className="p-3">
+            <Toast className={'text-white'} bg={'success'} onClose={() => setShow(false)} show={show} delay={3000} autohide>
+
+              <Toast.Body>Profile Updated Successfully !</Toast.Body>
+            </Toast>
+          </ToastContainer>
         </Form>
 
 
