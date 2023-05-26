@@ -27,7 +27,7 @@ const StudentDashboard = () => {
     navigate("../login");
   }
   return (
-    <div
+    <div className={styles['student-dashboard']}
       style={{
         display: "flex",
         height: "100%",
