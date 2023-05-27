@@ -32,7 +32,7 @@ const AttendanceReport = () => {
 
     const [uploadedGroupPhotos, setUploadedGroupPhotos] = useState([]);
 
-    // For Attendance Report
+    // For Manual Attendance
     let todaysDate = moment().format('YYYY-MM-DD');
     const isUserSectionHead = JSON.parse(localStorage.getItem("icmsUserInfo")).data.user.isSectionHead;
     const [selectedDate, setSelectedDate] = useState(todaysDate);
@@ -45,30 +45,36 @@ const AttendanceReport = () => {
     const [currentAttendance, setCurrentAttendance] = useState([]);
     const [todaysAttendanceUploaded, setTodaysAttendanceUploaded] = useState(false);
 
-    function selectedDateChanged(e) {
-        setSelectedDate(moment(e.target.value).format('YYYY-MM-DD'));
+    async function selectedDateChanged(e) {
+        await setSelectedDate(moment(e.target.value).format('YYYY-MM-DD'));
+        fetchAttendanceForSelectedDetails(selectedSectionId, selectedSubjectId, moment(e.target.value).format('YYYY-MM-DD'));
     }
-    function selectedSubjectChanged(sId, tId) {
+    async function selectedSubjectChanged(sId, tId) {
         console.log(sId, tId, "sID, tId");
-        setSelectedSubjectId(sId);
-        setSelectedSubjectTeacherId(tId)
+        await setSelectedSubjectId(sId);
+        await setSelectedSubjectTeacherId(tId)
+        fetchAttendanceForSelectedDetails(selectedSectionId, sId, selectedDate)
     }
-    function selectedSectionChanged(sId) {
-        setSelectedSectionId(sId);
-        fetchSubjectsForSection(sId);
+    async function selectedSectionChanged(sId) {
+        await setSelectedSectionId(sId);
+        await fetchSubjectsForSection(sId);
+        fetchAttendanceForSelectedDetails(sId, selectedSubjectId, selectedDate)
     }
-    async function fetchAttendanceForSelectedDate() {
+    async function fetchAttendanceForSelectedDetails(secId, subId, selDate) {
         const sectionId = JSON.parse(localStorage.getItem("icmsUserInfo")).data.sectionHeadRef;
         // const sectionId = "64006b64a96106bdcef99406";
         try {
-            const { data } = await axios.get(`http://localhost:8002/api/v1/section/fetch-attendance-date?sectionId=${sectionId}&date=${('' + new Date(selectedDate)).slice(0, 15)}`);
+            const { data } = await axios.get(`http://localhost:8002/api/v1/section/get-attendance-subject-section-id?sectionId=${secId}&subjectId=${subId}`);
 
             if (data && data.success) {
-                setFetchedAttendanceData(data.data);
-                if (data.data.length == 0)
+                console.log(data.data[0], "attendanceForDate");
+                let attendanceForDate = data.data[0].attendance.filter(item => item.date == ('' + new Date(selDate)).slice(0, 15))
+                console.log(attendanceForDate, "attendanceForDate after filter");
+                setFetchedAttendanceData(attendanceForDate);
+                if (attendanceForDate.length == 0)
                     setCurrentAttendance([]);
                 else
-                    setCurrentAttendance(data.data[0].presentStudents);
+                    setCurrentAttendance(attendanceForDate[0]?.presentStudents);
             }
         } catch (e) {
             console.log(e, "e");
@@ -94,8 +100,6 @@ const AttendanceReport = () => {
             if (data && data.success) {
                 setSectionData(data.data);
                 setSectionStudents(data.data.verifiedStudents);
-
-                fetchAttendanceForSelectedDate();
             }
         } catch (e) {
             console.log(e, "e");
@@ -177,23 +181,6 @@ const AttendanceReport = () => {
         getSectionList()
     }, [])
 
-    async function fetchTodaysAttendanceStatus() {
-        const sectionId = JSON.parse(localStorage.getItem("icmsUserInfo")).data.sectionHeadRef;
-        try {
-            // URL to be updated after api created
-            const { data } = await axios.get(`http://localhost:8002/api/v1/section/fetch-attendance-date?sectionId=${sectionId}&date=${new Date().toDateString()}`);
-
-            if (data && data.success) {
-                if (data.data.length == 0)
-                    todaysAttendanceUploaded(false);
-                else
-                    todaysAttendanceUploaded(true);
-            }
-        } catch (e) {
-            console.log(e, "e");
-        }
-    }
-
     async function handleMarkAttendance() {
         // logic to mark attendance
         // a post request to backend with the list of uploaded images
@@ -269,7 +256,7 @@ const AttendanceReport = () => {
             });
 
             console.log(data, "manual attendance submitted");
-            fetchAttendanceForSelectedDate();
+            fetchAttendanceForSelectedDetails(selectedSectionId, selectedSubjectId, selectedDate);
 
             setSuccess(true);
             setSuccessMessage("Your updated attendance submitted successfully!");
