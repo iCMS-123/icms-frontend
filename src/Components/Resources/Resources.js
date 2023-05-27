@@ -202,7 +202,7 @@ const Resources = () => {
                 </div>
 
                 <Button variant="success" type='submit' className="mt-3 mb-4">
-                    Submit Resources
+                    Share Resources
                 </Button>
 
             </Form>

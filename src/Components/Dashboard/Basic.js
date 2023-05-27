@@ -125,7 +125,7 @@ export const Basic = () => {
       <div style={{ display: 'flex' }} >
         <div className="basic-left" style={{ flex: 1, padding: '0px 10px' }}>
 
-          <Card style={{ margin: '0 10px' }}>
+          <Card style={{ margin: '0 10px', minHeight : "350px" }}>
             <Card.Img style={{ objectFit: 'contain', padding: '5px', width: '200px', margin: '0 auto', height: '175px' }} variant="top" src="https://res.cloudinary.com/abhistrike/image/upload/v1626953029/avatar-370-456322_wdwimj.png" />
             <Card.Body>
               <Card.Title className='text-center'>Welcome back <strong>{userData?.firstName || userData?.user.firstName}</strong> !</Card.Title>
@@ -136,6 +136,14 @@ export const Basic = () => {
             </Card.Body>
           </Card>
 
+          <Card className='mb-3' style={{ margin: '15px 10px', minHeight : "300px" }}>
+            <Card.Body>
+              <h4>Notifications</h4>
+
+              <p>You are all caught up! There are currently no new notifications.</p>
+
+            </Card.Body>
+          </Card>
 
 
 
@@ -145,29 +153,14 @@ export const Basic = () => {
 
         <div className="basic-right" style={{ flex: 2 }}>
 
-          <Card className='mb-3'>
-
-
+          <Card className='mb-3' style={{ minHeight : "350px" }}>
             <Card.Body>
-              <h4>Notifications</h4>
-
-              <p>You are all caught up! There are currently no new notifications.</p>
-
-            </Card.Body>
-          </Card>
-          <Card className='mb-3'>
-
-
-            <Card.Body>
-
               <Line options={lastFiveDaysOptions} data={lastFiveDaysData} />
             </Card.Body>
           </Card>
-          <Card className='mb-3'>
 
-
+          <Card className='mb-3' style={{ minHeight : "350px" }}>
             <Card.Body>
-
               <Line options={allTimeOptions} data={alltimeData} />
             </Card.Body>
           </Card>
