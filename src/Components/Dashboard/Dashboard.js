@@ -12,6 +12,7 @@ import MyClassroom from "../MyClassroom/MyClassroom";
 import MyBranch from "../MyBranch/MyBranch"
 import Resources from "../Resources/Resources"
 import MarkAttendance from "../MarkAttendance/MarkAttendance"
+import AttendanceReport from "../AttendanceReport/AttendanceReport"
 import ManageSubjects from "../ManageSubjects/ManageSubjects"
 import dashboardBgImage from "../../assets/images/dashboard-bg.jpg"
 
@@ -71,8 +72,9 @@ const Dashboard = () => {
             <MenuItem className="menuitem" component={<Link to="" />} onClick={() => setNavTitle("Dashboard")}> Dashboard</MenuItem>
             {icmsUserInfo?.data.isSectionHead  && <MenuItem className="menuitem" component={<Link to="MyClassroom" />} onClick={() => setNavTitle("My Classroom")}> My Classroom </MenuItem>}
             {icmsUserInfo?.data.isHod  && <MenuItem className="menuitem" component={<Link to="MyBranch" />} onClick={() => setNavTitle("My Branch")}> My Branch</MenuItem>}
-            {icmsUserInfo?.data.isSectionHead  && <MenuItem className="menuitem" component={<Link to="MarkAttendance" />} onClick={() => setNavTitle("Mark Attendance")}> Mark Attendance</MenuItem>}
             {icmsUserInfo?.data.isSectionHead  && <MenuItem className="menuitem" component={<Link to="ManageSubjects" />} onClick={() => setNavTitle("Manage Subjects")}> Manage Subjects</MenuItem>}
+            <MenuItem className="menuitem" component={<Link to="MarkAttendance" />} onClick={() => setNavTitle("Mark Attendance")}> Mark Attendance</MenuItem>
+            <MenuItem className="menuitem" component={<Link to="AttendanceReport" />} onClick={() => setNavTitle("Attendance Report")}> Attendance Report</MenuItem>
             {icmsUserInfo?.data.isSectionHead  && <MenuItem className="menuitem" component={<Link to="Resources" />} onClick={() => setNavTitle("Resources")}> Resources</MenuItem>}
             <MenuItem className="menuitem" component={<Link to="profile" />} onClick={() => setNavTitle("Profile")}> Profile</MenuItem>
           </Menu>
@@ -104,12 +106,13 @@ const Dashboard = () => {
 
   <Routes >
           <Route index element={<Basic />} />
-          <Route path="/profile" element={<Profile />} />
           <Route path="/MyClassroom" element={<MyClassroom />} />
           <Route path="/MyBranch" element={<MyBranch />} />
-          <Route path="/Resources" element={<Resources />} />
-          <Route path="/MarkAttendance" element={<MarkAttendance />} />
           <Route path="/ManageSubjects" element={<ManageSubjects />} />
+          <Route path="/MarkAttendance" element={<MarkAttendance />} />
+          <Route path="/AttendanceReport" element={<AttendanceReport />} />
+          <Route path="/Resources" element={<Resources />} />
+          <Route path="/profile" element={<Profile />} />
           <Route path="*" element={<Navigate to='/notfound' />} />
         </Routes>
 
