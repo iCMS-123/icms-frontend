@@ -57,6 +57,7 @@ const AttendanceReport = () => {
     }
     async function selectedSectionChanged(sId) {
         await setSelectedSectionId(sId);
+        await getListOfStudents(sId);
         await fetchSubjectsForSection(sId);
         fetchAttendanceForSelectedDetails(sId, selectedSubjectId, selectedDate)
     }
@@ -80,6 +81,18 @@ const AttendanceReport = () => {
             console.log(e, "e");
         }
     }
+
+    const getListOfStudents = async (secId) => {
+        try {
+            const { data } = await axios.get(`http://localhost:8002/api/v1/teacher/get-list-of-students/${secId}`);
+
+            if (data && data.success) {
+                setSectionStudents(data.data.verifiedStudents);
+            }
+        } catch (e) {
+            console.log(e, "e");
+        }
+    };
 
     useEffect(() => {
         getClassroomData();
@@ -107,7 +120,8 @@ const AttendanceReport = () => {
     };
 
     useEffect(() => {
-        getClassroomData();
+        if(isUserSectionHead)
+            getClassroomData();
     }, []);
 
     async function handleOnGroupPhotoUpload(error, result, widget) {
@@ -346,7 +360,7 @@ const AttendanceReport = () => {
                     !isUserSectionHead && <>
                         {/* Section Picker */}
                         <Form.Group className="mb-2" controlId="formFirstName">
-                            <Form.Label className="text-muted">Section for marking attendance</Form.Label>
+                            <Form.Label className="text-muted">Section for viewing attendance</Form.Label>
                             <InputGroup className="mb-3">
                                 <InputGroup.Text id="basic-addon1"><FaUsers /></InputGroup.Text>
 
@@ -496,6 +510,26 @@ const AttendanceReport = () => {
                                                 </>
                                             )
                                     })
+                                }
+                                {
+                                    !selectedSectionId && <tr className="text-warning mt-4">
+                                        <td style={{ textAlign: 'center' }}>
+                                            Please select section first!
+                                        </td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                }
+                                {
+                                    !selectedSubjectId && <tr className="text-warning mt-4">
+                                        <td style={{ textAlign: 'center' }}>
+                                            Please select subject first!
+                                        </td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
                                 }
 
 

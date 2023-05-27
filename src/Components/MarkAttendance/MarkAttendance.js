@@ -54,6 +54,7 @@ const MarkAttendance = () => {
     }
     async function selectedSectionChanged(sId) {
         await setSelectedSectionId(sId);
+        await getListOfStudents(sId);
         await fetchSubjectsForSection(sId);
         fetchAttendanceForSelectedDetails(sId, selectedSubjectId, selectedDate)
     }
@@ -96,6 +97,17 @@ const MarkAttendance = () => {
 
             if (data && data.success) {
                 setSectionData(data.data);
+            }
+        } catch (e) {
+            console.log(e, "e");
+        }
+    };
+
+    const getListOfStudents = async (secId) => {
+        try {
+            const { data } = await axios.get(`http://localhost:8002/api/v1/teacher/get-list-of-students/${secId}`);
+
+            if (data && data.success) {
                 setSectionStudents(data.data.verifiedStudents);
             }
         } catch (e) {
@@ -558,15 +570,26 @@ const MarkAttendance = () => {
                             }
 
                             {
-                                !selectedSubjectId && <tr className="text-muted mt-4">
-                                    <td style={{textAlign : 'center' }}>
-                                    Please select section first!
+                                !selectedSectionId && <tr className="text-warning mt-4">
+                                    <td style={{ textAlign: 'center' }}>
+                                        Please select section first!
                                     </td>
                                     <td></td>
                                     <td></td>
                                     <td></td>
-                                    </tr>
+                                </tr>
                             }
+                            {
+                                !selectedSubjectId && <tr className="text-warning mt-4">
+                                    <td style={{ textAlign: 'center' }}>
+                                        Please select subject first!
+                                    </td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            }
+
 
                         </tbody>
                     </Table>
