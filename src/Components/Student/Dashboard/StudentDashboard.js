@@ -56,9 +56,9 @@ const StudentDashboard = () => {
               {" "}
               Updates
             </MenuItem>
-            <MenuItem className={styles.menuitem} onClick={() => setNavTitle("Attendance")} component={<Link to="attendance" />}>
+            <MenuItem className={styles.menuitem} onClick={() => setNavTitle("My Attendance")} component={<Link to="attendance" />}>
               {" "}
-              Attendance
+              My Attendance
             </MenuItem>
           </Menu>
         </Sidebar>
