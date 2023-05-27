@@ -297,7 +297,7 @@ const MyClassroom = () => {
       setActiveIssues(allIssues.filter((issue) => !issue.isAttended))
       setResolvedIssues(allIssues.filter((issue) => issue.isAttended))
       } catch (err) {
-      console.log(error);
+      console.log(err);
     }
     handleIssueModalClose();
   }

@@ -39,14 +39,17 @@ const MyBranch = (props) => {
   const modalClassCoordinatorRef = useRef(null);
 
   let icmsLocalStorageData = JSON.parse(localStorage.getItem("icmsUserInfo"));
-  console.log(icmsLocalStorageData);
+  // console.log(icmsLocalStorageData);
   let userData = icmsLocalStorageData.data;
   let branchName = userData.branchName || userData.user.branchName;
+  let userID = userData._id || userData.user._id;
   const [error, seterror] = useState(null);
   const [success, setSuccess] = useState(false);
   const [successMessage, setSuccessMessage] = useState(false);
-
+  const [studentCountData, setStudentCountData] = useState([]);
   const [issuesData, setIssuesData] = useState([]); // for issues data
+  const [activeIssues, setActiveIssues] = useState([]);
+  const [resolvedIssues, setResolvedIssues] = useState([]);
   // For issue Modal
   const [showIssueModal, setShowIssueModal] = useState(false);
   const [issueModalData, setIssueModalData] = useState({});
@@ -54,24 +57,23 @@ const MyBranch = (props) => {
   const handleIssueModalShow = () => setShowIssueModal(true);
 
 
-  function handleIssueModal(studentID) {
-    const target = issuesData.find((obj) => {
-      return obj._id == studentID;
-    })
-    setIssueModalData(target);
+  function handleIssueModal(index, isActive) {
+    if(isActive){
+      setIssueModalData(activeIssues[index]);
+    }else{
+      setIssueModalData(resolvedIssues[index]);
+    }
     handleIssueModalShow(true);
   }
   const getClassroomsList = async () => {
     try {
-      console.log(branchName);
       const { data } = await axios.get(`http://localhost:8002/api/v1/hod/get-list-section?branchName=${branchName}`);
-
       if (data && data.success) {
         setClassroomList([data.firstYear, data.secondYear, data.thirdYear, data.fourthYear]);
         // setIssuesData(data.issues); // for issues data
 
-        console.log([data.firstYear, data.secondYear, data.thirdYear, data.fourthYear]);
-        console.log(classroomList, "Classroom LIST");
+        // console.log([data.firstYear, data.secondYear, data.thirdYear, data.fourthYear]);
+        // console.log(classroomList, "Classroom LIST");
       }
     } catch (e) {
       console.log(e, "e");
@@ -85,12 +87,13 @@ const MyBranch = (props) => {
   useEffect(() => {
     const getIssuesList = async () => {
       try {
-        console.log(branchName);
         const { data } = await axios.get(`http://localhost:8002/api/v1/branch/get-branch-detail?branchName=${branchName}`);
 
         if (data && data.success) {
-          console.log(data, "issues data");
-          setIssuesData(data.data.branchData[0].issues); // for issues data
+          let allIssues = data.data.branchData[0].issues;
+          setIssuesData(allIssues); // for issues data    
+          setActiveIssues(allIssues.filter((issue) => !issue.isAttended))
+          setResolvedIssues(allIssues.filter((issue) => issue.isAttended))
         }
       } catch (e) {
         console.log(e, "e");
@@ -100,18 +103,35 @@ const MyBranch = (props) => {
     getIssuesList();
 
   }, []);
+
+  useEffect(()=>{
+// get year wise student count
+    const getStudentCount = async ()=>{
+      try {
+        const { data } = await axios.get(`http://localhost:8002/api/v1/hod/get-student-count?branchName=${branchName}`);
+        if (data && data.success) {
+          let temp = data.data;
+          temp = temp.sort((a,b)=>parseInt(a._id)-parseInt(b._id));
+          setStudentCountData(temp);
+        }
+      }catch (e) {
+        console.log(e, "e");
+      }
+    }
+    getStudentCount();
+  }, [])
   let years = ["First Year", "Second Year", "Third Year", "Fourth Year"];
   let yearWiseColors = ["info", "warning", "danger", "success"];
 
   async function showClassroomCardModal(idx, index) {
-    console.log(classroomList[idx][index], "classroomList[idx][index]");
+    // console.log(classroomList[idx][index], "classroomList[idx][index]");
     getNotSectionHeadList();
     try {
       const { data } = await axios.get(`http://localhost:8002/api/v1/section/get-section-data/${classroomList[idx][index].sectionHead}`);
 
       if (data && data.success) {
-        console.log(data, "section data");
-        console.log(data.data.id, "section id");
+        // console.log(data, "section data");
+        // console.log(data.data.id, "section id");
         setSectionId(data.data.id);
         setClassroomCardDetailsForModal(data.data);
       }
@@ -133,7 +153,7 @@ const MyBranch = (props) => {
 
       if (data && data.success) {
         setNotSectionHeadList(data.data);
-        console.log(data.data, "setNotSectionHeadList");
+        // console.log(data.data, "setNotSectionHeadList");
       }
 
     } catch (e) {
@@ -142,8 +162,8 @@ const MyBranch = (props) => {
   };
   async function handleModalForm(e) {
     e.preventDefault();
-    console.log(modalSectionRef?.current);
-    console.log(JSON.parse(localStorage.getItem("icmsUserInfo")).data._id);
+    // console.log(modalSectionRef?.current);
+    // console.log(JSON.parse(localStorage.getItem("icmsUserInfo")).data._id);
     try {
       let { data } = await axios.post("http://localhost:8002/api/v1/hod/create-section", {
         year: modalYearRef?.current?.value,
@@ -159,7 +179,7 @@ const MyBranch = (props) => {
       classroomList[year - 1].push(data.data.sectionData);
       setClassroomList(classroomList);
 
-      console.log(data, "classroom created");
+      // console.log(data, "classroom created");
 
       setSuccess(true);
       setSuccessMessage("Classroom created successfully !");
@@ -176,13 +196,13 @@ const MyBranch = (props) => {
 
   const submitUpdateSectionHeadForm = async (e) => {
     e.preventDefault();
-    console.log("submitUpdateSectionHeadForm called");
+    // console.log("submitUpdateSectionHeadForm called");
     try {
       const { data } = await axios.post(`http://localhost:8002/api/v1/hod/assign-section-head`, {
         sectionId: sectionId,
         updatedSectionHeadRef: sectionHeadIdForUpdate
       });
-      console.log(data, "ddaattaa");
+      // console.log(data, "ddaattaa");
       if (data && data.success) {
         await getClassroomsList();
         setClassroomCardModalShow(false)
@@ -209,7 +229,7 @@ const MyBranch = (props) => {
     let hodBranch = JSON.parse(localStorage.getItem("icmsUserInfo")).data.user.branchName;
     try {
       const { data } = await axios.get(`http://localhost:8002/api/v1/admin/get-unverified-teacher?branchName=${hodBranch}`);
-      console.log(data, "dataaaaaaaaaaa");
+      // console.log(data, "dataaaaaaaaaaa");
       if (data && data.success) {
         if (data.data.teacherList.length) {
           setUnverifiedTeachersList(data.data.teacherList);
@@ -219,7 +239,7 @@ const MyBranch = (props) => {
           setUnverifiedTeachersList(null);
           setUnverifiedTeachersListCopy(null);
         }
-        console.log(data, "data");
+        // console.log(data, "data");
         setLoadingForFilter(false);
         // setSuccess(true);
       }
@@ -241,7 +261,7 @@ const MyBranch = (props) => {
       return ((teacher.firstName + " " + teacher.lastName).toUpperCase().indexOf(filter.toUpperCase()) > -1)
     })
 
-    console.log(myTeachersList, "myTeachersList");
+    // console.log(myTeachersList, "myTeachersList");
     if (myTeachersList.length)
       setUnverifiedTeachersListCopy(myTeachersList);
     else
@@ -249,7 +269,7 @@ const MyBranch = (props) => {
   }
 
   async function getTeacherDetailsAndShowInModal(idx) {
-    console.log('getTeacherDetailsAndShowInModal');
+    // console.log('getTeacherDetailsAndShowInModal');
     console.log(unverifiedTeachersList, "unverifiedTeachersList");
     setTeacherDetailsForModal(unverifiedTeachersListCopy[idx]);
     setTeacherDetailsModalShow(true);
@@ -262,7 +282,7 @@ const MyBranch = (props) => {
 
   async function setTeacherVerified(teacher_id) {
     //function to verify teacher's account
-    console.log(teacher_id, 'teacher_id for verification');
+    // console.log(teacher_id, 'teacher_id for verification');
 
     try {
       const { data } = await axios.put(`http://localhost:8002/api/v1/admin/verify-teacher/${teacher_id}`);
@@ -279,7 +299,32 @@ const MyBranch = (props) => {
       setTimeout(() => seterror(null), 3000);
     }
   }
-
+  async function handleIssueStatusModal(decision) {
+    try {
+      const { data } = await axios.put(`http://localhost:8002/api/v1/section/resolve-issue/${userID}`, {
+        issueId: issueModalData._id,
+        status: decision
+      })
+      console.log(data, "handleIssuesStatusModal");
+      if (data.success) {
+        if (decision === true) {
+          setSuccess(true);
+          setSuccessMessage("Issue Resolved!");
+          setTimeout(() => setSuccess(false), 5000);
+        } else {
+          seterror("Issue Rejected!");
+          setTimeout(() => seterror(null), 3000);
+        }
+      }
+      let allIssues = data.data.issues;
+      setIssuesData(allIssues);
+      setActiveIssues(allIssues.filter((issue) => !issue.isAttended))
+      setResolvedIssues(allIssues.filter((issue) => issue.isAttended))
+      } catch (err) {
+      console.log(err);
+    }
+    handleIssueModalClose();
+  }
 
   // Unverified Teachers Code ends
 
@@ -302,7 +347,7 @@ const MyBranch = (props) => {
 
         {years?.map((yr, idx) => (
           <>
-            {/* <h5>{yr}</h5> */}
+            <h5>{yr} - {studentCountData[idx]?.totalStudents} student(s)</h5>
             <Row xs={1} md={4} className="" key={idx}>
               {classroomList != null && classroomList[idx].length !== 0 &&
                 classroomList[idx]?.map((classRoom, index) => (
@@ -564,15 +609,13 @@ const MyBranch = (props) => {
       </div>
 
 
-      {/* Issues */}
-      <h4>Active Issues</h4>
+{/* Issues */}
+<h4>Active Issues</h4>
       <section className="active-issues-section">
         <div className="active-issues-container" >
-
-          {(issuesData == null) && <h6 className="text-muted">No issue posted currently!</h6>}
-          {(issuesData != null) && (issuesData.length == 0) && <h6 className="text-muted">No issues posted currently!</h6>}
+          {activeIssues?.length < 1 && <p>No active issues, Hurray!</p>}
           {
-            issuesData?.map((issue, idx) => {
+            activeIssues?.map((issue, idx) => {
 
               return <div key={idx} className="card issue-card">
                 <div className="card-body">
@@ -594,7 +637,7 @@ const MyBranch = (props) => {
                   <h5 className="card-title"> {issue.title || 'title to be added'}</h5>
                   <p className="card-text">
                     {issue.issueMsg.slice(0, 50) + '...'}   </p>
-                  <a href="#" className="btn btn-primary" onClick={() => { handleIssueModal(issue._id) }}>
+                  <a href="#" className="btn btn-primary" onClick={() => { handleIssueModal(idx, 1) }}>
                     View Issue
                   </a>
 
@@ -608,9 +651,9 @@ const MyBranch = (props) => {
 
         {/* View Issue Card Modal*/}
 
-        <Modal show={showIssueModal} onHide={handleIssueModalClose}>
+        <Modal id="unresolved-issues" show={showIssueModal} onHide={handleIssueModalClose}>
           <Modal.Header closeButton>
-            <Modal.Title>{issueModalData.issueTitle || 'Title'}</Modal.Title>
+            <Modal.Title>{issueModalData.title || 'Title'}</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <h6>Submitted By : {issueModalData.issueSubmittedByStudent?.firstName + " " + issueModalData.issueSubmittedByStudent?.lastName || 'Full Name'}</h6>
@@ -618,11 +661,61 @@ const MyBranch = (props) => {
 
 
           </Modal.Body>
+          {!issueModalData.isAttended && <Modal.Footer style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <Button onClick={() => { handleIssueStatusModal(true) }} variant="success">Resolve</Button>
+            <Button onClick={() => { handleIssueStatusModal(false) }} variant="danger">Reject</Button>
+          </Modal.Footer>}
 
         </Modal>
+
+
       </section>
 
-      {/* Issues end */}
+      <h4>Resolved Issues</h4>
+      <section className="active-issues-section">
+        <div className="active-issues-container" >
+          {resolvedIssues?.length < 1 && <p>No resolved issue, checkout active issues</p>}
+          {
+            resolvedIssues?.map((issue, idx) => {
+
+              return <div key={idx} className="card issue-card">
+                <div className="card-body">
+                  <div className="d-flex justify-content-between">
+                    <Badge bg="success">Resolved</Badge>
+                    <Badge bg={(issue.priority == 1 && "danger") || (issue.priority == 2 && "primary") || (issue.priority == 3 && "warning")}>{(issue.priority == 1 && "High") || (issue.priority == 2 && "Low") || (issue.priority == 3 && "Medium")}</Badge>
+                  </div>
+                  <div className="d-flex justify-content-between mt-3">
+                    <div className="d-flex align-items-center">
+                      <img
+
+                        src={issue.issueSubmittedByStudent?.profileImg || 'https://res.cloudinary.com/abhistrike/image/upload/v1626953029/avatar-370-456322_wdwimj.png'}
+                        alt="profile"
+                        className="rounded-circle"
+                        style={{ width: "60px", height: "60px" }}
+                      />
+                      <div className="ms-3">
+                        <p className="mb-0">  {issue.issueSubmittedByStudent?.firstName + " " + issue.issueSubmittedByStudent?.lastName || 'Full Name'}</p>
+                      </div>
+                    </div>
+                  </div>
+                  <h5 className="card-title"> {issue.title || 'title to be added'}</h5>
+                  <p className="card-text">
+                    {issue.issueMsg.slice(0, 50) + '...'}   </p>
+                  <a href="#" className="btn btn-primary" onClick={() => { handleIssueModal(idx, 0) }}>
+                    View Issue
+                  </a>
+
+
+                </div>
+              </div>
+            })
+          }
+
+        </div>
+        {/* Same modal is being used to show details of resolved issues */}
+      </section>
+
+
 
       {/* Unverified Teachers start */}
       <div id={styles.unverifiedBox}>
