@@ -67,7 +67,7 @@ const StudentBasic = () => {
     labels: lastFiveDaysLabels,
     datasets: [
       {
-        label: 'Number of students',
+        label: 'Present/Absent',
         data: attendanceCountLabels.slice(-5),
         borderColor: 'rgb(255, 99, 132)',
         backgroundColor: 'rgba(255, 99, 132, 0.5)',
