@@ -15,6 +15,7 @@ import MarkAttendance from "../MarkAttendance/MarkAttendance"
 import AttendanceReport from "../AttendanceReport/AttendanceReport"
 import ManageSubjects from "../ManageSubjects/ManageSubjects"
 import dashboardBgImage from "../../assets/images/dashboard-bg.jpg"
+import MySubject from "../Teacher/MySubjects";
 
 const navLinkStyles = {
   textDecoration: 'none',
@@ -27,7 +28,7 @@ const Dashboard = () => {
   const [navTitle, setNavTitle] = useState("Dashboard");
   const icmsUserInfo = JSON.parse(localStorage.getItem("icmsUserInfo"));
   console.log(icmsUserInfo);
-    
+
 
   const [error, seterror] = useState(null);
   const [success, setSuccess] = useState(false);
@@ -65,9 +66,9 @@ const Dashboard = () => {
       <div className="dashboard-left">
 
         <Sidebar className="dashboard-sidebar">
-        <h3 className="sidebar-header fw-bold mb-0 py-2 text-center">
-          <img src='/images/icms-logo.png' alt='logo' style={{ height: '40px', filter: 'invert(1)' }} />
-        </h3>
+          <h3 className="sidebar-header fw-bold mb-0 py-2 text-center">
+            <img src='/images/icms-logo.png' alt='logo' style={{ height: '40px', filter: 'invert(1)' }} />
+          </h3>
           <Menu className="dashboard-menu"  >
             <MenuItem className="menuitem" component={<Link to="" />} onClick={() => setNavTitle("Dashboard")}> Dashboard</MenuItem>
             {icmsUserInfo?.data.isSectionHead  && <MenuItem className="menuitem" component={<Link to="MyClassroom" />} onClick={() => setNavTitle("My Classroom")}> My Classroom </MenuItem>}
@@ -75,7 +76,8 @@ const Dashboard = () => {
             {icmsUserInfo?.data.isSectionHead  && <MenuItem className="menuitem" component={<Link to="ManageSubjects" />} onClick={() => setNavTitle("Manage Subjects")}> Manage Subjects</MenuItem>}
             <MenuItem className="menuitem" component={<Link to="MarkAttendance" />} onClick={() => setNavTitle("Mark Attendance")}> Mark Attendance</MenuItem>
             <MenuItem className="menuitem" component={<Link to="AttendanceReport" />} onClick={() => setNavTitle("Attendance Report")}> Attendance Report</MenuItem>
-            {icmsUserInfo?.data.isSectionHead  && <MenuItem className="menuitem" component={<Link to="Resources" />} onClick={() => setNavTitle("Resources")}> Resources</MenuItem>}
+            {icmsUserInfo?.data.isSectionHead && <MenuItem className="menuitem" component={<Link to="Resources" />} onClick={() => setNavTitle("Resources")}> Resources</MenuItem>}
+            {icmsUserInfo?.data.userStatus === 'teacher' && <MenuItem className="menuitem" component={<Link to="Subjects" />} onClick={() => setNavTitle("My Subjects")}> My Subjects</MenuItem>}
             <MenuItem className="menuitem" component={<Link to="profile" />} onClick={() => setNavTitle("Profile")}> Profile</MenuItem>
           </Menu>
         </Sidebar>
@@ -102,7 +104,7 @@ const Dashboard = () => {
           </Container>
         </Navbar>
 
-<div style={{padding: '20px',height:'100%', objectFit:'contain',backgroundRepeat:'repeatX',backgroundPosition:'center', backgroundSize:'cover',backgroundImage: `url(${dashboardBgImage})`}}>
+        <div style={{ padding: '20px', height: '100%', objectFit: 'contain', backgroundRepeat: 'repeatX', backgroundPosition: 'center', backgroundSize: 'cover', backgroundImage: `url(${dashboardBgImage})` }}>
 
   <Routes >
           <Route index element={<Basic />} />
@@ -113,11 +115,11 @@ const Dashboard = () => {
           <Route path="/AttendanceReport" element={<AttendanceReport />} />
           <Route path="/Resources" element={<Resources />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/Subjects" element={<MySubject />} />
           <Route path="*" element={<Navigate to='/notfound' />} />
         </Routes>
+        </div>
 
-</div>
-      
 
       </div>
       {/* <main style={{ padding: 10 }}> Hello I am Dashboard</main> */}
