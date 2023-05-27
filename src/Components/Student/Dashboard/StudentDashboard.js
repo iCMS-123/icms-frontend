@@ -5,7 +5,8 @@ import { Container, Nav, Navbar } from "react-bootstrap";
 import StudentBasic from "../Basic/StudentBasic";
 import StudentProfile from "../Profile/StudentProfile";
 import StudentUpdates from "../Updates/StudentUpdates";
-import "./studentDashboard.css";
+import StudentAttendance from "../Attendance/StudentAttendance"
+import styles from "./studentDashboard.module.css"
 import Support from "../Support/Support";
 import { useState } from "react";
 const navLinkStyles = {
@@ -26,7 +27,7 @@ const StudentDashboard = () => {
     navigate("../login");
   }
   return (
-    <div
+    <div className={styles['student-dashboard']}
       style={{
         display: "flex",
         height: "100%",
@@ -35,25 +36,29 @@ const StudentDashboard = () => {
       }}
     >
       <div className="dashboard-left">
-        <h3 className="sidebar-header fw-bold mb-0 py-2 text-center">iCMS</h3>
+        <h3 className={`${styles['sidebar-header']} fw-bold mb-0 py-2 text-center`}>iCMS</h3>
 
         <Sidebar className="dashboard-sidebar">
           <Menu className="dashboard-menu">
-            <MenuItem className="menuitem" onClick={() => setNavTitle("Dashboard")} component={<Link to="" />}>
+            <MenuItem className={styles.menuitem} onClick={() => setNavTitle("Dashboard")} component={<Link to="" />}>
               {" "}
               Dashboard
             </MenuItem>
-            <MenuItem className="menuitem" onClick={() => setNavTitle("Profile")} component={<Link to="profile" />}>
+            <MenuItem className={styles.menuitem} onClick={() => setNavTitle("Profile")} component={<Link to="profile" />}>
               {" "}
               Profile
             </MenuItem>
-            <MenuItem className="menuitem" onClick={() => setNavTitle("Support")} component={<Link to="support" />}>
+            <MenuItem className={styles.menuitem} onClick={() => setNavTitle("Support")} component={<Link to="support" />}>
               {" "}
               Support
             </MenuItem>
-            <MenuItem className="menuitem" onClick={() => setNavTitle("Updates")} component={<Link to="student-updates" />}>
+            <MenuItem className={styles.menuitem} onClick={() => setNavTitle("Updates")} component={<Link to="student-updates" />}>
               {" "}
               Updates
+            </MenuItem>
+            <MenuItem className={styles.menuitem} onClick={() => setNavTitle("My Attendance")} component={<Link to="attendance" />}>
+              {" "}
+              My Attendance
             </MenuItem>
           </Menu>
         </Sidebar>
@@ -61,9 +66,9 @@ const StudentDashboard = () => {
 
       {/* Right side containing Navbar and Content */}
 
-      <div className="dashboard-right">
-        <Navbar className="common-navbar" expand="lg">
-          <Container className="common-navbar-container">
+      <div className={styles['dashboard-right']}>
+        <Navbar className={styles['common-navbar']} expand="lg">
+          <Container className={styles['common-navbar-container']}>
             <Navbar.Brand as={NavLink} to="./">
             {navTitle}
             </Navbar.Brand>
@@ -101,6 +106,7 @@ const StudentDashboard = () => {
     <Route path="/profile" element={<StudentProfile />} />
     <Route path="/support" element={<Support />} />
     <Route path="/student-updates" element={<StudentUpdates />} />
+    <Route path="/attendance" element={<StudentAttendance />} />
     <Route path="*" element={<Navigate to = '/notfound' /> } />
   </Route>
 </Routes>

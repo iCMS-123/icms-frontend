@@ -69,8 +69,8 @@ const Resources = () => {
     }
 
     async function addResourceAppend() {
-        let resType = currentResourceUrl.format;
-        if(currentResourceUrl.format == 'jpg' || currentResourceUrl.format == 'png' || currentResourceUrl.format == 'jpeg')
+        let resType = currentResourceUrl?.format;
+        if(currentResourceUrl?.format == 'jpg' || currentResourceUrl?.format == 'png' || currentResourceUrl?.format == 'jpeg')
             resType = 'img';
 
         if(currentResourceType != resType){
