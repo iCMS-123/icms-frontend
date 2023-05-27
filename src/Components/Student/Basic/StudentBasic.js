@@ -143,8 +143,9 @@ const StudentBasic = () => {
               onClick={(e) => {
                 updateLineChart(ind);
               }}
+              style={subjectButton}
               type="button"
-              className="btn btn-dark mx-1 mb-2"
+              className="btn btn-dark mx-1 mb-1 btn-sm"
             >
               {subject.subjectName} {`(${subject.subjectCode})`}
             </button>
@@ -222,3 +223,7 @@ const StudentBasic = () => {
 };
 
 export default StudentBasic;
+
+const subjectButton = {
+  borderRadius: "20px",
+};

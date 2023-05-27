@@ -115,7 +115,8 @@ const StudentAttendance = () => {
               updateLineChart(ind);
             }}
             type="button"
-            className="btn btn-dark mx-1 mb-2"
+            className="btn btn-dark btn-sm mx-1 mb-2"
+            style={subjectButton}
           >
             {subject.subjectName} {`(${subject.subjectCode})`}
           </button>
@@ -156,3 +157,7 @@ const cardStyles= {
 const chartStyles = {
  height : '500px',
 }
+
+const subjectButton = {
+  borderRadius: "20px",
+};
