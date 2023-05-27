@@ -44,20 +44,20 @@ const MarkAttendance = () => {
 
     async function selectedDateChanged(e) {
         await setSelectedDate(moment(e.target.value).format('YYYY-MM-DD'));
-        fetchAttendanceForSelectedDetails(selectedSectionId, selectedSubjectId);
+        fetchAttendanceForSelectedDetails(selectedSectionId, selectedSubjectId, moment(e.target.value).format('YYYY-MM-DD'));
     }
     async function selectedSubjectChanged(sId, tId) {
         console.log(sId, tId, "sID, tId");
         await setSelectedSubjectId(sId);
         await setSelectedSubjectTeacherId(tId)
-        fetchAttendanceForSelectedDetails(selectedSectionId, sId)
+        fetchAttendanceForSelectedDetails(selectedSectionId, sId, selectedDate)
     }
     async function selectedSectionChanged(sId) {
         await setSelectedSectionId(sId);
         await fetchSubjectsForSection(sId);
-        fetchAttendanceForSelectedDetails(sId, selectedSubjectId)
+        fetchAttendanceForSelectedDetails(sId, selectedSubjectId, selectedDate)
     }
-    async function fetchAttendanceForSelectedDetails(secId, subId) {
+    async function fetchAttendanceForSelectedDetails(secId, subId, selDate) {
         const sectionId = JSON.parse(localStorage.getItem("icmsUserInfo")).data.sectionHeadRef;
         // const sectionId = "64006b64a96106bdcef99406";
         try {
@@ -65,7 +65,7 @@ const MarkAttendance = () => {
 
             if (data && data.success) {
                 console.log(data.data[0], "attendanceForDate");
-                let attendanceForDate = data.data[0].attendance.filter(item => item.date == ('' + new Date(selectedDate)).slice(0, 15))
+                let attendanceForDate = data.data[0].attendance.filter(item => item.date == ('' + new Date(selDate)).slice(0, 15))
                 console.log(attendanceForDate, "attendanceForDate after filter");
                 setFetchedAttendanceData(attendanceForDate);
                 if (attendanceForDate.length == 0)
@@ -253,7 +253,7 @@ const MarkAttendance = () => {
             });
 
             console.log(data, "manual attendance submitted");
-            fetchAttendanceForSelectedDetails(selectedSectionId, selectedSubjectId);
+            fetchAttendanceForSelectedDetails(selectedSectionId, selectedSubjectId, selectedDate);
 
             setSuccess(true);
             setSuccessMessage("Your updated attendance submitted successfully!");
@@ -562,6 +562,9 @@ const MarkAttendance = () => {
                                     <td style={{textAlign : 'center' }}>
                                     Please select section first!
                                     </td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
                                     </tr>
                             }
 
