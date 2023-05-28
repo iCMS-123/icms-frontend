@@ -667,8 +667,7 @@ const MyBranch = (props) => {
                       </div>
                     </div>
                   </div>
-                  <h5 className="card-title"> {issue.title || 'title to be added'}</h5>
-                  <p className="card-text">
+                  <p className="card-text mt-3">
                     {issue.issueMsg.slice(0, 50) + '...'}   </p>
                   <a href="#" className="btn btn-primary" onClick={() => { handleIssueModal(idx, 1) }}>
                     View Issue
