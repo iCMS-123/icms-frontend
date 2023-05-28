@@ -53,6 +53,9 @@ const MyBranch = (props) => {
   const [allTeachersData, setAllTeachersData] = useState([]);
   const [verifiedTeachers, setVerifiedTeachers] = useState([]);
   const [unverifiedTeachers, setUnverifiedTeachers] = useState([]);
+  const [filteredVerifiedTeachers, setFilteredVerifiedTeachers] = useState([]);
+  const [filteredUnverifiedTeachers, setFilteredUnverifiedTeachers] = useState([]);
+  const [filterTeachersList, setFilteredTeachersList] = useState([]);
   // For issue Modal
   const [showIssueModal, setShowIssueModal] = useState(false);
   const [issueModalData, setIssueModalData] = useState({});
@@ -94,7 +97,9 @@ const MyBranch = (props) => {
 
   useEffect(()=>{
       setVerifiedTeachers(allTeachersData.filter((teacher)=>teacher.isVerified));
+      setFilteredVerifiedTeachers(allTeachersData.filter((teacher)=>teacher.isVerified));
       setUnverifiedTeachers(allTeachersData.filter((teacher)=>!teacher.isVerified));
+      setFilteredUnverifiedTeachers(allTeachersData.filter((teacher)=>!teacher.isVerified));
   }, [allTeachersData])
   useEffect(() => {
     const getIssuesList = async () => {
@@ -269,16 +274,30 @@ const MyBranch = (props) => {
     getUnverifiedTeachersListBranchWise();
   }, []);
 
-  const filterByName = async (filter) => {
-    let myTeachersList = unverifiedTeachersList.filter((teacher) => {
-      return ((teacher.firstName + " " + teacher.lastName).toUpperCase().indexOf(filter.toUpperCase()) > -1)
+  const filterByName = async (query, isVerified) => {
+    query = query.trim();
+    if(query == ""){
+      if(isVerified){
+        setFilteredVerifiedTeachers(verifiedTeachers);
+      }else{
+        setFilteredUnverifiedTeachers(unverifiedTeachers);
+      }
+      return;
+    }
+    let source;
+    if (isVerified) {
+      source = verifiedTeachers;
+    } else {
+      source = unverifiedTeachersList;
+    }
+    let myTeachersList = source.filter((teacher) => {
+      return ((teacher.firstName + " " + teacher.lastName).toUpperCase().indexOf(query.toUpperCase()) > -1)
     })
-
-    // console.log(myTeachersList, "myTeachersList");
-    if (myTeachersList.length)
-      setUnverifiedTeachersListCopy(myTeachersList);
-    else
-      setUnverifiedTeachersListCopy(null);
+    if(isVerified){
+      setFilteredVerifiedTeachers(myTeachersList);
+    }else{
+      setFilteredUnverifiedTeachers(myTeachersList);
+    }
   }
 
   async function getTeacherDetailsAndShowInModal(idx, isVerified) {
@@ -734,7 +753,7 @@ const MyBranch = (props) => {
       {/* Verified Teachers start */}
       <div id={styles.verifiedBox}>
         <h5 style={{ fontWeight: 'bold' }}>Verified Teachers</h5>
-        {(verifiedTeachers?.length < 1) && <p className='mt-3'>Currently there are no verified teachers.</p>}
+        {(filteredVerifiedTeachers?.length < 1) && <p className='mt-3'>Currently there are no verified teachers.</p>}
 
         <Row>
           <Col xs={9}>
@@ -745,7 +764,7 @@ const MyBranch = (props) => {
             <Row xs={1} md={2} className="g-4" id={styles.teachersDiv}>
 
               {
-                verifiedTeachers?.map((teacher, index) => (
+                filteredVerifiedTeachers?.map((teacher, index) => (
                   <Col>
                     <Card>
                       <Card.Body>
@@ -862,7 +881,7 @@ const MyBranch = (props) => {
                 placeholder="Enter Teacher's Name"
                 aria-label="searchBox"
                 aria-describedby="basic-addon2"
-                onChange={e => { filterByName(e.target.value) }}
+                onChange={e => { filterByName(e.target.value, 1) }}
               />
               <InputGroup.Text id="basic-addon2"> <FaSearch /> </InputGroup.Text>
             </InputGroup>
@@ -876,7 +895,7 @@ const MyBranch = (props) => {
       {/* Unverified Teachers start */}
       <div id={styles.unverifiedBox}>
         <h5 style={{ fontWeight: 'bold' }}>Unverified Teachers</h5>
-        {(unverifiedTeachers?.length < 1) && <p className='mt-3'>Currently there are no such unverified teachers.</p>}
+        {(filteredUnverifiedTeachers?.length < 1) && <p className='mt-3'>Currently there are no such unverified teachers.</p>}
 
         <Row>
           <Col xs={9}>
@@ -888,7 +907,7 @@ const MyBranch = (props) => {
 
               {
 
-                unverifiedTeachers?.map((teacher, index) => (
+                filteredUnverifiedTeachers?.map((teacher, index) => (
                   <Col>
                     <Card>
                       <Card.Body>
@@ -1005,7 +1024,7 @@ const MyBranch = (props) => {
                 placeholder="Enter Teacher's Name"
                 aria-label="searchBox"
                 aria-describedby="basic-addon2"
-                onChange={e => { filterByName(e.target.value) }}
+                onChange={e => { filterByName(e.target.value, 0) }}
               />
               <InputGroup.Text id="basic-addon2"> <FaSearch /> </InputGroup.Text>
             </InputGroup>
