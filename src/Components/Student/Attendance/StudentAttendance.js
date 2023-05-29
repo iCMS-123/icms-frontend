@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import axios from "axios";
 import moment from 'moment/moment';
 import {
   Chart as ChartJS,
@@ -17,13 +18,9 @@ import { Card } from "react-bootstrap";
 const StudentAttendance = () => {
   let icmsUserInfo = JSON.parse(localStorage.getItem("icmsUserInfo"));
   let userData = icmsUserInfo.data;
-  console.log(userData);
-  let subjectsAttendanceData = userData.attendanceData;
-  // sort all the attendance data by date
-  subjectsAttendanceData?.forEach((subject)=>{
-    subject.subjectAttendance = subject.subjectAttendance.sort((a, b) => moment(a.date).diff(moment(b.date)));
-  })
-  const [activeSubject, setActiveSubject] = useState(subjectsAttendanceData[0].subjectName);
+  let userID = userData.user._id;
+  const [subjectsAttendanceData, setSubjectsAttendanceData] = useState();
+  const [activeSubject, setActiveSubject] = useState();
   const [attendanceCountLabels, setAttendanceCountLabels] = useState([]);
   const [dateLabels, setDateLabels] = useState([]);
   function updateLineChart(index) {
@@ -38,9 +35,31 @@ const StudentAttendance = () => {
     setDateLabels(temp1);
     setAttendanceCountLabels(temp2);
   }
-  useEffect(() => {
-    updateLineChart(0);
+  
+  useEffect( ()=>{
+    const fetchAttendance = async () => {
+    try{
+            let data = await axios.get(`http://localhost:8002/api/v1/section/fetch-attendance-student-id/${userID}`)
+            console.log(data.data.data, "subjectsAttendanceData");
+            let receivedData = data.data.data;
+              // sort all the attendance data by date
+            receivedData.forEach((subject)=>{
+              subject.subjectAttendance = subject.subjectAttendance.sort((a, b) => moment(a.date).diff(moment(b.date)));
+            })
+            setSubjectsAttendanceData(receivedData);
+          }catch(err){
+            console.log(err);
+        }
+    }
+    fetchAttendance();
+    
   }, []);
+
+  useEffect(()=>{
+    if(subjectsAttendanceData){
+      updateLineChart(0);
+    }
+  }, [subjectsAttendanceData])
 
   // Chart.js code
   // for chartjs
@@ -107,7 +126,7 @@ const StudentAttendance = () => {
   return (
     <div className="attendance-container" style={attendanceContainer}>
       <h4>Subjects</h4>
-      {subjectsAttendanceData.map((subject, ind) => {
+      {subjectsAttendanceData?.map((subject, ind) => {
         return (
           <button
             key={ind}

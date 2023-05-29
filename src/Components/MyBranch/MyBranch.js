@@ -39,14 +39,23 @@ const MyBranch = (props) => {
   const modalClassCoordinatorRef = useRef(null);
 
   let icmsLocalStorageData = JSON.parse(localStorage.getItem("icmsUserInfo"));
-  console.log(icmsLocalStorageData);
+  // console.log(icmsLocalStorageData);
   let userData = icmsLocalStorageData.data;
   let branchName = userData.branchName || userData.user.branchName;
+  let userID = userData._id || userData.user._id;
   const [error, seterror] = useState(null);
   const [success, setSuccess] = useState(false);
   const [successMessage, setSuccessMessage] = useState(false);
-
+  const [studentCountData, setStudentCountData] = useState([]);
   const [issuesData, setIssuesData] = useState([]); // for issues data
+  const [activeIssues, setActiveIssues] = useState([]);
+  const [resolvedIssues, setResolvedIssues] = useState([]);
+  const [allTeachersData, setAllTeachersData] = useState([]);
+  const [verifiedTeachers, setVerifiedTeachers] = useState([]);
+  const [unverifiedTeachers, setUnverifiedTeachers] = useState([]);
+  const [filteredVerifiedTeachers, setFilteredVerifiedTeachers] = useState([]);
+  const [filteredUnverifiedTeachers, setFilteredUnverifiedTeachers] = useState([]);
+  const [filterTeachersList, setFilteredTeachersList] = useState([]);
   // For issue Modal
   const [showIssueModal, setShowIssueModal] = useState(false);
   const [issueModalData, setIssueModalData] = useState({});
@@ -54,24 +63,23 @@ const MyBranch = (props) => {
   const handleIssueModalShow = () => setShowIssueModal(true);
 
 
-  function handleIssueModal(studentID) {
-    const target = issuesData.find((obj) => {
-      return obj._id == studentID;
-    })
-    setIssueModalData(target);
+  function handleIssueModal(index, isActive) {
+    if(isActive){
+      setIssueModalData(activeIssues[index]);
+    }else{
+      setIssueModalData(resolvedIssues[index]);
+    }
     handleIssueModalShow(true);
   }
   const getClassroomsList = async () => {
     try {
-      console.log(branchName);
       const { data } = await axios.get(`http://localhost:8002/api/v1/hod/get-list-section?branchName=${branchName}`);
-
       if (data && data.success) {
         setClassroomList([data.firstYear, data.secondYear, data.thirdYear, data.fourthYear]);
         // setIssuesData(data.issues); // for issues data
 
-        console.log([data.firstYear, data.secondYear, data.thirdYear, data.fourthYear]);
-        console.log(classroomList, "Classroom LIST");
+        // console.log([data.firstYear, data.secondYear, data.thirdYear, data.fourthYear]);
+        // console.log(classroomList, "Classroom LIST");
       }
     } catch (e) {
       console.log(e, "e");
@@ -82,15 +90,27 @@ const MyBranch = (props) => {
     getClassroomsList();
   }, []);
 
+  useEffect(()=>{
+    setActiveIssues(issuesData.filter((issue) => !issue.isAttended))
+    setResolvedIssues(issuesData.filter((issue) => issue.isAttended))
+  }, [issuesData]);
+
+  useEffect(()=>{
+      setVerifiedTeachers(allTeachersData.filter((teacher)=>teacher.isVerified));
+      setFilteredVerifiedTeachers(allTeachersData.filter((teacher)=>teacher.isVerified));
+      setUnverifiedTeachers(allTeachersData.filter((teacher)=>!teacher.isVerified));
+      setFilteredUnverifiedTeachers(allTeachersData.filter((teacher)=>!teacher.isVerified));
+  }, [allTeachersData])
   useEffect(() => {
     const getIssuesList = async () => {
       try {
-        console.log(branchName);
         const { data } = await axios.get(`http://localhost:8002/api/v1/branch/get-branch-detail?branchName=${branchName}`);
 
         if (data && data.success) {
-          console.log(data, "issues data");
-          setIssuesData(data.data.branchData[0].issues); // for issues data
+          let allIssues = data.data.branchData[0].issues;
+          let allTeachers = data.data.branchData[0].teachers;
+          setIssuesData(allIssues); // for issues data      
+          setAllTeachersData(allTeachers);
         }
       } catch (e) {
         console.log(e, "e");
@@ -100,20 +120,38 @@ const MyBranch = (props) => {
     getIssuesList();
 
   }, []);
+
+  useEffect(()=>{
+// get year wise student count
+    const getStudentCount = async ()=>{
+      try {
+        const { data } = await axios.get(`http://localhost:8002/api/v1/hod/get-student-count?branchName=${branchName}`);
+        if (data && data.success) {
+          let temp = data.data;
+          temp = temp.sort((a,b)=>parseInt(a._id)-parseInt(b._id));
+          setStudentCountData(temp);
+        }
+      }catch (e) {
+        console.log(e, "e");
+      }
+    }
+    getStudentCount();
+  }, [])
   let years = ["First Year", "Second Year", "Third Year", "Fourth Year"];
   let yearWiseColors = ["info", "warning", "danger", "success"];
 
   async function showClassroomCardModal(idx, index) {
-    console.log(classroomList[idx][index], "classroomList[idx][index]");
+    // console.log(classroomList[idx][index], "classroomList[idx][index]");
     getNotSectionHeadList();
     try {
       const { data } = await axios.get(`http://localhost:8002/api/v1/section/get-section-data/${classroomList[idx][index].sectionHead}`);
 
       if (data && data.success) {
-        console.log(data, "section data");
-        console.log(data.data.id, "section id");
+        // console.log(data, "section data");
+        // console.log(data.data.id, "section id");
         setSectionId(data.data.id);
         setClassroomCardDetailsForModal(data.data);
+        console.log(data.data, "all section data");
       }
     } catch (e) {
       console.log(e, "e");
@@ -133,7 +171,7 @@ const MyBranch = (props) => {
 
       if (data && data.success) {
         setNotSectionHeadList(data.data);
-        console.log(data.data, "setNotSectionHeadList");
+        // console.log(data.data, "setNotSectionHeadList");
       }
 
     } catch (e) {
@@ -142,8 +180,8 @@ const MyBranch = (props) => {
   };
   async function handleModalForm(e) {
     e.preventDefault();
-    console.log(modalSectionRef?.current);
-    console.log(JSON.parse(localStorage.getItem("icmsUserInfo")).data._id);
+    // console.log(modalSectionRef?.current);
+    // console.log(JSON.parse(localStorage.getItem("icmsUserInfo")).data._id);
     try {
       let { data } = await axios.post("http://localhost:8002/api/v1/hod/create-section", {
         year: modalYearRef?.current?.value,
@@ -159,7 +197,7 @@ const MyBranch = (props) => {
       classroomList[year - 1].push(data.data.sectionData);
       setClassroomList(classroomList);
 
-      console.log(data, "classroom created");
+      // console.log(data, "classroom created");
 
       setSuccess(true);
       setSuccessMessage("Classroom created successfully !");
@@ -176,13 +214,13 @@ const MyBranch = (props) => {
 
   const submitUpdateSectionHeadForm = async (e) => {
     e.preventDefault();
-    console.log("submitUpdateSectionHeadForm called");
+    // console.log("submitUpdateSectionHeadForm called");
     try {
       const { data } = await axios.post(`http://localhost:8002/api/v1/hod/assign-section-head`, {
         sectionId: sectionId,
         updatedSectionHeadRef: sectionHeadIdForUpdate
       });
-      console.log(data, "ddaattaa");
+      // console.log(data, "ddaattaa");
       if (data && data.success) {
         await getClassroomsList();
         setClassroomCardModalShow(false)
@@ -209,7 +247,7 @@ const MyBranch = (props) => {
     let hodBranch = JSON.parse(localStorage.getItem("icmsUserInfo")).data.user.branchName;
     try {
       const { data } = await axios.get(`http://localhost:8002/api/v1/admin/get-unverified-teacher?branchName=${hodBranch}`);
-      console.log(data, "dataaaaaaaaaaa");
+      // console.log(data, "dataaaaaaaaaaa");
       if (data && data.success) {
         if (data.data.teacherList.length) {
           setUnverifiedTeachersList(data.data.teacherList);
@@ -219,7 +257,7 @@ const MyBranch = (props) => {
           setUnverifiedTeachersList(null);
           setUnverifiedTeachersListCopy(null);
         }
-        console.log(data, "data");
+        // console.log(data, "data");
         setLoadingForFilter(false);
         // setSuccess(true);
       }
@@ -236,22 +274,38 @@ const MyBranch = (props) => {
     getUnverifiedTeachersListBranchWise();
   }, []);
 
-  const filterByName = async (filter) => {
-    let myTeachersList = unverifiedTeachersList.filter((teacher) => {
-      return ((teacher.firstName + " " + teacher.lastName).toUpperCase().indexOf(filter.toUpperCase()) > -1)
+  const filterByName = async (query, isVerified) => {
+    query = query.trim();
+    if(query == ""){
+      if(isVerified){
+        setFilteredVerifiedTeachers(verifiedTeachers);
+      }else{
+        setFilteredUnverifiedTeachers(unverifiedTeachers);
+      }
+      return;
+    }
+    let source;
+    if (isVerified) {
+      source = verifiedTeachers;
+    } else {
+      source = unverifiedTeachersList;
+    }
+    let myTeachersList = source.filter((teacher) => {
+      return ((teacher.firstName + " " + teacher.lastName).toUpperCase().indexOf(query.toUpperCase()) > -1)
     })
-
-    console.log(myTeachersList, "myTeachersList");
-    if (myTeachersList.length)
-      setUnverifiedTeachersListCopy(myTeachersList);
-    else
-      setUnverifiedTeachersListCopy(null);
+    if(isVerified){
+      setFilteredVerifiedTeachers(myTeachersList);
+    }else{
+      setFilteredUnverifiedTeachers(myTeachersList);
+    }
   }
 
-  async function getTeacherDetailsAndShowInModal(idx) {
-    console.log('getTeacherDetailsAndShowInModal');
-    console.log(unverifiedTeachersList, "unverifiedTeachersList");
-    setTeacherDetailsForModal(unverifiedTeachersListCopy[idx]);
+  async function getTeacherDetailsAndShowInModal(idx, isVerified) {
+    if(isVerified){
+      setTeacherDetailsForModal(verifiedTeachers[idx]);
+    }else{
+      setTeacherDetailsForModal(unverifiedTeachers[idx]);
+    }
     setTeacherDetailsModalShow(true);
   }
 
@@ -262,7 +316,7 @@ const MyBranch = (props) => {
 
   async function setTeacherVerified(teacher_id) {
     //function to verify teacher's account
-    console.log(teacher_id, 'teacher_id for verification');
+    // console.log(teacher_id, 'teacher_id for verification');
 
     try {
       const { data } = await axios.put(`http://localhost:8002/api/v1/admin/verify-teacher/${teacher_id}`);
@@ -279,7 +333,31 @@ const MyBranch = (props) => {
       setTimeout(() => seterror(null), 3000);
     }
   }
-
+  async function handleIssueStatusModal(decision) {
+    // console.log(issuesData, "allIssues");
+    try {
+      const { data } = await axios.put(`http://localhost:8002/api/v1/branch/resolve-issue/${userID}`, {
+        issueId: issueModalData._id,
+        status: decision
+      })
+      console.log(data, "handleIssuesStatusModal");
+      if (data.success) {
+        if (decision === true) {
+          setSuccess(true);
+          setSuccessMessage("Issue Resolved!");
+          setTimeout(() => setSuccess(false), 5000);
+        } else {
+          seterror("Issue Rejected!");
+          setTimeout(() => seterror(null), 3000);
+        }
+      }
+      let allIssues = data.data.issues;
+      setIssuesData(allIssues);
+      } catch (err) {
+      console.log(err);
+    }
+    handleIssueModalClose();
+  }
 
   // Unverified Teachers Code ends
 
@@ -302,7 +380,7 @@ const MyBranch = (props) => {
 
         {years?.map((yr, idx) => (
           <>
-            {/* <h5>{yr}</h5> */}
+            <h5>{yr} - {studentCountData[idx]?.totalStudents} student(s)</h5>
             <Row xs={1} md={4} className="" key={idx}>
               {classroomList != null && classroomList[idx].length !== 0 &&
                 classroomList[idx]?.map((classRoom, index) => (
@@ -564,15 +642,13 @@ const MyBranch = (props) => {
       </div>
 
 
-      {/* Issues */}
-      <h4>Active Issues</h4>
+{/* Issues */}
+<h4>Active Issues</h4>
       <section className="active-issues-section">
         <div className="active-issues-container" >
-
-          {(issuesData == null) && <h6 className="text-muted">No issue posted currently!</h6>}
-          {(issuesData != null) && (issuesData.length == 0) && <h6 className="text-muted">No issues posted currently!</h6>}
+          {activeIssues?.length < 1 && <p>No active issues, Hurray!</p>}
           {
-            issuesData?.map((issue, idx) => {
+            activeIssues?.map((issue, idx) => {
 
               return <div key={idx} className="card issue-card">
                 <div className="card-body">
@@ -591,10 +667,9 @@ const MyBranch = (props) => {
                       </div>
                     </div>
                   </div>
-                  <h5 className="card-title"> {issue.title || 'title to be added'}</h5>
-                  <p className="card-text">
+                  <p className="card-text mt-3">
                     {issue.issueMsg.slice(0, 50) + '...'}   </p>
-                  <a href="#" className="btn btn-primary" onClick={() => { handleIssueModal(issue._id) }}>
+                  <a href="#" className="btn btn-primary" onClick={() => { handleIssueModal(idx, 1) }}>
                     View Issue
                   </a>
 
@@ -608,9 +683,9 @@ const MyBranch = (props) => {
 
         {/* View Issue Card Modal*/}
 
-        <Modal show={showIssueModal} onHide={handleIssueModalClose}>
+        <Modal id="unresolved-issues" show={showIssueModal} onHide={handleIssueModalClose}>
           <Modal.Header closeButton>
-            <Modal.Title>{issueModalData.issueTitle || 'Title'}</Modal.Title>
+            <Modal.Title>{issueModalData.title || 'Title'}</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <h6>Submitted By : {issueModalData.issueSubmittedByStudent?.firstName + " " + issueModalData.issueSubmittedByStudent?.lastName || 'Full Name'}</h6>
@@ -618,16 +693,65 @@ const MyBranch = (props) => {
 
 
           </Modal.Body>
+          {!issueModalData.isAttended && <Modal.Footer style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <Button onClick={() => { handleIssueStatusModal(true) }} variant="success">Resolve</Button>
+            <Button onClick={() => { handleIssueStatusModal(false) }} variant="danger">Reject</Button>
+          </Modal.Footer>}
 
         </Modal>
+
+
       </section>
 
-      {/* Issues end */}
+      <h4>Resolved Issues</h4>
+      <section className="active-issues-section">
+        <div className="active-issues-container" >
+          {resolvedIssues?.length < 1 && <p>No resolved issue, checkout active issues</p>}
+          {
+            resolvedIssues?.map((issue, idx) => {
 
-      {/* Unverified Teachers start */}
-      <div id={styles.unverifiedBox}>
-        <h5 style={{ fontWeight: 'bold' }}>Unverified Teachers</h5>
-        {(unverifiedTeachersListCopy == null) && <p className='mt-3'>Currently there are no such unverified teachers.</p>}
+              return <div key={idx} className="card issue-card">
+                <div className="card-body">
+                  <div className="d-flex justify-content-between">
+                    <Badge bg="success">Resolved</Badge>
+                    <Badge bg={(issue.priority == 1 && "danger") || (issue.priority == 2 && "primary") || (issue.priority == 3 && "warning")}>{(issue.priority == 1 && "High") || (issue.priority == 2 && "Low") || (issue.priority == 3 && "Medium")}</Badge>
+                  </div>
+                  <div className="d-flex justify-content-between mt-3">
+                    <div className="d-flex align-items-center">
+                      <img
+
+                        src={issue.issueSubmittedByStudent?.profileImg || 'https://res.cloudinary.com/abhistrike/image/upload/v1626953029/avatar-370-456322_wdwimj.png'}
+                        alt="profile"
+                        className="rounded-circle"
+                        style={{ width: "60px", height: "60px" }}
+                      />
+                      <div className="ms-3">
+                        <p className="mb-0">  {issue.issueSubmittedByStudent?.firstName + " " + issue.issueSubmittedByStudent?.lastName || 'Full Name'}</p>
+                      </div>
+                    </div>
+                  </div>
+                  <p className="card-text mt-3">
+                    {issue.issueMsg.slice(0, 50) + '...'}   </p>
+                  <a href="#" className="btn btn-primary" onClick={() => { handleIssueModal(idx, 0) }}>
+                    View Issue
+                  </a>
+
+
+                </div>
+              </div>
+            })
+          }
+
+        </div>
+        {/* Same modal is being used to show details of resolved issues */}
+      </section>
+
+
+
+      {/* Verified Teachers start */}
+      <div id={styles.verifiedBox}>
+        <h5 style={{ fontWeight: 'bold' }}>Verified Teachers</h5>
+        {(filteredVerifiedTeachers?.length < 1) && <p className='mt-3'>Currently there are no verified teachers.</p>}
 
         <Row>
           <Col xs={9}>
@@ -637,9 +761,8 @@ const MyBranch = (props) => {
 
             <Row xs={1} md={2} className="g-4" id={styles.teachersDiv}>
 
-              {(unverifiedTeachersListCopy != null) &&
-
-                unverifiedTeachersListCopy.map((teacher, index) => (
+              {
+                filteredVerifiedTeachers?.map((teacher, index) => (
                   <Col>
                     <Card>
                       <Card.Body>
@@ -647,16 +770,157 @@ const MyBranch = (props) => {
                           {teacher.isHod && <Badge bg="dark" style={{ position: 'absolute', top: '10px', right: '30px' }}>
                             HOD
                           </Badge>}
-                          {teacher.isVerified && <FaUserCheck style={{ position: 'absolute', top: '10px', right: '10px', color: 'green' }} />}
-                          {!teacher.isVerified && <FaUserTimes style={{ position: 'absolute', top: '10px', right: '10px', color: 'red' }} />}
-
+                          <FaUserCheck style={{ position: 'absolute', top: '10px', right: '10px', color: 'green' }} />
                           <Image src={teacher.profileImg} rounded={true} style={{ height: "90px", width: 'auto' }} className="me-3" />
                           <span style={{ display: 'flex', flexDirection: 'column' }}>
                             <b className="text-muted">{teacher.branchName.toUpperCase()}</b>
                             <b className="mb-2">{teacher.firstName + " " + teacher.lastName}</b>
                             <span>
                               <Button variant="outline-info" size="sm"
-                                onClick={e => getTeacherDetailsAndShowInModal(index)}
+                                onClick={e => getTeacherDetailsAndShowInModal(index, 1)}
+                              >
+                                View Details
+                              </Button>
+                              <Button variant="success" size="sm" style={{ width: 'fit-content', marginLeft: '15px' }}
+                                onClick={e => setTeacherVerified(teacher._id)}
+                              >
+                                <FaCheck />
+                              </Button>
+                            </span>
+                          </span>
+                        </div>
+                        {/* <Card.Text>
+            Some quick example text to build on the card title and make up the
+            bulk of the card's content.
+        </Card.Text>
+        <Card.Link href="#">Card Link</Card.Link>
+        <Card.Link href="#">Another Link</Card.Link> */}
+                      </Card.Body>
+                    </Card>
+                  </Col>
+                ))
+              }
+            </Row>
+            {/* Modal code starts */}
+            <Modal show={teacherDetailsModalShow} fullscreen={true} onHide={() => setTeacherDetailsModalShow(false)}>
+              <Modal.Header closeButton>
+                {/* <Modal.Title>Teacher's Details</Modal.Title> */}
+              </Modal.Header>
+              <Modal.Body>
+                <div style={{ display: 'flex', width: '100%', height: '100%' }}>
+                  <div id='left-section' style={{ width: '30%', background: 'linear-gradient(90deg, #1CB5E0 0%, #000851 100%)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
+                    <h5>
+                      {teacherDetailsForModal.isHod && <Badge bg="secondary" style={{ marginBottom: '20px' }}>
+                        HOD
+                      </Badge>}
+                    </h5>
+                    <Image src={teacherDetailsForModal.profileImg} roundedCircle={true} style={{ height: "100px", width: '100px' }} className="mb-3" />
+                    <h5>{teacherDetailsForModal.firstName + " " + teacherDetailsForModal.lastName}</h5>
+                    <h5> {teacherDetailsForModal.branchName?.toUpperCase()}</h5>
+                  </div>
+                  <div id='right-section' style={{ width: '70%', padding: '10px 20px' }}>
+                    <h6>Information</h6>
+                    <hr />
+                    <div style={{ padding: '10px 20px' }}>
+                      <Row>
+                        <Col style={{ display: 'flex', flexDirection: 'column' }}>
+                          <h6>First Name </h6>
+                          <p className='text-muted'>{teacherDetailsForModal.firstName}</p>
+                        </Col>
+                        <Col style={{ display: 'flex', flexDirection: 'column' }}>
+                          <h6>Last Name </h6>
+                          <p className='text-muted'>{teacherDetailsForModal.lastName}</p>
+                        </Col>
+                      </Row>
+                      <Row>
+                        <Col style={{ display: 'flex', flexDirection: 'column' }}>
+                          <h6>Email </h6>
+                          <p className='text-muted'>{teacherDetailsForModal.email}</p>
+                        </Col>
+                        <Col style={{ display: 'flex', flexDirection: 'column' }}>
+                          <h6>Verification Status</h6>
+
+                          {teacherDetailsForModal.isVerified &&
+                            <p className='text-muted'>Verified
+                              <FaUserCheck style={{ marginLeft: '10px', color: 'green' }} />
+                            </p>
+                          }
+                          {!teacherDetailsForModal.isVerified &&
+                            <p className='text-muted'>Not Verified
+                              <FaUserTimes style={{ marginLeft: '10px', color: 'red' }} />
+                            </p>
+                          }
+
+                        </Col>
+                      </Row>
+                      <Col style={{ display: 'flex', flexDirection: 'column' }}>
+                        <h6>College ID</h6>
+                        <Image src={teacherDetailsForModal.collegeIdCard || 'https://picturedensity.com/wp-content/uploads/2019/06/Polytechnicollege-id-card.jpg'} style={{ height: "auto", width: 'auto', maxWidth: '300px' }} className="mt-2" />
+                      </Col>
+
+                    </div>
+
+                  </div>
+                </div>
+
+              </Modal.Body>
+              {/* <Modal.Footer>
+                <Button variant="success" onClick={e => setTeacherVerified(teacherDetailsForModal._id)}>Verify Account</Button>
+                <Button variant="dark" onClick={e => terminateAccount(teacherDetailsForModal._id)}>Terminate Account</Button>
+              </Modal.Footer> */}
+            </Modal>
+            {/* Modal code ends */}
+
+          </Col>
+          <Col className="ms-2 mt-0">
+            <h5>Search Teachers</h5>
+            <InputGroup className="mb-3">
+              <Form.Control
+                placeholder="Enter Teacher's Name"
+                aria-label="searchBox"
+                aria-describedby="basic-addon2"
+                onChange={e => { filterByName(e.target.value, 1) }}
+              />
+              <InputGroup.Text id="basic-addon2"> <FaSearch /> </InputGroup.Text>
+            </InputGroup>
+
+
+          </Col>
+        </Row>
+
+      </div>
+      {/* Verified Teachers end */}
+      {/* Unverified Teachers start */}
+      <div id={styles.unverifiedBox}>
+        <h5 style={{ fontWeight: 'bold' }}>Unverified Teachers</h5>
+        {(filteredUnverifiedTeachers?.length < 1) && <p className='mt-3'>Currently there are no such unverified teachers.</p>}
+
+        <Row>
+          <Col xs={9}>
+            {loadingForFilter ? (
+              <Loader1></Loader1>
+            ) : ('')}
+
+            <Row xs={1} md={2} className="g-4" id={styles.teachersDiv}>
+
+              {
+
+                filteredUnverifiedTeachers?.map((teacher, index) => (
+                  <Col>
+                    <Card>
+                      <Card.Body>
+                        <div style={{ display: 'flex', }}>
+                          {teacher.isHod && <Badge bg="dark" style={{ position: 'absolute', top: '10px', right: '30px' }}>
+                            HOD
+                          </Badge>}
+                          <FaUserTimes style={{ position: 'absolute', top: '10px', right: '10px', color: 'red' }} />
+                          <Image src={teacher.profileImg} rounded={true} style={{ height: "90px", width: 'auto' }} className="me-3" />
+                          <span style={{ display: 'flex', flexDirection: 'column' }}>
+                            <b className="text-muted">{teacher.branchName.toUpperCase()}</b>
+                            <b className="mb-2">{teacher.firstName + " " + teacher.lastName}</b>
+                            <span>
+                              <Button variant="outline-info" size="sm"
+                                onClick={e => getTeacherDetailsAndShowInModal(index, 0)}
                               >
                                 View Details
                               </Button>
@@ -758,7 +1022,7 @@ const MyBranch = (props) => {
                 placeholder="Enter Teacher's Name"
                 aria-label="searchBox"
                 aria-describedby="basic-addon2"
-                onChange={e => { filterByName(e.target.value) }}
+                onChange={e => { filterByName(e.target.value, 0) }}
               />
               <InputGroup.Text id="basic-addon2"> <FaSearch /> </InputGroup.Text>
             </InputGroup>
