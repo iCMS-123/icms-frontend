@@ -1,9 +1,9 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { useNavigate, Link } from "react-router-dom";
-import { Button, Card, Form, Badge, Modal, Image } from "react-bootstrap";
+import { Button, Card, Form, Badge, Modal, Image, InputGroup } from "react-bootstrap";
 import useDocumentTitle from "../../Hooks/useDocumentTitle";
 import styles from "./index.module.css";
-import { FaTimesCircle } from "react-icons/fa"
+import { FaSearch, FaUserCheck, FaUserTimes, FaTimesCircle, FaBookOpen, FaCalendar, FaUsers } from 'react-icons/fa';
 
 import axios from 'axios';
 import Message from "../Message/index";
@@ -42,6 +42,8 @@ const Resources = () => {
     const isUserHod = JSON.parse(localStorage.getItem("icmsUserInfo")).data.isHod;
     const [selectedSubjectId, setSelectedSubjectId] = useState(null);
 
+    const [sectionData, setSectionData] = useState(null);
+    let yearMap = ["First Year", "Second Year", "Third Year", "Fourth Year"];
     const sectionId = JSON.parse(localStorage.getItem("icmsUserInfo")).data.sectionHeadRef;
     const [selectedSectionId, setSelectedSectionId] = useState(sectionId);
     const [selectedSubjectTeacherId, setSelectedSubjectTeacherId] = useState(null);
@@ -50,16 +52,132 @@ const Resources = () => {
         console.log(sId, tId, "sID, tId");
         await setSelectedSubjectId(sId);
         await setSelectedSubjectTeacherId(tId)
-        fetchAttendanceForSelectedDetails(selectedSectionId, sId, selectedDate)
     }
     async function selectedSectionChanged(sId) {
         await setSelectedSectionId(sId);
-        await getListOfStudents(sId);
         await fetchSubjectsForSection(sId);
-        fetchAttendanceForSelectedDetails(sId, selectedSubjectId, selectedDate)
     }
 
-    function resetResourcesForm(){
+
+    const [subjectList, setSubjectList] = useState([]);
+
+    const [sectionList, setSectionList] = useState([]);
+    const [subjectListForSection, setSubjectListForSection] = useState([]);
+
+    const getSubjectsList = async () => {
+        try {
+            const { data } = await axios.get(`http://localhost:8002/api/v1/section/get-section-subject-list/${selectedSectionId}`);
+
+            if (data && data.success)
+                setSubjectList(data.data);
+        } catch (e) {
+            console.log(e, "e");
+        }
+    }
+
+    const getSectionList = async () => {
+        const userId = JSON.parse(localStorage.getItem("icmsUserInfo")).data._id;
+        try {
+            const { data } = await axios.get(`http://localhost:8002/api/v1/teacher/fetch-subjects/${userId}`);
+
+            if (data && data.success) {
+                let sectionListDB = data.data;
+                let listOfSections = {
+                    firstYear: [],
+                    secondYear: [],
+                    thirdYear: [],
+                    fourthYear: [],
+                }
+                let listOfSections1 = {
+                    firstYear: [],
+                    secondYear: [],
+                    thirdYear: [],
+                    fourthYear: [],
+                }
+                data.data.map(item => {
+                    if (item.sectionId.sectionYear == 1)
+                        listOfSections.firstYear.push(item.sectionId._id)
+                    else if (item.sectionId.sectionYear == 2)
+                        listOfSections.secondYear.push(item.sectionId._id)
+                    else if (item.sectionId.sectionYear == 3)
+                        listOfSections.thirdYear.push(item.sectionId._id)
+                    else if (item.sectionId.sectionYear == 4)
+                        listOfSections.fourthYear.push(item.sectionId._id)
+                })
+
+                listOfSections.firstYear = [...new Set(listOfSections.firstYear)]
+                listOfSections.secondYear = [...new Set(listOfSections.secondYear)]
+                listOfSections.thirdYear = [...new Set(listOfSections.thirdYear)]
+                listOfSections.fourthYear = [...new Set(listOfSections.fourthYear)]
+
+                listOfSections.firstYear.map(item =>
+                    listOfSections1.firstYear.push(sectionListDB.filter(it => it.sectionId._id == item)[0].sectionId)
+                )
+                listOfSections.secondYear.map(item =>
+                    listOfSections1.secondYear.push(sectionListDB.filter(it => it.sectionId._id == item)[0].sectionId)
+                )
+                listOfSections.thirdYear.map(item =>
+                    listOfSections1.thirdYear.push(sectionListDB.filter(it => it.sectionId._id == item)[0].sectionId)
+                )
+                listOfSections.fourthYear.map(item =>
+                    listOfSections1.fourthYear.push(sectionListDB.filter(it => it.sectionId._id == item)[0].sectionId)
+                )
+
+                setSectionList(listOfSections1);
+                console.log(data, listOfSections1, "section subject list");
+            }
+        } catch (e) {
+            console.log(e, "e");
+        }
+    }
+
+    const getSectionListForHOD = async () => {
+        const branchName = JSON.parse(localStorage.getItem("icmsUserInfo")).data.user.branchName;
+        try {
+            const { data } = await axios.get(`http://localhost:8002/api/v1/hod/get-list-section?branchName=${branchName}`);
+
+            if (data && data.success) {
+                setSectionList(data);
+                console.log(data, "section list");
+            }
+        } catch (e) {
+            console.log(e, "e");
+        }
+    }
+
+    const fetchSubjectsForSection = async (sId) => {
+        let fetchedSubjects = [];
+        try {
+            const { data } = await axios.get(`http://localhost:8002/api/v1/section/get-section-subject-list/${sId}`);
+
+            if (data && data.success) {
+                setSubjectListForSection(data.data);
+                fetchedSubjects = data.data;
+            }
+        } catch (e) {
+            console.log(e, "e");
+            return
+        }
+
+        if (!isUserSectionHead && !isUserHod) {
+            const userId = JSON.parse(localStorage.getItem("icmsUserInfo"))?.data?._id;
+            console.log(fetchedSubjects, "fetchedSubjects 1");
+            fetchedSubjects = fetchedSubjects.filter(item => item.subjectTeacher._id == userId)
+            setSubjectListForSection(fetchedSubjects)
+            console.log(fetchedSubjects, "fetchedSubjects 2");
+        }
+    }
+
+    useEffect(() => {
+        if (isUserHod || isUserSectionHead)
+            getSubjectsList()
+        if (isUserHod)
+            getSectionListForHOD();
+        else
+            getSectionList();
+    }, [])
+
+    function resetResourcesForm() {
         resourceName.current.value = null
         resourceDescription.current.value = null
         resourcePriority.current.value = null
@@ -91,16 +209,16 @@ const Resources = () => {
 
     async function addResourceAppend() {
         let resType = currentResourceUrl?.format;
-        if(currentResourceUrl?.format == 'jpg' || currentResourceUrl?.format == 'png' || currentResourceUrl?.format == 'jpeg')
+        if (currentResourceUrl?.format == 'jpg' || currentResourceUrl?.format == 'png' || currentResourceUrl?.format == 'jpeg')
             resType = 'img';
 
-        if(currentResourceType != resType){
+        if (currentResourceType != resType) {
             seterror("Resource Type choosen does not match with uploaded item !");
             setTimeout(() => seterror(null), 3000);
         }
-        else{
+        else {
             setAddResourceModalShow(false);
-        
+
             setResourcesArray(resourcesArray => [...resourcesArray, {
                 "resourceType": currentResourceType,
                 "resourceLink": currentResourceUrl?.secure_url,
@@ -112,7 +230,7 @@ const Resources = () => {
     }
 
     async function removeThisRes(resource) {
-        setResourcesArray(resourcesArray => resourcesArray.filter((item, idx) => 
+        setResourcesArray(resourcesArray => resourcesArray.filter((item, idx) =>
             item != resource
         ))
     }
@@ -121,30 +239,31 @@ const Resources = () => {
         e.preventDefault();
         console.log(JSON.parse(localStorage.getItem("icmsUserInfo")).data._id);
         try {
-          let { data } = await axios.post("http://localhost:8002/api/v1/teacher/share-msg-to-section", {
-            msgTitle: resourceName?.current?.value,
-            msgBody: resourceDescription?.current?.value,
-            priority: resourcePriority?.current?.value,
-            type: resourceType?.current?.value,
-            links: resourcesArray,
-            sectionId: JSON.parse(localStorage.getItem("icmsUserInfo")).data.sectionHeadRef,
-            createdBy: JSON.parse(localStorage.getItem("icmsUserInfo")).data._id,
-          });
-       
-          console.log(data, "resource submitted");
+            let { data } = await axios.post("http://localhost:8002/api/v1/teacher/share-msg-to-section", {
+                msgTitle: resourceName?.current?.value,
+                msgBody: resourceDescription?.current?.value,
+                priority: resourcePriority?.current?.value,
+                type: resourceType?.current?.value,
+                links: resourcesArray,
+                subjectId : selectedSubjectId,
+                sectionId: selectedSectionId,
+                createdBy: JSON.parse(localStorage.getItem("icmsUserInfo")).data._id,
+            });
 
-          resetResourcesForm();
-    
-          setSuccess(true);
-          setSuccessMessage("Your shared resource submitted successfully !");
-          setTimeout(() => setSuccess(false), 3000);
-    
+            console.log(data, "resource submitted");
+
+            resetResourcesForm();
+
+            setSuccess(true);
+            setSuccessMessage("Your shared resource submitted successfully !");
+            setTimeout(() => setSuccess(false), 3000);
+
         } catch (err) {
-          console.log(err, "Resource not submitted !");
-          seterror(err.msg);
-          setTimeout(() => seterror(null), 3000);
+            console.log(err, "Resource not submitted !");
+            seterror(err.msg);
+            setTimeout(() => seterror(null), 3000);
         }
-      }
+    }
 
     return (
         <div>
@@ -153,7 +272,9 @@ const Resources = () => {
                 <Message variant={"success"}>{successMessage}</Message>
             )}
 
-{
+
+            <h5 className="modal-title">Add New Resource </h5>
+            {
                 isUserSectionHead &&
                 <>
                     <section className="student-count">
@@ -200,7 +321,7 @@ const Resources = () => {
                 !isUserSectionHead && <>
                     {/* Section Picker */}
                     <Form.Group className="mb-2" controlId="formFirstName">
-                        <Form.Label className="text-muted">Section for marking attendance</Form.Label>
+                        <Form.Label className="text-muted">Section for Sending Resources</Form.Label>
                         <InputGroup className="mb-3">
                             <InputGroup.Text id="basic-addon1"><FaUsers /></InputGroup.Text>
 
@@ -262,8 +383,6 @@ const Resources = () => {
                 </>
             }
 
-            <h5 className="modal-title">Add New Resource </h5>
-
             <Form onSubmit={handleResourceFormSubmit}>
                 <Form.Group className="mb-3" controlId="resourceName">
                     <Form.Label>Resource Name</Form.Label>
@@ -306,28 +425,28 @@ const Resources = () => {
                     {
                         (resourcesArray != []) && resourcesArray.map((resource, index) => (
                             ((resource.resourceType == 'pdf') &&
-                                    <div key={index} style={{ display: "inline-block", height: '150px', marginRight: '10px', position: 'relative' }}>
-                                        <FaTimesCircle className="deleteImgBtn" onClick={(e) => removeThisRes(resource)} />
-                                        <Image thumbnail style={{ height: '100%' }} src='/images/pdfSnip.png' alt="User" />
-                                    </div>)
+                                <div key={index} style={{ display: "inline-block", height: '150px', marginRight: '10px', position: 'relative' }}>
+                                    <FaTimesCircle className="deleteImgBtn" onClick={(e) => removeThisRes(resource)} />
+                                    <Image thumbnail style={{ height: '100%' }} src='/images/pdfSnip.png' alt="User" />
+                                </div>)
                             ||
                             ((resource.resourceType == 'word') &&
-                                    <div key={index} style={{ display: "inline-block", height: '150px', marginRight: '10px', position: 'relative' }}>
+                                <div key={index} style={{ display: "inline-block", height: '150px', marginRight: '10px', position: 'relative' }}>
                                     <FaTimesCircle className="deleteImgBtn" onClick={(e) => removeThisRes(resource)} />
-                                        <Image thumbnail style={{ height: '100%' }} src='/images/wordSnip.png' alt="User" />
-                                    </div>)
+                                    <Image thumbnail style={{ height: '100%' }} src='/images/wordSnip.png' alt="User" />
+                                </div>)
                             ||
                             ((resource.resourceType == 'img') &&
-                                    <div key={index} style={{ display: "inline-block", height: '150px', marginRight: '10px', position: 'relative' }}>
+                                <div key={index} style={{ display: "inline-block", height: '150px', marginRight: '10px', position: 'relative' }}>
                                     <FaTimesCircle className="deleteImgBtn" onClick={(e) => removeThisRes(resource)} />
-                                        <Image thumbnail style={{ height: '100%' }} src={resource.resourceLink} alt="User" />
-                                    </div>)
+                                    <Image thumbnail style={{ height: '100%' }} src={resource.resourceLink} alt="User" />
+                                </div>)
                             ||
                             ((resource.resourceType == 'video') &&
-                                    <div key={index} style={{ display: "inline-block", height: '150px', marginRight: '10px', position: 'relative' }}>
+                                <div key={index} style={{ display: "inline-block", height: '150px', marginRight: '10px', position: 'relative' }}>
                                     <FaTimesCircle className="deleteImgBtn" onClick={(e) => removeThisRes(resource)} />
-                                        <Image thumbnail style={{ height: '100%' }} src='/images/videoSnip.png' alt="User" />
-                                    </div>)
+                                    <Image thumbnail style={{ height: '100%' }} src='/images/videoSnip.png' alt="User" />
+                                </div>)
                         ))
                     }
                 </div>
@@ -386,24 +505,24 @@ const Resources = () => {
                             {
                                 (currentResourceUrl != null) && (
                                     ((currentResourceType == 'pdf') &&
-                                            <div style={{ display: "inline-block", height: '150px', marginRight: '10px', position: 'relative' }}>
-                                                <Image thumbnail style={{ height: '100%' }} src='/images/pdfSnip.png' alt="User" />
-                                            </div>)
+                                        <div style={{ display: "inline-block", height: '150px', marginRight: '10px', position: 'relative' }}>
+                                            <Image thumbnail style={{ height: '100%' }} src='/images/pdfSnip.png' alt="User" />
+                                        </div>)
                                     ||
                                     ((currentResourceType == 'word') &&
-                                            <div style={{ display: "inline-block", height: '150px', marginRight: '10px', position: 'relative' }}>
-                                                <Image thumbnail style={{ height: '100%' }} src='/images/wordSnip.png' alt="User" />
-                                            </div>)
+                                        <div style={{ display: "inline-block", height: '150px', marginRight: '10px', position: 'relative' }}>
+                                            <Image thumbnail style={{ height: '100%' }} src='/images/wordSnip.png' alt="User" />
+                                        </div>)
                                     ||
                                     ((currentResourceType == 'img') &&
-                                            <div style={{ display: "inline-block", height: '150px', marginRight: '10px', position: 'relative' }}>
-                                                <Image thumbnail style={{ height: '100%' }} src={currentResourceUrl} alt="User" />
-                                            </div>)
+                                        <div style={{ display: "inline-block", height: '150px', marginRight: '10px', position: 'relative' }}>
+                                            <Image thumbnail style={{ height: '100%' }} src={currentResourceUrl} alt="User" />
+                                        </div>)
                                     ||
                                     ((currentResourceType == 'video') &&
-                                            <div style={{ display: "inline-block", height: '150px', marginRight: '10px', position: 'relative' }}>
-                                                <Image thumbnail style={{ height: '100%' }} src='/images/videoSnip.png' alt="User" />
-                                            </div>)
+                                        <div style={{ display: "inline-block", height: '150px', marginRight: '10px', position: 'relative' }}>
+                                            <Image thumbnail style={{ height: '100%' }} src='/images/videoSnip.png' alt="User" />
+                                        </div>)
                                 )
                             }
                         </div>

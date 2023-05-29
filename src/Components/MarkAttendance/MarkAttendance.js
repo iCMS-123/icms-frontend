@@ -54,6 +54,7 @@ const MarkAttendance = () => {
         fetchAttendanceForSelectedDetails(selectedSectionId, sId, selectedDate)
     }
     async function selectedSectionChanged(sId) {
+        console.log(sId, "sel sec changed");
         await setSelectedSectionId(sId);
         await getListOfStudents(sId);
         await fetchSubjectsForSection(sId);
@@ -164,7 +165,14 @@ const MarkAttendance = () => {
             const { data } = await axios.get(`http://localhost:8002/api/v1/teacher/fetch-subjects/${userId}`);
 
             if (data && data.success) {
+                let sectionListDB = data.data;
                 let listOfSections = {
+                    firstYear: [],
+                    secondYear: [],
+                    thirdYear: [],
+                    fourthYear: [],
+                }
+                let listOfSections1 = {
                     firstYear: [],
                     secondYear: [],
                     thirdYear: [],
@@ -172,16 +180,35 @@ const MarkAttendance = () => {
                 }
                 data.data.map(item => {
                     if (item.sectionId.sectionYear == 1)
-                        listOfSections.firstYear.push(item.sectionId)
+                        listOfSections.firstYear.push(item.sectionId._id)
                     else if (item.sectionId.sectionYear == 2)
-                        listOfSections.secondYear.push(item.sectionId)
+                        listOfSections.secondYear.push(item.sectionId._id)
                     else if (item.sectionId.sectionYear == 3)
-                        listOfSections.thirdYear.push(item.sectionId)
+                        listOfSections.thirdYear.push(item.sectionId._id)
                     else if (item.sectionId.sectionYear == 4)
-                        listOfSections.fourthYear.push(item.sectionId)
+                        listOfSections.fourthYear.push(item.sectionId._id)
                 })
-                setSectionList(listOfSections);
-                console.log(data, listOfSections, "section subject list");
+                
+                listOfSections.firstYear = [...new Set(listOfSections.firstYear)]
+                listOfSections.secondYear = [...new Set(listOfSections.secondYear)]
+                listOfSections.thirdYear = [...new Set(listOfSections.thirdYear)]
+                listOfSections.fourthYear = [...new Set(listOfSections.fourthYear)]
+
+                listOfSections.firstYear.map(item => 
+                    listOfSections1.firstYear.push(sectionListDB.filter(it => it.sectionId._id == item)[0].sectionId)
+                )
+                listOfSections.secondYear.map(item => 
+                    listOfSections1.secondYear.push(sectionListDB.filter(it => it.sectionId._id == item)[0].sectionId)
+                )
+                listOfSections.thirdYear.map(item => 
+                    listOfSections1.thirdYear.push(sectionListDB.filter(it => it.sectionId._id == item)[0].sectionId)
+                )
+                listOfSections.fourthYear.map(item => 
+                    listOfSections1.fourthYear.push(sectionListDB.filter(it => it.sectionId._id == item)[0].sectionId)
+                )
+
+                setSectionList(listOfSections1);
+                console.log(data, listOfSections1, "section subject list");
             }
         } catch (e) {
             console.log(e, "e");
@@ -204,28 +231,25 @@ const MarkAttendance = () => {
     }
 
     const fetchSubjectsForSection = async (sId) => {
-        if (isUserSectionHead || isUserHod) {
-            try {
-                const { data } = await axios.get(`http://localhost:8002/api/v1/section/get-section-subject-list/${sId}`);
+        let fetchedSubjects = [];
+        try {
+            const { data } = await axios.get(`http://localhost:8002/api/v1/section/get-section-subject-list/${sId}`);
 
-                if (data && data.success)
-                    setSubjectListForSection(data.data);
-            } catch (e) {
-                console.log(e, "e");
+            if (data && data.success) {
+                setSubjectListForSection(data.data);
+                fetchedSubjects = data.data;
             }
+        } catch (e) {
+            console.log(e, "e");
+            return
         }
-        else {
-            const userId = JSON.parse(localStorage.getItem("icmsUserInfo"))?.data?._id;
-            try {
-                const { data } = await axios.get(`http://localhost:8002/api/v1/teacher/fetch-subjects/${userId}`);
 
-                if (data && data.success)
-                // agar ye response bhi theek aata hai toh, section wise filter karna padega
-                // filter(item => item.sectionId == selectedSectionId)
-                    setSubjectListForSection(data.data);
-            } catch (e) {
-                console.log(e, "e");
-            }
+        if (!isUserSectionHead && !isUserHod) {
+            const userId = JSON.parse(localStorage.getItem("icmsUserInfo"))?.data?._id;
+            console.log(fetchedSubjects, "fetchedSubjects 1");
+            fetchedSubjects = fetchedSubjects.filter(item => item.subjectTeacher._id == userId)
+            setSubjectListForSection(fetchedSubjects)
+            console.log(fetchedSubjects, "fetchedSubjects 2");
         }
     }
 

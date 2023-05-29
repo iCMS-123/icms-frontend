@@ -781,11 +781,6 @@ const MyBranch = (props) => {
                               >
                                 View Details
                               </Button>
-                              <Button variant="success" size="sm" style={{ width: 'fit-content', marginLeft: '15px' }}
-                                onClick={e => setTeacherVerified(teacher._id)}
-                              >
-                                <FaCheck />
-                              </Button>
                             </span>
                           </span>
                         </div>
@@ -801,75 +796,6 @@ const MyBranch = (props) => {
                 ))
               }
             </Row>
-            {/* Modal code starts */}
-            <Modal show={teacherDetailsModalShow} fullscreen={true} onHide={() => setTeacherDetailsModalShow(false)}>
-              <Modal.Header closeButton>
-                {/* <Modal.Title>Teacher's Details</Modal.Title> */}
-              </Modal.Header>
-              <Modal.Body>
-                <div style={{ display: 'flex', width: '100%', height: '100%' }}>
-                  <div id='left-section' style={{ width: '30%', background: 'linear-gradient(90deg, #1CB5E0 0%, #000851 100%)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
-                    <h5>
-                      {teacherDetailsForModal.isHod && <Badge bg="secondary" style={{ marginBottom: '20px' }}>
-                        HOD
-                      </Badge>}
-                    </h5>
-                    <Image src={teacherDetailsForModal.profileImg} roundedCircle={true} style={{ height: "100px", width: '100px' }} className="mb-3" />
-                    <h5>{teacherDetailsForModal.firstName + " " + teacherDetailsForModal.lastName}</h5>
-                    <h5> {teacherDetailsForModal.branchName?.toUpperCase()}</h5>
-                  </div>
-                  <div id='right-section' style={{ width: '70%', padding: '10px 20px' }}>
-                    <h6>Information</h6>
-                    <hr />
-                    <div style={{ padding: '10px 20px' }}>
-                      <Row>
-                        <Col style={{ display: 'flex', flexDirection: 'column' }}>
-                          <h6>First Name </h6>
-                          <p className='text-muted'>{teacherDetailsForModal.firstName}</p>
-                        </Col>
-                        <Col style={{ display: 'flex', flexDirection: 'column' }}>
-                          <h6>Last Name </h6>
-                          <p className='text-muted'>{teacherDetailsForModal.lastName}</p>
-                        </Col>
-                      </Row>
-                      <Row>
-                        <Col style={{ display: 'flex', flexDirection: 'column' }}>
-                          <h6>Email </h6>
-                          <p className='text-muted'>{teacherDetailsForModal.email}</p>
-                        </Col>
-                        <Col style={{ display: 'flex', flexDirection: 'column' }}>
-                          <h6>Verification Status</h6>
-
-                          {teacherDetailsForModal.isVerified &&
-                            <p className='text-muted'>Verified
-                              <FaUserCheck style={{ marginLeft: '10px', color: 'green' }} />
-                            </p>
-                          }
-                          {!teacherDetailsForModal.isVerified &&
-                            <p className='text-muted'>Not Verified
-                              <FaUserTimes style={{ marginLeft: '10px', color: 'red' }} />
-                            </p>
-                          }
-
-                        </Col>
-                      </Row>
-                      <Col style={{ display: 'flex', flexDirection: 'column' }}>
-                        <h6>College ID</h6>
-                        <Image src={teacherDetailsForModal.collegeIdCard || 'https://picturedensity.com/wp-content/uploads/2019/06/Polytechnicollege-id-card.jpg'} style={{ height: "auto", width: 'auto', maxWidth: '300px' }} className="mt-2" />
-                      </Col>
-
-                    </div>
-
-                  </div>
-                </div>
-
-              </Modal.Body>
-              {/* <Modal.Footer>
-                <Button variant="success" onClick={e => setTeacherVerified(teacherDetailsForModal._id)}>Verify Account</Button>
-                <Button variant="dark" onClick={e => terminateAccount(teacherDetailsForModal._id)}>Terminate Account</Button>
-              </Modal.Footer> */}
-            </Modal>
-            {/* Modal code ends */}
 
           </Col>
           <Col className="ms-2 mt-0">
@@ -1007,10 +933,13 @@ const MyBranch = (props) => {
                 </div>
 
               </Modal.Body>
-              <Modal.Footer>
+              {
+                !teacherDetailsForModal?.isVerified && <Modal.Footer>
                 <Button variant="success" onClick={e => setTeacherVerified(teacherDetailsForModal._id)}>Verify Account</Button>
-                <Button variant="dark" onClick={e => terminateAccount(teacherDetailsForModal._id)}>Terminate Account</Button>
+                <Button variant="dark" disabled onClick={e => terminateAccount(teacherDetailsForModal._id)}>Terminate Account
+                </Button>
               </Modal.Footer>
+              }
             </Modal>
             {/* Modal code ends */}
 

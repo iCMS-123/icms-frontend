@@ -57,6 +57,7 @@ const AttendanceReport = () => {
         fetchAttendanceForSelectedDetails(selectedSectionId, sId, selectedDate)
     }
     async function selectedSectionChanged(sId) {
+        console.log(sId, "sel sec changed");
         await setSelectedSectionId(sId);
         await getListOfStudents(sId);
         await fetchSubjectsForSection(sId);
@@ -83,18 +84,6 @@ const AttendanceReport = () => {
         }
     }
 
-    const getListOfStudents = async (secId) => {
-        try {
-            const { data } = await axios.get(`http://localhost:8002/api/v1/teacher/get-list-of-students/${secId}`);
-
-            if (data && data.success) {
-                setSectionStudents(data.data.verifiedStudents);
-            }
-        } catch (e) {
-            console.log(e, "e");
-        }
-    };
-
     function unmarkThisStudent(id) {
         setCurrentAttendance(currentAttendance.filter(item => item != id));
     }
@@ -109,6 +98,17 @@ const AttendanceReport = () => {
 
             if (data && data.success) {
                 setSectionData(data.data);
+            }
+        } catch (e) {
+            console.log(e, "e");
+        }
+    };
+
+    const getListOfStudents = async (secId) => {
+        try {
+            const { data } = await axios.get(`http://localhost:8002/api/v1/teacher/get-list-of-students/${secId}`);
+
+            if (data && data.success) {
                 setSectionStudents(data.data.verifiedStudents);
             }
         } catch (e) {
@@ -118,7 +118,7 @@ const AttendanceReport = () => {
 
     useEffect(() => {
         getListOfStudents(selectedSectionId)
-        if(isUserSectionHead)
+        if (isUserSectionHead)
             getClassroomData();
     }, []);
 
@@ -162,36 +162,62 @@ const AttendanceReport = () => {
         }
     }
 
-    
     const getSectionList = async () => {
         const userId = JSON.parse(localStorage.getItem("icmsUserInfo")).data._id;
         try {
             const { data } = await axios.get(`http://localhost:8002/api/v1/teacher/fetch-subjects/${userId}`);
 
             if (data && data.success) {
+                let sectionListDB = data.data;
                 let listOfSections = {
-                    firstYear : [],
-                    secondYear : [],
-                    thirdYear : [],
-                    fourthYear : [],
+                    firstYear: [],
+                    secondYear: [],
+                    thirdYear: [],
+                    fourthYear: [],
+                }
+                let listOfSections1 = {
+                    firstYear: [],
+                    secondYear: [],
+                    thirdYear: [],
+                    fourthYear: [],
                 }
                 data.data.map(item => {
-                    if(item.sectionId.sectionYear == 1)
-                        listOfSections.firstYear.push(item.sectionId)
-                    else if(item.sectionId.sectionYear == 2)
-                        listOfSections.secondYear.push(item.sectionId)
-                    else if(item.sectionId.sectionYear == 3)
-                        listOfSections.thirdYear.push(item.sectionId)
-                    else if(item.sectionId.sectionYear == 4)
-                        listOfSections.fourthYear.push(item.sectionId)
+                    if (item.sectionId.sectionYear == 1)
+                        listOfSections.firstYear.push(item.sectionId._id)
+                    else if (item.sectionId.sectionYear == 2)
+                        listOfSections.secondYear.push(item.sectionId._id)
+                    else if (item.sectionId.sectionYear == 3)
+                        listOfSections.thirdYear.push(item.sectionId._id)
+                    else if (item.sectionId.sectionYear == 4)
+                        listOfSections.fourthYear.push(item.sectionId._id)
                 })
-                setSectionList(listOfSections);
-                console.log(data, listOfSections, "section subject list");
+                
+                listOfSections.firstYear = [...new Set(listOfSections.firstYear)]
+                listOfSections.secondYear = [...new Set(listOfSections.secondYear)]
+                listOfSections.thirdYear = [...new Set(listOfSections.thirdYear)]
+                listOfSections.fourthYear = [...new Set(listOfSections.fourthYear)]
+
+                listOfSections.firstYear.map(item => 
+                    listOfSections1.firstYear.push(sectionListDB.filter(it => it.sectionId._id == item)[0].sectionId)
+                )
+                listOfSections.secondYear.map(item => 
+                    listOfSections1.secondYear.push(sectionListDB.filter(it => it.sectionId._id == item)[0].sectionId)
+                )
+                listOfSections.thirdYear.map(item => 
+                    listOfSections1.thirdYear.push(sectionListDB.filter(it => it.sectionId._id == item)[0].sectionId)
+                )
+                listOfSections.fourthYear.map(item => 
+                    listOfSections1.fourthYear.push(sectionListDB.filter(it => it.sectionId._id == item)[0].sectionId)
+                )
+
+                setSectionList(listOfSections1);
+                console.log(data, listOfSections1, "section subject list");
             }
         } catch (e) {
             console.log(e, "e");
         }
     }
+
 
     const getSectionListForHOD = async () => {
         const branchName = JSON.parse(localStorage.getItem("icmsUserInfo")).data.user.branchName;
@@ -207,21 +233,33 @@ const AttendanceReport = () => {
         }
     }
 
-
     const fetchSubjectsForSection = async (sId) => {
+        let fetchedSubjects = [];
         try {
             const { data } = await axios.get(`http://localhost:8002/api/v1/section/get-section-subject-list/${sId}`);
 
-            if (data && data.success)
+            if (data && data.success) {
                 setSubjectListForSection(data.data);
+                fetchedSubjects = data.data;
+            }
         } catch (e) {
             console.log(e, "e");
+            return
+        }
+
+        if (!isUserSectionHead && !isUserHod) {
+            const userId = JSON.parse(localStorage.getItem("icmsUserInfo"))?.data?._id;
+            console.log(fetchedSubjects, "fetchedSubjects 1");
+            fetchedSubjects = fetchedSubjects.filter(item => item.subjectTeacher._id == userId)
+            setSubjectListForSection(fetchedSubjects)
+            console.log(fetchedSubjects, "fetchedSubjects 2");
         }
     }
 
     useEffect(() => {
-        getSubjectsList()
-        if(isUserHod)
+        if (isUserHod || isUserSectionHead)
+            getSubjectsList()
+        if (isUserHod)
             getSectionListForHOD();
         else
             getSectionList();
@@ -230,14 +268,12 @@ const AttendanceReport = () => {
     async function handleMarkAttendance() {
         // logic to mark attendance
         // a post request to backend with the list of uploaded images
-
-        const sectionId = JSON.parse(localStorage.getItem("icmsUserInfo")).data.sectionHeadRef;
         const current_timestamp = moment().valueOf();
 
-        console.log(`attandanceAtModel${sectionId}`)
-        const testingData = Number(localStorage.getItem(`attandanceAtModel${sectionId}`));
+        console.log(`attandanceAtModel${selectedSectionId}`)
+        const testingData = Number(localStorage.getItem(`attandanceAtModel${selectedSectionId}`));
         if (testingData && testingData + 3600000 > current_timestamp) {
-            seterror("You have already requested for marking attendance! You can only request again after 60 minutes only if request fails.");
+            seterror("You have already requested for marking attendance for this section! You can request again after 60 minutes, only if request fails.");
             setTimeout(() => seterror(null), 3000);
             return
         }
@@ -249,17 +285,20 @@ const AttendanceReport = () => {
 
         try {
             axios.post("http://localhost:8002/api/v1/task/create-task", {
-                sectionId: sectionId,
+                sectionId: selectedSectionId,
                 taskId: current_timestamp,
-                date: new Date().toDateString()
+                date: new Date(selectedDate).toDateString(),
+                subjectTeacherId: selectedSubjectTeacherId
             })
                 .then((res) => {
                     console.log(res, "response");
                     if (res.data.success) {
                         axios.post("https://7258-34-90-13-120.ngrok-free.app/mark_attendance", {
-                            "sectionId": sectionId,
+                            "sectionId": selectedSectionId,
+                            "subjectId": selectedSubjectId,
+                            "subjectTeacherId": selectedSubjectTeacherId,
                             "activityTimeStamp": current_timestamp,
-                            "date": new Date().toDateString(),
+                            "date": new Date(selectedDate).toDateString(),
                             "image-links": uploadedGroupPhotos
                         });
                         setTodaysAttendanceUploaded(true)
@@ -268,7 +307,7 @@ const AttendanceReport = () => {
                         setSuccess(true);
                         setTimeout(() => setSuccess(false), 3000);
 
-                        localStorage.setItem(`attandanceAtModel${sectionId}`, current_timestamp);
+                        localStorage.setItem(`attandanceAtModel${selectedSectionId}`, current_timestamp);
                     }
                     else {
                         console.log(res.data?.error, "error from backend");
@@ -314,6 +353,7 @@ const AttendanceReport = () => {
             setTimeout(() => seterror(null), 3000);
         }
     }
+
 
     function getPdf() {
         let input = document.querySelector("#elementForPDF")

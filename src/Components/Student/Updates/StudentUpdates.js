@@ -55,7 +55,8 @@ const StudentUpdates = () => {
                                             <Image src={item.createdBy.profileImg} className="me-3 rounded-circle" style={{ height: '40px', width: '40px' }} />
                                             <span style={{ display: 'flex', flexDirection: 'column' }}>
                                                 <b>{item.createdBy.firstName + " " + item.createdBy.lastName}</b>
-                                                {item.createdBy.isSectionHead && <span className="mb-2 text-muted">Section Head </span>}
+                                                {item.createdBy.isSectionHead && <span className="mb-2 text-muted fw-bold">Section Head </span>}
+                                                {item.createdBy.isHod && <span className="mb-2 text-muted fw-bold">HOD </span>}
                                             </span>
                                         </div>
                                         <Card.Title>{item?.msgTitle || ""}</Card.Title>

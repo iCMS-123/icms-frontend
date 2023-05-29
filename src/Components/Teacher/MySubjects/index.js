@@ -26,7 +26,7 @@ const MySubject = () => {
     let userID = userData._id;
     console.log(userID);
     const navigate = useNavigate()
-    
+
     const isUserSectionHead = JSON.parse(localStorage.getItem("icmsUserInfo")).data.user.isSectionHead;
     const isUserHod = JSON.parse(localStorage.getItem("icmsUserInfo")).data.isHod;
 
@@ -91,8 +91,20 @@ const MySubject = () => {
 
     async function showSubjectCardModal(idx) {
         setSubjectCardDetailsForModal(subjectList[idx]);
-        displayAttendanceData(subjectList[idx].attendance)
+        fetchAttendanceData(subjectList[idx].sectionId._id, subjectList[idx].subjectId)
         setSubjectCardModalShow(true);
+    }
+
+    async function fetchAttendanceData(secId, subId) {
+        try {
+            const { data } = await axios.get(`http://localhost:8002/api/v1/section/get-attendance-subject-section-id?sectionId=${secId}&subjectId=${subId}`);
+
+            if (data && data.success) {
+                displayAttendanceData(data?.data[0].attendance)
+            }
+        } catch (e) {
+            console.log(e, "e");
+        }
     }
 
     // Refs
@@ -175,7 +187,7 @@ const MySubject = () => {
         }
         fetchSubjectList();
     }, [])
-    
+
     return (
         <div>
 
@@ -241,13 +253,13 @@ const MySubject = () => {
                                 >
                                     <Card.Body>
                                         <Card.Title>{subject?.subjectName || ""}</Card.Title>
-                                        <div style={{ display: 'flex' }}>
+                                        {/* <div style={{ display: 'flex' }}>
                                             <Image src={subject?.subjectTeacher?.profileImg} roundedCircle={true} style={{ height: "40px", width: '40px' }} className="me-3" />
                                             <span style={{ display: 'flex', flexDirection: 'column' }}>
                                                 <b>{subject?.subjectTeacher?.firstName + " " + subject?.subjectTeacher?.lastName}</b>
                                                 <b className="mb-2 text-muted">Subject Teacher </b>
                                             </span>
-                                        </div>
+                                        </div> */}
                                         <Badge bg="dark" style={{ position: 'absolute', top: '10px', right: '30px' }}>
                                             {subject?.subjectId || ""}
                                         </Badge>
@@ -275,7 +287,7 @@ const MySubject = () => {
                     <Modal.Body>
                         {/* {subjectCardDetailsForModal} */}
                         <div style={{ display: "flex", width: "100%", height: "100%" }}>
-                            <div
+                            {/* <div
                                 id="left-section"
                                 style={{
                                     width: "30%",
@@ -319,10 +331,11 @@ const MySubject = () => {
                                         <FaUserTimes style={{ marginLeft: "10px", color: "red" }} />
                                     </p>
                                 )}
-                            </div>
+                            </div> */}
                             <div
                                 id="right-section"
-                                style={{ width: "70%", padding: "10px 20px" }}
+                                style={{ width: "100%", padding: "10px 20px" }}
+                                // style={{ width: "70%", padding: "10px 20px" }}
                             >
                                 <h6>Information</h6>
                                 <hr />
