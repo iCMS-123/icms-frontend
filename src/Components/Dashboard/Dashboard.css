@@ -1,8 +1,7 @@
 .sidebar-header {
-  height: 55px;
-  color: rgb(255, 255, 255);
-  background-color: rgb(61, 83, 84);
-
+  height: 56px;
+  color: #ffffff;
+  background-color: rgba(226, 225, 225, 0.938);
 }
 
 .dashboard-right {
@@ -14,32 +13,22 @@
 
 .dashboard-sidebar {
   height: 100vh !important;
-  background-color: rgb(75, 60, 140);
+  background-color: rgb(241, 241, 241);
+  /* background-color: rgb(75, 60, 140); */
   height: 100%;
-}
-
-.css-dip3t8 {
-  background: none !important;
 }
 
 .menuitem {
   /* background-blend-mode: color-burn; */
-  color: white;
+  /* color: white; */
+  /* background-color: rgb(241, 241, 241); */
 }
 
 .common-navbar {
   /* height: 55px; */
-  background-color: rgb(68, 63, 90);
+  /* background-color: rgb(68, 63, 90); */
+  background-color: rgb(241, 241, 241);
   position: sticky;
   top: 0;
   z-index: 10;
-}
-
-.common-navbar-container>* {
-  color: white;
-}
-
-.menuitem:hover {
-  color: black;
-  background-color: white;
 }

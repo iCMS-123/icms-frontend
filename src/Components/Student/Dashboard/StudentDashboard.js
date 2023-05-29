@@ -35,11 +35,11 @@ const StudentDashboard = () => {
         // border: "1px solid black",
       }}
     >
-      <div className="dashboard-left">
+      <div className={styles.dashboardLeft}>
         <h3 className={`${styles['sidebar-header']} fw-bold mb-0 py-2 text-center`}>iCMS</h3>
 
-        <Sidebar className="dashboard-sidebar">
-          <Menu className="dashboard-menu">
+        <Sidebar className={styles.dashboardSidebar}>
+          <Menu  className={styles.dashboardMenu}>
             <MenuItem className={styles.menuitem} onClick={() => setNavTitle("Dashboard")} component={<Link to="" />}>
               {" "}
               Dashboard

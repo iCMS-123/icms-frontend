@@ -58,7 +58,7 @@ const StudentBasic = () => {
       },
       title: {
         display: true,
-        text: `Attendance of last 5 days of ${activeSubject}` ,
+        text: `Attendance of last 5 classes of ${activeSubject}` ,
       },
     },
   };

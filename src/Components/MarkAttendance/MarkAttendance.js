@@ -32,6 +32,7 @@ const MarkAttendance = () => {
     // For Manual Attendance
     let todaysDate = moment().format('YYYY-MM-DD');
     const isUserSectionHead = JSON.parse(localStorage.getItem("icmsUserInfo")).data.user.isSectionHead;
+    const isUserHod = JSON.parse(localStorage.getItem("icmsUserInfo")).data.isHod;
     const [selectedDate, setSelectedDate] = useState(todaysDate);
     const [selectedSubjectId, setSelectedSubjectId] = useState(null);
 
@@ -79,10 +80,6 @@ const MarkAttendance = () => {
         }
     }
 
-    useEffect(() => {
-        getClassroomData();
-    }, [selectedDate])
-
     function unmarkThisStudent(id) {
         setCurrentAttendance(currentAttendance.filter(item => item != id));
     }
@@ -116,7 +113,9 @@ const MarkAttendance = () => {
     };
 
     useEffect(() => {
-        getClassroomData();
+        getListOfStudents(selectedSectionId)
+        if (isUserSectionHead)
+            getClassroomData();
     }, []);
 
     async function handleOnGroupPhotoUpload(error, result, widget) {
@@ -149,9 +148,8 @@ const MarkAttendance = () => {
     const [subjectListForSection, setSubjectListForSection] = useState([]);
 
     const getSubjectsList = async () => {
-        const sectionId = JSON.parse(localStorage.getItem("icmsUserInfo")).data.sectionHeadRef;
         try {
-            const { data } = await axios.get(`http://localhost:8002/api/v1/section/get-section-subject-list/${sectionId}`);
+            const { data } = await axios.get(`http://localhost:8002/api/v1/section/get-section-subject-list/${selectedSectionId}`);
 
             if (data && data.success)
                 setSubjectList(data.data);
@@ -161,6 +159,37 @@ const MarkAttendance = () => {
     }
 
     const getSectionList = async () => {
+        const userId = JSON.parse(localStorage.getItem("icmsUserInfo")).data._id;
+        try {
+            const { data } = await axios.get(`http://localhost:8002/api/v1/teacher/fetch-subjects/${userId}`);
+
+            if (data && data.success) {
+                let listOfSections = {
+                    firstYear: [],
+                    secondYear: [],
+                    thirdYear: [],
+                    fourthYear: [],
+                }
+                data.data.map(item => {
+                    if (item.sectionId.sectionYear == 1)
+                        listOfSections.firstYear.push(item.sectionId)
+                    else if (item.sectionId.sectionYear == 2)
+                        listOfSections.secondYear.push(item.sectionId)
+                    else if (item.sectionId.sectionYear == 3)
+                        listOfSections.thirdYear.push(item.sectionId)
+                    else if (item.sectionId.sectionYear == 4)
+                        listOfSections.fourthYear.push(item.sectionId)
+                })
+                setSectionList(listOfSections);
+                console.log(data, listOfSections, "section subject list");
+            }
+        } catch (e) {
+            console.log(e, "e");
+        }
+    }
+
+
+    const getSectionListForHOD = async () => {
         const branchName = JSON.parse(localStorage.getItem("icmsUserInfo")).data.user.branchName;
         try {
             const { data } = await axios.get(`http://localhost:8002/api/v1/hod/get-list-section?branchName=${branchName}`);
@@ -175,32 +204,49 @@ const MarkAttendance = () => {
     }
 
     const fetchSubjectsForSection = async (sId) => {
-        try {
-            const { data } = await axios.get(`http://localhost:8002/api/v1/section/get-section-subject-list/${sId}`);
+        if (isUserSectionHead || isUserHod) {
+            try {
+                const { data } = await axios.get(`http://localhost:8002/api/v1/section/get-section-subject-list/${sId}`);
 
-            if (data && data.success)
-                setSubjectListForSection(data.data);
-        } catch (e) {
-            console.log(e, "e");
+                if (data && data.success)
+                    setSubjectListForSection(data.data);
+            } catch (e) {
+                console.log(e, "e");
+            }
+        }
+        else {
+            const userId = JSON.parse(localStorage.getItem("icmsUserInfo"))?.data?._id;
+            try {
+                const { data } = await axios.get(`http://localhost:8002/api/v1/teacher/fetch-subjects/${userId}`);
+
+                if (data && data.success)
+                // agar ye response bhi theek aata hai toh, section wise filter karna padega
+                // filter(item => item.sectionId == selectedSectionId)
+                    setSubjectListForSection(data.data);
+            } catch (e) {
+                console.log(e, "e");
+            }
         }
     }
 
     useEffect(() => {
-        getSubjectsList()
-        getSectionList()
+        if (isUserHod || isUserSectionHead)
+            getSubjectsList()
+        if (isUserHod)
+            getSectionListForHOD();
+        else
+            getSectionList();
     }, [])
 
     async function handleMarkAttendance() {
         // logic to mark attendance
         // a post request to backend with the list of uploaded images
-
-        const sectionId = JSON.parse(localStorage.getItem("icmsUserInfo")).data.sectionHeadRef;
         const current_timestamp = moment().valueOf();
 
-        console.log(`attandanceAtModel${sectionId}`)
-        const testingData = Number(localStorage.getItem(`attandanceAtModel${sectionId}`));
+        console.log(`attandanceAtModel${selectedSectionId}`)
+        const testingData = Number(localStorage.getItem(`attandanceAtModel${selectedSectionId}`));
         if (testingData && testingData + 3600000 > current_timestamp) {
-            seterror("You have already requested for marking attendance! You can only request again after 60 minutes only if request fails.");
+            seterror("You have already requested for marking attendance for this section! You can request again after 60 minutes, only if request fails.");
             setTimeout(() => seterror(null), 3000);
             return
         }
@@ -212,17 +258,20 @@ const MarkAttendance = () => {
 
         try {
             axios.post("http://localhost:8002/api/v1/task/create-task", {
-                sectionId: sectionId,
+                sectionId: selectedSectionId,
                 taskId: current_timestamp,
-                date: new Date().toDateString()
+                date: new Date(selectedDate).toDateString(),
+                subjectTeacherId: selectedSubjectTeacherId
             })
                 .then((res) => {
                     console.log(res, "response");
                     if (res.data.success) {
                         axios.post("https://7258-34-90-13-120.ngrok-free.app/mark_attendance", {
-                            "sectionId": sectionId,
+                            "sectionId": selectedSectionId,
+                            "subjectId": selectedSubjectId,
+                            "subjectTeacherId": selectedSubjectTeacherId,
                             "activityTimeStamp": current_timestamp,
-                            "date": new Date().toDateString(),
+                            "date": new Date(selectedDate).toDateString(),
                             "image-links": uploadedGroupPhotos
                         });
                         setTodaysAttendanceUploaded(true)
@@ -231,7 +280,7 @@ const MarkAttendance = () => {
                         setSuccess(true);
                         setTimeout(() => setSuccess(false), 3000);
 
-                        localStorage.setItem(`attandanceAtModel${sectionId}`, current_timestamp);
+                        localStorage.setItem(`attandanceAtModel${selectedSectionId}`, current_timestamp);
                     }
                     else {
                         console.log(res.data?.error, "error from backend");
@@ -259,7 +308,7 @@ const MarkAttendance = () => {
             let { data } = await axios.post("http://localhost:8002/api/v1/section/upload-section-attendance", {
                 date: ('' + new Date(selectedDate)).slice(0, 15),
                 presentStudents: currentAttendance,
-                sectionId: sectionId,
+                sectionId: selectedSectionId,
                 subjectId: selectedSubjectId,
                 subjectTeacherId: selectedSubjectTeacherId
             });
@@ -338,7 +387,7 @@ const MarkAttendance = () => {
                         <InputGroup className="mb-3">
                             <InputGroup.Text id="basic-addon1"><FaUsers /></InputGroup.Text>
 
-                            {((sectionList?.firstYear?.length + sectionList?.secondYear?.length + sectionList?.thirdYear?.length + sectionList?.fourthYear?.length) < 1) && <p className="text-muted m-1">No section available!</p>}
+                            {(sectionList.length == 0 || (sectionList?.firstYear?.length + sectionList?.secondYear?.length + sectionList?.thirdYear?.length + sectionList?.fourthYear?.length) < 1) && <p className="text-muted m-1">No section available!</p>}
 
                             <Form.Select style={{ display: ((sectionList?.firstYear?.length + sectionList?.secondYear?.length + sectionList?.thirdYear?.length + sectionList?.fourthYear?.length) > 0) ? '' : 'none' }}
                                 onChange={e => selectedSectionChanged(e.target.value)}

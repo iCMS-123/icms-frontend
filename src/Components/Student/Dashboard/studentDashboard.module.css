@@ -2,12 +2,18 @@
  /* visibility: hidden; */
 
 }
+
+.dashboardLeft{
+  height: 100vh;
+  background-color: #f8f9fa;
+}
+
 .sidebar-header {
-    height: 55px;
-    color: rgb(255, 255, 255);
-    background-color: rgb(61, 83, 84);
+    height: 56px;
+    /* color: rgb(255, 255, 255); */
+  background-color: rgba(226, 225, 225, 0.938);
   
-  }
+}
   
   .dashboard-right {
     width: 100%;
@@ -16,26 +22,26 @@
   }
   
   
-  .css-dip3t8 {
+  /* .css-dip3t8 {
     background: none !important;
-  }
+  } */
   
-  .menuitem {
-    /* background-blend-mode: color-burn; */
+  /* .menuitem {
+    background-blend-mode: color-burn;
     color: white;
-  }
+  } */
   
   .common-navbar {
     /* height: 55px; */
-    background-color: rgb(68, 63, 90);
+  background-color: rgb(241, 241, 241);
     position: sticky;
     top: 0;
     z-index: 10;
   }
   
-  .common-navbar-container>* {
+  /* .common-navbar-container>* {
     color: white;
-  }
+  } */
   
   .menuitem:hover {
     color: black;

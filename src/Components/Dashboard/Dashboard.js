@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useEffect } from "react";
 import { Link, Navigate, NavLink, Route, Routes, useNavigate } from "react-router-dom";
 import useDocumentTitle from "../../Hooks/useDocumentTitle";
-import { Sidebar, Menu, MenuItem } from "react-pro-sidebar";
+import { Sidebar, Menu, MenuItem, SubMenu } from "react-pro-sidebar";
 import { Container, Nav, Navbar } from "react-bootstrap";
 import Message from "../Message/index";
 import Profile from "../Profile/Profile";
@@ -67,17 +67,27 @@ const Dashboard = () => {
 
         <Sidebar className="dashboard-sidebar">
           <h3 className="sidebar-header fw-bold mb-0 py-2 text-center">
-            <img src='/images/icms-logo.png' alt='logo' style={{ height: '40px', filter: 'invert(1)' }} />
+            <img src='/images/icms-logo.png' alt='logo' style={{ height: '40px', filter: 'invert(0)' }} />
           </h3>
-          <Menu className="dashboard-menu"  >
+          <Menu className="dashboard-menu" menuItemStyles={{
+            button: {
+              [`&.active`]: {
+                backgroundColor: '#13395e',
+                color: '#b6c8d9',
+              },
+            },
+          }}>
+
             <MenuItem className="menuitem" component={<Link to="" />} onClick={() => setNavTitle("Dashboard")}> Dashboard</MenuItem>
-            {icmsUserInfo?.data.isSectionHead  && <MenuItem className="menuitem" component={<Link to="MyClassroom" />} onClick={() => setNavTitle("My Classroom")}> My Classroom </MenuItem>}
-            {icmsUserInfo?.data.isHod  && <MenuItem className="menuitem" component={<Link to="MyBranch" />} onClick={() => setNavTitle("My Branch")}> My Branch</MenuItem>}
-            {icmsUserInfo?.data.isSectionHead  && <MenuItem className="menuitem" component={<Link to="ManageSubjects" />} onClick={() => setNavTitle("Manage Subjects")}> Manage Subjects</MenuItem>}
-            <MenuItem className="menuitem" component={<Link to="MarkAttendance" />} onClick={() => setNavTitle("Mark Attendance")}> Mark Attendance</MenuItem>
-            <MenuItem className="menuitem" component={<Link to="AttendanceReport" />} onClick={() => setNavTitle("Attendance Report")}> Attendance Report</MenuItem>
-            {icmsUserInfo?.data.isSectionHead && <MenuItem className="menuitem" component={<Link to="Resources" />} onClick={() => setNavTitle("Resources")}> Resources</MenuItem>}
-            {icmsUserInfo?.data.userStatus === 'teacher' && <MenuItem className="menuitem" component={<Link to="Subjects" />} onClick={() => setNavTitle("My Subjects")}> My Subjects</MenuItem>}
+            {icmsUserInfo?.data.userStatus === 'teacher' && <MenuItem className="menuitem" component={<Link to="MySubjects" />} onClick={() => setNavTitle("My Subjects")}> My Subjects</MenuItem>}
+            <SubMenu label={(icmsUserInfo?.data.isSectionHead && "My Classroom") || (icmsUserInfo?.data.isHod && "My Branch") || "Subject Attendance"} defaultOpen="true">
+              {icmsUserInfo?.data.isHod && <MenuItem className="menuitem" component={<Link to="MyBranch" />} onClick={() => setNavTitle("Branch")}> Branch</MenuItem>}
+              {icmsUserInfo?.data.isSectionHead && <MenuItem className="menuitem" component={<Link to="MyClassroom" />} onClick={() => setNavTitle("Classroom")}> Classroom </MenuItem>}
+              {icmsUserInfo?.data.isSectionHead && <MenuItem className="menuitem" component={<Link to="ManageSubjects" />} onClick={() => setNavTitle("Manage Subjects")}> Manage Subjects</MenuItem>}
+              <MenuItem className="menuitem" component={<Link to="MarkAttendance" />} onClick={() => setNavTitle("Mark Attendance")}> Mark Attendance</MenuItem>
+              <MenuItem className="menuitem" component={<Link to="AttendanceReport" />} onClick={() => setNavTitle("Attendance Report")}> Attendance Report</MenuItem>
+              <MenuItem className="menuitem" component={<Link to="Resources" />} onClick={() => setNavTitle("Resources")}> Resources</MenuItem>
+            </SubMenu>
             <MenuItem className="menuitem" component={<Link to="profile" />} onClick={() => setNavTitle("Profile")}> Profile</MenuItem>
           </Menu>
         </Sidebar>
@@ -106,18 +116,18 @@ const Dashboard = () => {
 
         <div style={{ padding: '20px', height: '100%', objectFit: 'contain', backgroundRepeat: 'repeatX', backgroundPosition: 'center', backgroundSize: 'cover', backgroundImage: `url(${dashboardBgImage})` }}>
 
-  <Routes >
-          <Route index element={<Basic />} />
-          <Route path="/MyClassroom" element={<MyClassroom />} />
-          <Route path="/MyBranch" element={<MyBranch />} />
-          <Route path="/ManageSubjects" element={<ManageSubjects />} />
-          <Route path="/MarkAttendance" element={<MarkAttendance />} />
-          <Route path="/AttendanceReport" element={<AttendanceReport />} />
-          <Route path="/Resources" element={<Resources />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/Subjects" element={<MySubject />} />
-          <Route path="*" element={<Navigate to='/notfound' />} />
-        </Routes>
+          <Routes >
+            <Route index element={<Basic />} />
+            <Route path="/MyClassroom" element={<MyClassroom />} />
+            <Route path="/MyBranch" element={<MyBranch />} />
+            <Route path="/ManageSubjects" element={<ManageSubjects />} />
+            <Route path="/MarkAttendance" element={<MarkAttendance />} />
+            <Route path="/AttendanceReport" element={<AttendanceReport />} />
+            <Route path="/Resources" element={<Resources />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/MySubjects" element={<MySubject />} />
+            <Route path="*" element={<Navigate to='/notfound' />} />
+          </Routes>
         </div>
 
 

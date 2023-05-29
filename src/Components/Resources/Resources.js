@@ -38,6 +38,27 @@ const Resources = () => {
     const [currentResourceUrl, setCurrentResourceUrl] = useState(null);
     const [currentResourceType, setCurrentResourceType] = useState('pdf');
 
+    const isUserSectionHead = JSON.parse(localStorage.getItem("icmsUserInfo")).data.user.isSectionHead;
+    const isUserHod = JSON.parse(localStorage.getItem("icmsUserInfo")).data.isHod;
+    const [selectedSubjectId, setSelectedSubjectId] = useState(null);
+
+    const sectionId = JSON.parse(localStorage.getItem("icmsUserInfo")).data.sectionHeadRef;
+    const [selectedSectionId, setSelectedSectionId] = useState(sectionId);
+    const [selectedSubjectTeacherId, setSelectedSubjectTeacherId] = useState(null);
+
+    async function selectedSubjectChanged(sId, tId) {
+        console.log(sId, tId, "sID, tId");
+        await setSelectedSubjectId(sId);
+        await setSelectedSubjectTeacherId(tId)
+        fetchAttendanceForSelectedDetails(selectedSectionId, sId, selectedDate)
+    }
+    async function selectedSectionChanged(sId) {
+        await setSelectedSectionId(sId);
+        await getListOfStudents(sId);
+        await fetchSubjectsForSection(sId);
+        fetchAttendanceForSelectedDetails(sId, selectedSubjectId, selectedDate)
+    }
+
     function resetResourcesForm(){
         resourceName.current.value = null
         resourceDescription.current.value = null
@@ -131,6 +152,116 @@ const Resources = () => {
             {success && (
                 <Message variant={"success"}>{successMessage}</Message>
             )}
+
+{
+                isUserSectionHead &&
+                <>
+                    <section className="student-count">
+                        {(sectionData != null) && <>
+                            <h5>
+                                <strong className="text-muted">
+                                    {sectionData.sectionName?.toUpperCase()}
+                                </strong>
+                                <Badge bg="success" style={{ float: 'right', margin: '0 10px' }}>
+                                    {yearMap[sectionData.sectionYear - 1]}
+                                </Badge>
+                                <Badge bg="dark" style={{ float: 'right', margin: '0 10px' }}>
+                                    {sectionData.sectionBranchName?.toUpperCase() || ""}
+                                </Badge>
+                            </h5>
+                        </>}
+                    </section>
+
+
+                    {/* Subject Picker */}
+                    <Form.Group className="mb-2" controlId="formFirstName">
+                        <Form.Label className="text-muted">Subject for marking attendance</Form.Label>
+                        <InputGroup className="mb-3">
+                            <InputGroup.Text id="basic-addon1"><FaBookOpen /></InputGroup.Text>
+
+                            {(!subjectList.length) && <p className="text-muted m-1">No subject created yet!</p>}
+                            <Form.Select style={{ display: (subjectList.length) ? '' : 'none' }}
+                                onChange={e => selectedSubjectChanged(e.target.value, e.target.selectedOptions[0].attributes[1].value)}
+                                aria-label="Default select example" required>
+                                <option value="">Select Subject</option>
+                                {subjectList?.length != 0 && subjectList?.map((option, index) => (
+                                    <option key={index} value={option.subjectId} teacherid={option.subjectTeacher._id}>
+                                        {option.subjectName + " (" + option.subjectCode + ")"}
+                                    </option>
+                                ))}
+
+                            </Form.Select>
+                        </InputGroup>
+                    </Form.Group>
+                </>
+            }
+
+            {
+                !isUserSectionHead && <>
+                    {/* Section Picker */}
+                    <Form.Group className="mb-2" controlId="formFirstName">
+                        <Form.Label className="text-muted">Section for marking attendance</Form.Label>
+                        <InputGroup className="mb-3">
+                            <InputGroup.Text id="basic-addon1"><FaUsers /></InputGroup.Text>
+
+                            {(sectionList.length == 0 || (sectionList?.firstYear?.length + sectionList?.secondYear?.length + sectionList?.thirdYear?.length + sectionList?.fourthYear?.length) < 1) && <p className="text-muted m-1">No section available!</p>}
+
+                            <Form.Select style={{ display: ((sectionList?.firstYear?.length + sectionList?.secondYear?.length + sectionList?.thirdYear?.length + sectionList?.fourthYear?.length) > 0) ? '' : 'none' }}
+                                onChange={e => selectedSectionChanged(e.target.value)}
+                                aria-label="Default select example" required>
+
+                                <option value="">Select Section</option>
+                                <option disabled>First Year</option>
+                                {sectionList?.firstYear?.length != 0 && sectionList?.firstYear?.map((option, index) => (
+                                    <option key={index} value={option._id}>
+                                        {option.sectionName}
+                                    </option>
+                                ))}
+                                <option disabled>Second Year</option>
+                                {sectionList?.secondYear?.length != 0 && sectionList?.secondYear?.map((option, index) => (
+                                    <option key={index} value={option._id}>
+                                        {option.sectionName}
+                                    </option>
+                                ))}
+                                <option disabled>Third Year</option>
+                                {sectionList?.thirdYear?.length != 0 && sectionList?.thirdYear?.map((option, index) => (
+                                    <option key={index} value={option._id}>
+                                        {option.sectionName}
+                                    </option>
+                                ))}
+                                <option disabled>Fourth Year</option>
+                                {sectionList?.fourthYear?.length != 0 && sectionList?.fourthYear?.map((option, index) => (
+                                    <option key={index} value={option._id}>
+                                        {option.sectionName}
+                                    </option>
+                                ))}
+
+                            </Form.Select>
+                        </InputGroup>
+                    </Form.Group>
+                    {/* Subject Picker */}
+                    <Form.Group className="mb-2" controlId="formFirstName">
+                        <Form.Label className="text-muted">Subject</Form.Label>
+                        <InputGroup className="mb-3">
+                            <InputGroup.Text id="basic-addon1"><FaBookOpen /></InputGroup.Text>
+
+                            {(!subjectListForSection.length) && <p className="text-muted m-1">No subject available for selected section yet!</p>}
+                            <Form.Select style={{ display: (subjectListForSection.length) ? '' : 'none' }}
+                                onChange={e => selectedSubjectChanged(e.target.value, e.target.selectedOptions[0].attributes[1].value)}
+                                aria-label="Default select example" required>
+                                <option value="">Select Subject</option>
+                                {subjectListForSection?.length != 0 && subjectListForSection?.map((option, index) => (
+                                    <option key={index} value={option.subjectId} teacherid={option.subjectTeacher._id}>
+                                        {option.subjectName + " (" + option.subjectCode + ")"}
+                                    </option>
+                                ))}
+
+                            </Form.Select>
+                        </InputGroup>
+                    </Form.Group>
+                </>
+            }
+
             <h5 className="modal-title">Add New Resource </h5>
 
             <Form onSubmit={handleResourceFormSubmit}>

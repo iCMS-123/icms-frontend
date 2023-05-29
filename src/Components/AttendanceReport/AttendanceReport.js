@@ -35,6 +35,7 @@ const AttendanceReport = () => {
     // For Manual Attendance
     let todaysDate = moment().format('YYYY-MM-DD');
     const isUserSectionHead = JSON.parse(localStorage.getItem("icmsUserInfo")).data.user.isSectionHead;
+    const isUserHod = JSON.parse(localStorage.getItem("icmsUserInfo")).data.isHod;
     const [selectedDate, setSelectedDate] = useState(todaysDate);
     const [selectedSubjectId, setSelectedSubjectId] = useState(null);
 
@@ -94,10 +95,6 @@ const AttendanceReport = () => {
         }
     };
 
-    useEffect(() => {
-        getClassroomData();
-    }, [selectedDate])
-
     function unmarkThisStudent(id) {
         setCurrentAttendance(currentAttendance.filter(item => item != id));
     }
@@ -120,6 +117,7 @@ const AttendanceReport = () => {
     };
 
     useEffect(() => {
+        getListOfStudents(selectedSectionId)
         if(isUserSectionHead)
             getClassroomData();
     }, []);
@@ -154,9 +152,8 @@ const AttendanceReport = () => {
     const [subjectListForSection, setSubjectListForSection] = useState([]);
 
     const getSubjectsList = async () => {
-        const sectionId = JSON.parse(localStorage.getItem("icmsUserInfo")).data.sectionHeadRef;
         try {
-            const { data } = await axios.get(`http://localhost:8002/api/v1/section/get-section-subject-list/${sectionId}`);
+            const { data } = await axios.get(`http://localhost:8002/api/v1/section/get-section-subject-list/${selectedSectionId}`);
 
             if (data && data.success)
                 setSubjectList(data.data);
@@ -165,7 +162,38 @@ const AttendanceReport = () => {
         }
     }
 
+    
     const getSectionList = async () => {
+        const userId = JSON.parse(localStorage.getItem("icmsUserInfo")).data._id;
+        try {
+            const { data } = await axios.get(`http://localhost:8002/api/v1/teacher/fetch-subjects/${userId}`);
+
+            if (data && data.success) {
+                let listOfSections = {
+                    firstYear : [],
+                    secondYear : [],
+                    thirdYear : [],
+                    fourthYear : [],
+                }
+                data.data.map(item => {
+                    if(item.sectionId.sectionYear == 1)
+                        listOfSections.firstYear.push(item.sectionId)
+                    else if(item.sectionId.sectionYear == 2)
+                        listOfSections.secondYear.push(item.sectionId)
+                    else if(item.sectionId.sectionYear == 3)
+                        listOfSections.thirdYear.push(item.sectionId)
+                    else if(item.sectionId.sectionYear == 4)
+                        listOfSections.fourthYear.push(item.sectionId)
+                })
+                setSectionList(listOfSections);
+                console.log(data, listOfSections, "section subject list");
+            }
+        } catch (e) {
+            console.log(e, "e");
+        }
+    }
+
+    const getSectionListForHOD = async () => {
         const branchName = JSON.parse(localStorage.getItem("icmsUserInfo")).data.user.branchName;
         try {
             const { data } = await axios.get(`http://localhost:8002/api/v1/hod/get-list-section?branchName=${branchName}`);
@@ -178,6 +206,7 @@ const AttendanceReport = () => {
             console.log(e, "e");
         }
     }
+
 
     const fetchSubjectsForSection = async (sId) => {
         try {
@@ -192,7 +221,10 @@ const AttendanceReport = () => {
 
     useEffect(() => {
         getSubjectsList()
-        getSectionList()
+        if(isUserHod)
+            getSectionListForHOD();
+        else
+            getSectionList();
     }, [])
 
     async function handleMarkAttendance() {
@@ -264,7 +296,7 @@ const AttendanceReport = () => {
             let { data } = await axios.post("http://localhost:8002/api/v1/section/upload-section-attendance", {
                 date: ('' + new Date(selectedDate)).slice(0, 15),
                 presentStudents: currentAttendance,
-                sectionId: sectionId,
+                sectionId: selectedSectionId,
                 subjectId: selectedSubjectId,
                 subjectTeacherId: selectedSubjectTeacherId
             });
@@ -310,7 +342,7 @@ const AttendanceReport = () => {
 
             <button type="button" class="btn btn-labeled btn-warning ms-auto d-block mb-2" onClick={e => getPdf()}
                 disabled={!selectedSectionId || !selectedSubjectId || !selectedDate} >
-                <span class="btn-label"><FaBookmark /> </span> Print Attendance Report as PDF</button>
+                <span className="btn-label"><FaBookmark /> </span> Print Attendance Report as PDF</button>
 
             <div id="elementForPDF" className="p-3">
                 {

@@ -61,7 +61,7 @@ const StudentAttendance = () => {
       },
       title: {
         display: true,
-        text: `Attendance of last 5 days of ${activeSubject}` ,
+        text: `Attendance of last 5 classes of ${activeSubject}` ,
       },
     },
   };
@@ -86,7 +86,7 @@ const StudentAttendance = () => {
       },
       title: {
         display: true,
-        text: `Attendance of last 30 days of ${activeSubject}`,
+        text: `Attendance of last 30 classes of ${activeSubject}`,
       },
     },
   };

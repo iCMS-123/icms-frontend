@@ -67,7 +67,7 @@ const LoginForm = () => {
     {/* <ICMSTitle/> */}
     <h3 className="sidebar-header fw-bold mb-0 py-2 mb-4 text-center">
           <Link to={"/"}>
-          <img src='/images/icms-logo.png' alt='logo' style={{ height: '40px', filter: 'invert(1)' }} />
+          <img src='/images/icms-logo.png' alt='logo' style={{ height: '40px', filter: 'invert(0)' }} />
           </Link>
         </h3>
 
