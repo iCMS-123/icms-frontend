@@ -36,11 +36,25 @@ export const Basic = () => {
   let isSectionHead = userData.isSectionHead;
   // for reference 
   // let branchName = userData.branchName || userData.user.branchName; 
-  
+  // for section head
+  const [sectionHeadSubjects, setSectionHeadSubjects] = useState([]);
+  // for normal teacher
   const [subjectAndSectionID, setSubjectAndSectionID] = useState([]);
-
+  function updateDateAndAttendanceState(attendanceData){
+    let temp1 = [];
+    let temp2 = [];
+    attendanceData = attendanceData.sort((a, b) => moment(a.date).diff(moment(b.date)));
+    attendanceData?.forEach((item) => {
+      temp1.push(item.date);
+      temp2.push(item.presentStudents.length);
+    })
+    setDateLabels(temp1);
+    setAttendanceCountLabels(temp2);
+  }
   async function updateLineChart(index) {
-    console.log(subjectAndSectionID[index])
+    // this flow is for normal teacher
+    if(!isHod && !isSectionHead){
+      console.log(subjectAndSectionID[index])
     let subjectId = subjectAndSectionID[index].subjectId;
     let sectionId = subjectAndSectionID[index].sectionId;
     
@@ -48,25 +62,26 @@ export const Basic = () => {
     try{
       let {data} = await axios.get(`http://localhost:8002/api/v1/section/get-attendance-subject-section-id?sectionId=${sectionId}&subjectId=${subjectId}`);
       let attendanceData = data.data[0].attendance;
-      let temp1 = [];
-      let temp2 = [];
-      attendanceData = attendanceData.sort((a, b) => moment(a.date).diff(moment(b.date)));
-      attendanceData?.forEach((item) => {
-        temp1.push(item.date);
-        temp2.push(item.presentStudents.length);
-      })
-      setDateLabels(temp1);
-      setAttendanceCountLabels(temp2);
+      updateDateAndAttendanceState(attendanceData);
     }catch(err){
       console.log(err);
     }
-    
+    }
+    else if(isSectionHead && !isHod){
+      // for section head
+      let subject = sectionHeadSubjects[index];
+      setActiveSubject(subject.subjectName);
+      updateDateAndAttendanceState(subject.attendance);
+    }
   }
+
+   
+
   useEffect(()=>{
-    if(subjectAndSectionID.length > 0){
+    if(subjectAndSectionID.length > 0 || sectionHeadSubjects.length > 0){
       updateLineChart(0);
     }
-  }, [subjectAndSectionID])
+  }, [subjectAndSectionID, sectionHeadSubjects])
   useEffect(() => {
     const getClassroomData = async () => {
       if(!isHod && !isSectionHead){
@@ -94,16 +109,9 @@ export const Basic = () => {
         const { data } = await axios.get(`http://localhost:8002/api/v1/section/get-section-data/${currUser}`);
 
         if (data && data.success) {
-          let attendanceData = data.data.sectionAttendance;
-          attendanceData = attendanceData.sort((a, b) => moment(a.date).diff(moment(b.date)));
-          let temp1 = [];
-          let temp2 = [];
-          attendanceData.map((item, idx) => {
-            temp1.push(item.date);
-            temp2.push(item.presentStudents.length);
-          })
-          setDateLabels(temp1);
-          setAttendanceCountLabels(temp2);
+          let attendanceData = data.data.sectionSubject;
+          console.log(attendanceData, "attendanceData");
+          setSectionHeadSubjects(attendanceData);
         }
       } catch (e) {
         console.log(e, "e");
@@ -114,9 +122,6 @@ export const Basic = () => {
 
   }, []);
 
-  useEffect(() => {
-     
-    },[subjectAndSectionID]);
   // Chart.js code
   // for chartjs
   ChartJS.register(
@@ -214,7 +219,7 @@ export const Basic = () => {
           <Card className='mb-3' style={{ minHeight : "350px" }}>
             <Card.Body>
             <h4>Subjects</h4>
-          {subjectAndSectionID?.map((subject, ind) => {
+          { (!isHod && !isSectionHead) && subjectAndSectionID?.map((subject, ind) => {
           return (
             <button
               key={ind}
@@ -229,6 +234,24 @@ export const Basic = () => {
             </button>
           );
       })}
+
+      {
+        (isSectionHead && !isHod) && sectionHeadSubjects?.map((subject, ind) => {
+          return (
+            <button
+              key={ind}
+              onClick={(e) => {
+                updateLineChart(ind);
+              }}
+              style={subjectButton}
+              type="button"
+              className="btn btn-dark mx-1 mb-1 btn-sm"
+            >
+              {subject.subjectName} ({subject.subjectCode})
+            </button>
+          );
+      })
+    }
            
               <Line options={lastFiveDaysOptions} data={lastFiveDaysData} />
             </Card.Body>
