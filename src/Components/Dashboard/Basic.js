@@ -21,6 +21,7 @@ export const Basic = () => {
   // For attendance
   const [attendanceCountLabels, setAttendanceCountLabels] = useState([]);
   const [dateLabels, setDateLabels] = useState([]);
+  const [activeSubject, setActiveSubject] = useState();
   useDocumentTitle("Dashboard");
   const navigate = useNavigate();
   let userData;
@@ -31,11 +32,64 @@ export const Basic = () => {
     userData = icmsLocalStorageData?.data;
   }
   let currUser = userData._id;
+  let isHod = userData.isHod;
+  let isSectionHead = userData.isSectionHead;
   // for reference 
   // let branchName = userData.branchName || userData.user.branchName; 
+  
+  const [subjectAndSectionID, setSubjectAndSectionID] = useState([]);
 
+  async function updateLineChart(index) {
+    console.log(subjectAndSectionID[index])
+    let subjectId = subjectAndSectionID[index].subjectId;
+    let sectionId = subjectAndSectionID[index].sectionId;
+    
+    setActiveSubject(subjectAndSectionID[index].subjectName);
+    try{
+      let {data} = await axios.get(`http://localhost:8002/api/v1/section/get-attendance-subject-section-id?sectionId=${sectionId}&subjectId=${subjectId}`);
+      let attendanceData = data.data[0].attendance;
+      let temp1 = [];
+      let temp2 = [];
+      attendanceData = attendanceData.sort((a, b) => moment(a.date).diff(moment(b.date)));
+      attendanceData?.forEach((item) => {
+        temp1.push(item.date);
+        temp2.push(item.presentStudents.length);
+      })
+      setDateLabels(temp1);
+      setAttendanceCountLabels(temp2);
+    }catch(err){
+      console.log(err);
+    }
+    
+  }
+  useEffect(()=>{
+    if(subjectAndSectionID.length > 0){
+      updateLineChart(0);
+    }
+  }, [subjectAndSectionID])
   useEffect(() => {
     const getClassroomData = async () => {
+      if(!isHod && !isSectionHead){
+        try{
+          const {data} = await axios.get(`http://localhost:8002/api/v1/teacher/fetch-subjects/${currUser}`);   
+          console.log(data.data); 
+          let temp = data.data;
+          let obj = [];
+          temp.forEach((item) => {
+            obj.push({
+              subjectName : item.subjectName,
+              subjectId : item.subjectId,
+              sectionId : item.sectionId._id,
+            });
+          });
+          console.log(obj);
+          setSubjectAndSectionID(obj);
+
+        }catch(err){
+          console.log(err);
+        }
+      }
+      else if(isSectionHead && !isHod){
       try {
         const { data } = await axios.get(`http://localhost:8002/api/v1/section/get-section-data/${currUser}`);
 
@@ -54,11 +108,15 @@ export const Basic = () => {
       } catch (e) {
         console.log(e, "e");
       }
+    }
     };
     getClassroomData();
 
   }, []);
 
+  useEffect(() => {
+     
+    },[subjectAndSectionID]);
   // Chart.js code
   // for chartjs
   ChartJS.register(
@@ -79,7 +137,7 @@ export const Basic = () => {
       },
       title: {
         display: true,
-        text: 'Attendance of last 5 days',
+        text: `Attendance of last 5 days of ${activeSubject}`,
       },
     },
   };
@@ -103,7 +161,7 @@ export const Basic = () => {
       },
       title: {
         display: true,
-        text: 'Attendance of last 30 days',
+        text: `Attendance of last 30 days of ${activeSubject}`,
       },
     },
   };
@@ -155,6 +213,23 @@ export const Basic = () => {
 
           <Card className='mb-3' style={{ minHeight : "350px" }}>
             <Card.Body>
+            <h4>Subjects</h4>
+          {subjectAndSectionID?.map((subject, ind) => {
+          return (
+            <button
+              key={ind}
+              onClick={(e) => {
+                updateLineChart(ind);
+              }}
+              style={subjectButton}
+              type="button"
+              className="btn btn-dark mx-1 mb-1 btn-sm"
+            >
+              {subject.subjectName}
+            </button>
+          );
+      })}
+           
               <Line options={lastFiveDaysOptions} data={lastFiveDaysData} />
             </Card.Body>
           </Card>
@@ -186,3 +261,7 @@ export const Basic = () => {
   )
 }
 
+
+const subjectButton = {
+  borderRadius: "20px",
+};
