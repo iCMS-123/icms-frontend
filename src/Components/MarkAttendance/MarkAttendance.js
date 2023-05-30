@@ -188,22 +188,22 @@ const MarkAttendance = () => {
                     else if (item.sectionId.sectionYear == 4)
                         listOfSections.fourthYear.push(item.sectionId._id)
                 })
-                
+
                 listOfSections.firstYear = [...new Set(listOfSections.firstYear)]
                 listOfSections.secondYear = [...new Set(listOfSections.secondYear)]
                 listOfSections.thirdYear = [...new Set(listOfSections.thirdYear)]
                 listOfSections.fourthYear = [...new Set(listOfSections.fourthYear)]
 
-                listOfSections.firstYear.map(item => 
+                listOfSections.firstYear.map(item =>
                     listOfSections1.firstYear.push(sectionListDB.filter(it => it.sectionId._id == item)[0].sectionId)
                 )
-                listOfSections.secondYear.map(item => 
+                listOfSections.secondYear.map(item =>
                     listOfSections1.secondYear.push(sectionListDB.filter(it => it.sectionId._id == item)[0].sectionId)
                 )
-                listOfSections.thirdYear.map(item => 
+                listOfSections.thirdYear.map(item =>
                     listOfSections1.thirdYear.push(sectionListDB.filter(it => it.sectionId._id == item)[0].sectionId)
                 )
-                listOfSections.fourthYear.map(item => 
+                listOfSections.fourthYear.map(item =>
                     listOfSections1.fourthYear.push(sectionListDB.filter(it => it.sectionId._id == item)[0].sectionId)
                 )
 
@@ -262,6 +262,19 @@ const MarkAttendance = () => {
             getSectionList();
     }, [])
 
+    function fetchAttendanceStatus() {
+        const current_timestamp = moment().valueOf();
+        const testingData = Number(localStorage.getItem(`attandanceAtModel_${selectedSectionId}_${selectedSubjectId}`));
+        console.log(testingData, "testingData");
+        if (testingData && testingData + 3600000 > current_timestamp) 
+            setTodaysAttendanceUploaded(true)
+        else
+            setTodaysAttendanceUploaded(false)
+    }
+    useEffect(() => {
+        fetchAttendanceStatus();
+    }, [selectedSectionId, selectedSubjectId, selectedDate])
+
     async function handleMarkAttendance() {
         // logic to mark attendance
         // a post request to backend with the list of uploaded images
@@ -283,6 +296,7 @@ const MarkAttendance = () => {
         try {
             axios.post("http://localhost:8002/api/v1/task/create-task", {
                 sectionId: selectedSectionId,
+                subjectId: selectedSubjectId,
                 taskId: current_timestamp,
                 date: new Date(selectedDate).toDateString(),
                 subjectTeacherId: selectedSubjectTeacherId
@@ -290,7 +304,7 @@ const MarkAttendance = () => {
                 .then((res) => {
                     console.log(res, "response");
                     if (res.data.success) {
-                        axios.post("https://07a7-35-233-234-62.ngrok-free.app/mark_attendance", {
+                        axios.post("https://366f-34-143-211-29.ngrok-free.app/mark_attendance", {
                             "sectionId": selectedSectionId,
                             "subjectId": selectedSubjectId,
                             "subjectTeacherId": selectedSubjectTeacherId,
@@ -567,6 +581,8 @@ const MarkAttendance = () => {
                 {todaysAttendanceUploaded &&
                     <h6 className="text-muted">
                         You have already uploaded images for marking today's attendance! Please wait for response. It may take upto 5 to 10 minutes.
+                        <br />
+                        You can only mark attendance only once per day using Face Recognition and only for same day!
                     </h6>
                 }
 

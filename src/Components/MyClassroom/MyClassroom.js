@@ -65,7 +65,7 @@ const MyClassroom = () => {
     const trainingData = Number(localStorage.getItem(`trainingData${sectionId}`));
     console.log(trainingData + 3600000 - moment().valueOf(), "see you in hell");
     if (trainingData) {
-      setLastTrainTime(new Date(trainingData).toUTCString());
+      setLastTrainTime(new Date(trainingData).toLocaleString());
       if (trainingData + 3600000 > moment().valueOf()) {
         console.log("greater toh hai");
         setModelTrainBtnShow(false);
@@ -123,7 +123,7 @@ const MyClassroom = () => {
         .then((res) => {
           if (res.data.success) {
             console.log(res, "response");
-            axios.post("https://2be2-34-172-94-11.ngrok-free.app/train_model",
+            axios.post("https://366f-34-143-211-29.ngrok-free.app/train_model",
               payload
             );
 
@@ -132,7 +132,7 @@ const MyClassroom = () => {
             setTimeout(() => setSuccess(false), 3000);
 
             localStorage.setItem(`trainingData${sectionId}`, current_timestamp);
-            setLastTrainTime(new Date(current_timestamp).toUTCString());
+            setLastTrainTime(new Date(current_timestamp).toLocaleString());
           }
           else {
             seterror("Request not processed! Try again!");
@@ -170,7 +170,7 @@ const MyClassroom = () => {
           setUnverifiedStudentsList(data.data.unverifiedStudents);
           setSectionAttendance(data.data.sectionAttendance)
           if (data.data?.lastAttendanceRequest) 
-            setLastSuccessfulTrainTime(new Date(data.data?.lastAttendanceRequest).toUTCString());
+            setLastSuccessfulTrainTime(new Date(data.data?.lastAttendanceRequest).toLocaleString());
 
           let allIssues = data.data.sectionIssues;
           setIssuesData(allIssues); // for issues data    

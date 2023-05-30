@@ -264,7 +264,7 @@ export const Basic = () => {
                 isHod && <>
                   {/* Section Picker */}
                   <Form.Group className="mb-2" controlId="formFirstName">
-                    <Form.Label className="text-muted">Section for marking attendance</Form.Label>
+                    <Form.Label className="text-muted">Section for showing attendance</Form.Label>
                     <InputGroup className="mb-3">
                       <InputGroup.Text id="basic-addon1"><FaUsers /></InputGroup.Text>
 
