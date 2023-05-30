@@ -268,7 +268,7 @@ const MarkAttendance = () => {
         const current_timestamp = moment().valueOf();
 
         console.log(`attandanceAtModel${selectedSectionId}`)
-        const testingData = Number(localStorage.getItem(`attandanceAtModel${selectedSectionId}`));
+        const testingData = Number(localStorage.getItem(`attandanceAtModel_${selectedSectionId}_${selectedSubjectId}`));
         if (testingData && testingData + 3600000 > current_timestamp) {
             seterror("You have already requested for marking attendance for this section! You can request again after 60 minutes, only if request fails.");
             setTimeout(() => seterror(null), 3000);
@@ -290,7 +290,7 @@ const MarkAttendance = () => {
                 .then((res) => {
                     console.log(res, "response");
                     if (res.data.success) {
-                        axios.post("https://7258-34-90-13-120.ngrok-free.app/mark_attendance", {
+                        axios.post("https://07a7-35-233-234-62.ngrok-free.app/mark_attendance", {
                             "sectionId": selectedSectionId,
                             "subjectId": selectedSubjectId,
                             "subjectTeacherId": selectedSubjectTeacherId,
@@ -304,7 +304,7 @@ const MarkAttendance = () => {
                         setSuccess(true);
                         setTimeout(() => setSuccess(false), 3000);
 
-                        localStorage.setItem(`attandanceAtModel${selectedSectionId}`, current_timestamp);
+                        localStorage.setItem(`attandanceAtModel_${selectedSectionId}_${selectedSubjectId}`, current_timestamp);
                     }
                     else {
                         console.log(res.data?.error, "error from backend");

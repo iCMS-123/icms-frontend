@@ -123,7 +123,7 @@ const MyClassroom = () => {
         .then((res) => {
           if (res.data.success) {
             console.log(res, "response");
-            axios.post("https://7258-34-90-13-120.ngrok-free.app/train_model",
+            axios.post("https://2be2-34-172-94-11.ngrok-free.app/train_model",
               payload
             );
 
@@ -169,14 +169,14 @@ const MyClassroom = () => {
           setVerifiedStudentsList(data.data.verifiedStudents);
           setUnverifiedStudentsList(data.data.unverifiedStudents);
           setSectionAttendance(data.data.sectionAttendance)
-          if (data.data?.sectionAttendanceStatus) 
-            setLastSuccessfulTrainTime(new Date(Number(data.data?.lastAttendanceRequest)).toUTCString());
+          if (data.data?.lastAttendanceRequest) 
+            setLastSuccessfulTrainTime(new Date(data.data?.lastAttendanceRequest).toUTCString());
 
           let allIssues = data.data.sectionIssues;
           setIssuesData(allIssues); // for issues data    
           setActiveIssues(allIssues.filter((issue) => !issue.isAttended))
           setResolvedIssues(allIssues.filter((issue) => issue.isAttended))
-          // console.log(data, "Classroom Data");
+          console.log(data, "Classroom Data");
         }
       } catch (e) {
         console.log(e, "e");

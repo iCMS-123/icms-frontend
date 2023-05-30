@@ -36,7 +36,10 @@ const StudentDashboard = () => {
       }}
     >
       <div className={styles.dashboardLeft}>
-        <h3 className={`${styles['sidebar-header']} fw-bold mb-0 py-2 text-center`}>iCMS</h3>
+        {/* <h3 className={`${styles['sidebar-header']} fw-bold mb-0 py-2 text-center`}>iCMS</h3> */}
+          <h3 className="sidebar-header fw-bold mb-0 py-2 text-center">
+            <img src='/images/icms-logo.png' alt='logo' style={{ height: '40px', filter: 'invert(0)' }} />
+          </h3>
 
         <Sidebar className={styles.dashboardSidebar}>
           <Menu  className={styles.dashboardMenu}>

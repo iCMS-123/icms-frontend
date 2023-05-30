@@ -4,7 +4,7 @@ let cloudinary;
 let widget;
 
 const cloudName = "harshit9270"; 
-const uploadPreset = "icms-students"; 
+const uploadPreset = "iCMS_new_29-05-2023"; 
 
 const CloudinaryMarkAttendanceWidget = ({ children, onUpload, multipleAllowed}) => {
 

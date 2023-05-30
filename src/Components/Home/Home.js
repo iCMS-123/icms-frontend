@@ -28,7 +28,7 @@ const Home = () => {
       <Image
         className="mt-2"
         id="college-img"
-        src={'/images/jssImage.png'}
+        src={'/images/jssImage_latest.png'}
         alt="college-bg"
       />
 

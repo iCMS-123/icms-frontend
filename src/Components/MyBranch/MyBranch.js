@@ -367,7 +367,7 @@ const MyBranch = (props) => {
       {success && (
         <Message variant={"success"}>{successMessage}</Message>
       )}
-      <div id={styles.currentClassrooms}>
+      <div id={styles.currentClassrooms} className="mb-3">
         {/* branch fetch logic will come here */}
         <h5 style={{ fontWeight: "bold" }} className="pt-4">
           Current Classrooms
@@ -381,6 +381,9 @@ const MyBranch = (props) => {
         {years?.map((yr, idx) => (
           <>
             <h5>{yr} - {studentCountData[idx]?.totalStudents} student(s)</h5>
+            {
+              (! classroomList || classroomList[idx].length == 0) && <p clasName="text-muted"> Currently there are no classrooms for {yr}! </p>
+            }
             <Row xs={1} md={4} className="" key={idx}>
               {classroomList != null && classroomList[idx].length !== 0 &&
                 classroomList[idx]?.map((classRoom, index) => (

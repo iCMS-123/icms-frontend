@@ -116,8 +116,7 @@ const StudentBasic = () => {
     const getStudentUpdatesList = async () => {
       try {
         let studentID = JSON.parse(localStorage.getItem("icmsUserInfo")).data.user._id;
-        // const { data } = await axios.get(`http://localhost:8002/api/v1/student/fetch-updates/${studentID}`);
-        const { data } = await axios.get(`http://localhost:8002/api/v1/student/fetch-updates/6419ef7901e5b63cf6c04a0d`);
+        const { data } = await axios.get(`http://localhost:8002/api/v1/student/fetch-updates/${studentID}`);
 
         if (data && data.success) {
           console.log(data, "student updates data");
@@ -135,7 +134,7 @@ const StudentBasic = () => {
   }, []);
 
   return (
-    <div className="student-basic-container">
+    <div className="student-basic-container pb-5">
       <div className="card welcome-card">
         <div className="card-body welcome-card-body">
           <div>

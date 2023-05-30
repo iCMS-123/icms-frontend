@@ -78,7 +78,7 @@ const ManageSubjects = () => {
     const getDepartmentTeachersList = async () => {
         try {
             const { data } = await axios.get(
-                `http://localhost:8002/api/v1/teacher/get-list?branch=${sectionBranch}`
+                `http://localhost:8002/api/v1/teacher/get-list?branch=${sectionBranch}&isSubjectCreation=true`
             );
 
             if (data && data.success) {

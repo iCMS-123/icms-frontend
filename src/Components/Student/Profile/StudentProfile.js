@@ -71,7 +71,7 @@ function StudentProfile() {
     console.log(result?.info?.secure_url, "img url");
     let currUrl = await result?.info?.secure_url;
 
-    await setUploadedUserImages(uploadedUserImages => [...uploadedUserImages, currUrl])
+    await setUploadedUserImages(uploadedUserImages => [currUrl, ...uploadedUserImages])
     console.log(uploadedUserImages, "after append");
 
     setSuccess(true);
@@ -129,7 +129,7 @@ function StudentProfile() {
       let userID = userData._id;
       console.log(userID);
       const updatedDetails = {
-        userId: userID,
+        id: userID,
         firstName: firstNameRef.current.value,
         lastName: lastNameRef.current.value,
         mobileNumber: phoneRef.current.value,
@@ -139,7 +139,7 @@ function StudentProfile() {
       }
       // console.log(updatedDetails)
       try {
-        const response = await axios.put("http://localhost:8002/api/v1/student/update-student", updatedDetails);
+        const response = await axios.post("http://localhost:8002/api/v1/student/update-profile", updatedDetails);
         console.log(response);
         localStorage.setItem("icmsUserInfo", JSON.stringify(response.data));
         if (response.data.success) {
@@ -171,7 +171,7 @@ function StudentProfile() {
         <div id="trainingImagesBox">
           <h6 className="fw-bold mt-3">Images for Automated Attendance System</h6>
           {(uploadedUserImages != []) && uploadedUserImages.map((img, index) => (
-              <div style={{ display: "inline-block", height: '100px', margin: '10px', position: 'relative' }}>
+              <div style={{ display: "inline-block", height: '100px', margin: '10px', position: 'relative' }} key={index}>
                 <Image thumbnail style={{ height: '100%' }} src={img} alt="User" />
               </div>
           ))}
