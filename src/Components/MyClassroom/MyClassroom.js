@@ -9,6 +9,7 @@ import styles from './styles.module.css'
 import './styles.css'
 import { FaTimesCircle } from "react-icons/fa"
 import moment from "moment"
+import { url } from '../url'
 
 const MyClassroom = () => {
   let icmsLocalStorageData = JSON.parse(localStorage.getItem("icmsUserInfo"));
@@ -119,7 +120,7 @@ const MyClassroom = () => {
     console.log(payload, "payload");
 
     try {
-      axios.post(`http://localhost:8002/api/v1/section/train-attendance/${sectionId}`)
+      axios.post(`${url}/api/v1/section/train-attendance/${sectionId}`)
         .then((res) => {
           if (res.data.success) {
             console.log(res, "response");
@@ -160,7 +161,7 @@ const MyClassroom = () => {
   useEffect(() => {
     const getClassroomData = async () => {
       try {
-        const { data } = await axios.get(`http://localhost:8002/api/v1/section/get-section-data/${currUser}`);
+        const { data } = await axios.get(`${url}/api/v1/section/get-section-data/${currUser}`);
 
         if (data && data.success) {
           setSectionData(data.data);
@@ -232,7 +233,7 @@ const MyClassroom = () => {
     console.log(student_id, 'student_id for verification');
 
     try {
-      const { data } = await axios.put(`http://localhost:8002/api/v1/section/verify-section-student/${student_id}`);
+      const { data } = await axios.put(`${url}/api/v1/section/verify-section-student/${student_id}`);
       if (data && data.success) {
         console.log(data.data, "verified student response");
         setSuccess(true);
@@ -278,7 +279,7 @@ const MyClassroom = () => {
 
   async function handleIssueStatusModal(decision) {
     try {
-      const { data } = await axios.put(`http://localhost:8002/api/v1/section/resolve-issue/${userID}`, {
+      const { data } = await axios.put(`${url}/api/v1/section/resolve-issue/${userID}`, {
         issueId: issueModalData._id,
         status: decision
       })

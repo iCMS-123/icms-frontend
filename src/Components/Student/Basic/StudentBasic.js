@@ -19,6 +19,7 @@ import {
   Legend,
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
+import { url } from '../url'
 
 const StudentBasic = () => {
   let icmsUserInfo = JSON.parse(localStorage.getItem("icmsUserInfo"));
@@ -87,7 +88,7 @@ const StudentBasic = () => {
   useEffect( ()=>{
     const fetchAttendance = async () => {
     try{
-            let data = await axios.get(`http://localhost:8002/api/v1/section/fetch-attendance-student-id/${userID}`)
+            let data = await axios.get(`${url}/api/v1/section/fetch-attendance-student-id/${userID}`)
             console.log(data.data.data, "subjectsAttendanceData");
             let receivedData = data.data.data;
               // sort all the attendance data by date
@@ -116,7 +117,7 @@ const StudentBasic = () => {
     const getStudentUpdatesList = async () => {
       try {
         let studentID = JSON.parse(localStorage.getItem("icmsUserInfo")).data.user._id;
-        const { data } = await axios.get(`http://localhost:8002/api/v1/student/fetch-updates/${studentID}`);
+        const { data } = await axios.get(`${url}/api/v1/student/fetch-updates/${studentID}`);
 
         if (data && data.success) {
           console.log(data, "student updates data");

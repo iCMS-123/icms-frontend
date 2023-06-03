@@ -8,6 +8,7 @@ import { FaSearch, FaUserCheck, FaUserTimes, FaTimesCircle, FaBookOpen, FaCalend
 import axios from 'axios';
 import Message from "../Message/index";
 import CloudinaryUploadWidget from "../CloudinaryWidget/CloudinaryUploadWidget";
+import { url } from '../url'
 
 const Resources = () => {
     useDocumentTitle("Resources");
@@ -66,7 +67,7 @@ const Resources = () => {
 
     const getSubjectsList = async () => {
         try {
-            const { data } = await axios.get(`http://localhost:8002/api/v1/section/get-section-subject-list/${selectedSectionId}`);
+            const { data } = await axios.get(`${url}/api/v1/section/get-section-subject-list/${selectedSectionId}`);
 
             if (data && data.success)
                 setSubjectList(data.data);
@@ -78,7 +79,7 @@ const Resources = () => {
     const getSectionList = async () => {
         const userId = JSON.parse(localStorage.getItem("icmsUserInfo")).data._id;
         try {
-            const { data } = await axios.get(`http://localhost:8002/api/v1/teacher/fetch-subjects/${userId}`);
+            const { data } = await axios.get(`${url}/api/v1/teacher/fetch-subjects/${userId}`);
 
             if (data && data.success) {
                 let sectionListDB = data.data;
@@ -134,7 +135,7 @@ const Resources = () => {
     const getSectionListForHOD = async () => {
         const branchName = JSON.parse(localStorage.getItem("icmsUserInfo")).data.user.branchName;
         try {
-            const { data } = await axios.get(`http://localhost:8002/api/v1/hod/get-list-section?branchName=${branchName}`);
+            const { data } = await axios.get(`${url}/api/v1/hod/get-list-section?branchName=${branchName}`);
 
             if (data && data.success) {
                 setSectionList(data);
@@ -148,7 +149,7 @@ const Resources = () => {
     const fetchSubjectsForSection = async (sId) => {
         let fetchedSubjects = [];
         try {
-            const { data } = await axios.get(`http://localhost:8002/api/v1/section/get-section-subject-list/${sId}`);
+            const { data } = await axios.get(`${url}/api/v1/section/get-section-subject-list/${sId}`);
 
             if (data && data.success) {
                 setSubjectListForSection(data.data);
@@ -239,7 +240,7 @@ const Resources = () => {
         e.preventDefault();
         console.log(JSON.parse(localStorage.getItem("icmsUserInfo")).data._id);
         try {
-            let { data } = await axios.post("http://localhost:8002/api/v1/teacher/share-msg-to-section", {
+            let { data } = await axios.post(`${url}/api/v1/teacher/share-msg-to-section`, {
                 msgTitle: resourceName?.current?.value,
                 msgBody: resourceDescription?.current?.value,
                 priority: resourcePriority?.current?.value,

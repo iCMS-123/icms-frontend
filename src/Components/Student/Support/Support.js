@@ -4,6 +4,7 @@ import { Button, Form } from "react-bootstrap"
 import "./Support.css"
 import axios from "axios";
 import Message from "../../Message";
+import { url } from '../url'
 
 const Support = () => {
     let icmsLocalStorageData = JSON.parse(localStorage.getItem("icmsUserInfo"));
@@ -24,7 +25,7 @@ const Support = () => {
     const handleSubmit = async (event) => {
         event.preventDefault();
         try {
-            const { data } = await axios.post("http://localhost:8002/api/v1/student/support", {
+            const { data } = await axios.post(`${url}/api/v1/student/support`, {
                 title: issueTitleRef["current"]?.value,
                 studentId: userID,
                 issueMsg: issueDescriptionRef["current"]?.value,

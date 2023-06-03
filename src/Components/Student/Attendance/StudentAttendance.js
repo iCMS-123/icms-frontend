@@ -13,6 +13,7 @@ import {
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import { Card } from "react-bootstrap";
+import { url } from '../url'
 
 
 const StudentAttendance = () => {
@@ -39,7 +40,7 @@ const StudentAttendance = () => {
   useEffect( ()=>{
     const fetchAttendance = async () => {
     try{
-            let data = await axios.get(`http://localhost:8002/api/v1/section/fetch-attendance-student-id/${userID}`)
+            let data = await axios.get(`${url}/api/v1/section/fetch-attendance-student-id/${userID}`)
             console.log(data.data.data, "subjectsAttendanceData");
             let receivedData = data.data.data;
               // sort all the attendance data by date

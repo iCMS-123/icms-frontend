@@ -6,6 +6,7 @@ import { GiTeacher } from "react-icons/gi";
 import axios from 'axios';
 import { Button, Card, Badge, Image } from "react-bootstrap";
 import { Link } from "react-router-dom";
+import { url } from '../url'
 
 const StudentUpdates = () => {
     let icmsUserInfo = JSON.parse(localStorage.getItem("icmsUserInfo"));
@@ -20,7 +21,7 @@ const StudentUpdates = () => {
         const getStudentUpdatesList = async () => {
             try {
                 let studentID = JSON.parse(localStorage.getItem("icmsUserInfo")).data.user._id;
-                const { data } = await axios.get(`http://localhost:8002/api/v1/student/fetch-updates/${studentID}`);
+                const { data } = await axios.get(`${url}/api/v1/student/fetch-updates/${studentID}`);
 
                 if (data && data.success) {
                     console.log(data, "student updates data");

@@ -19,6 +19,7 @@ import {
     Legend,
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
+import { url } from '../url'
 
 const ManageSubjects = () => {
     let icmsLocalStorageData = JSON.parse(localStorage.getItem("icmsUserInfo"));
@@ -49,7 +50,7 @@ const ManageSubjects = () => {
 
     const getClassroomData = async () => {
         try {
-            const { data } = await axios.get(`http://localhost:8002/api/v1/section/get-section-data/${currUser}`);
+            const { data } = await axios.get(`${url}/api/v1/section/get-section-data/${currUser}`);
 
             if (data && data.success) {
                 setSectionData(data.data);
@@ -64,7 +65,7 @@ const ManageSubjects = () => {
 
     const getSubjectsList = async () => {
         try {
-            const { data } = await axios.get(`http://localhost:8002/api/v1/section/get-section-subject-list/${sectionId}`);
+            const { data } = await axios.get(`${url}/api/v1/section/get-section-subject-list/${sectionId}`);
 
             if (data && data.success)
                 setSubjectList(data.data);
@@ -78,7 +79,7 @@ const ManageSubjects = () => {
     const getDepartmentTeachersList = async () => {
         try {
             const { data } = await axios.get(
-                `http://localhost:8002/api/v1/teacher/get-list?branch=${sectionBranch}&isSubjectCreation=true`
+                `${url}/api/v1/teacher/get-list?branch=${sectionBranch}&isSubjectCreation=true`
             );
 
             if (data && data.success) {
@@ -115,7 +116,7 @@ const ManageSubjects = () => {
         e.preventDefault();
         console.log(JSON.parse(localStorage.getItem("icmsUserInfo")).data._id);
         try {
-            let { data } = await axios.post(`http://localhost:8002/api/v1/section/create-subject/${sectionId}`, {
+            let { data } = await axios.post(`${url}/api/v1/section/create-subject/${sectionId}`, {
                 subjectName: modalSubjectNameRef?.current?.value,
                 subjectTeacherId: modalSubjectTeacherIdRef?.current?.value,
                 subjectCode: modalSubjectCodeRef?.current?.value,
@@ -144,7 +145,7 @@ const ManageSubjects = () => {
         e.preventDefault();
         console.log("submitUpdateSubjectTeacherForm called");
         try {
-            const { data } = await axios.post(`http://localhost:8002/api/v1/section/update-subject-teacher/${sectionId}`, {
+            const { data } = await axios.post(`${url}/api/v1/section/update-subject-teacher/${sectionId}`, {
                 subjectId: modalSubjectCodeForUpdateRef.current.value,
                 newSubjectTeacherId: modalSubjectTeacherIdForUpdateRef.current.value
             });

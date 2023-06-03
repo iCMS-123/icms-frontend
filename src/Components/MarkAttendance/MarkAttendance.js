@@ -8,6 +8,7 @@ import Message from "../Message/index";
 import styles from './index.module.css'
 import { FaTimesCircle } from "react-icons/fa"
 import moment from "moment"
+import { url } from '../url'
 
 const MarkAttendance = () => {
     let icmsLocalStorageData = JSON.parse(localStorage.getItem("icmsUserInfo"));
@@ -64,7 +65,7 @@ const MarkAttendance = () => {
         const sectionId = JSON.parse(localStorage.getItem("icmsUserInfo")).data.sectionHeadRef;
         // const sectionId = "64006b64a96106bdcef99406";
         try {
-            const { data } = await axios.get(`http://localhost:8002/api/v1/section/get-attendance-subject-section-id?sectionId=${secId}&subjectId=${subId}`);
+            const { data } = await axios.get(`${url}/api/v1/section/get-attendance-subject-section-id?sectionId=${secId}&subjectId=${subId}`);
 
             if (data && data.success) {
                 console.log(data.data[0], "attendanceForDate");
@@ -91,7 +92,7 @@ const MarkAttendance = () => {
 
     const getClassroomData = async () => {
         try {
-            const { data } = await axios.get(`http://localhost:8002/api/v1/section/get-section-data/${currUser}`);
+            const { data } = await axios.get(`${url}/api/v1/section/get-section-data/${currUser}`);
 
             if (data && data.success) {
                 setSectionData(data.data);
@@ -103,7 +104,7 @@ const MarkAttendance = () => {
 
     const getListOfStudents = async (secId) => {
         try {
-            const { data } = await axios.get(`http://localhost:8002/api/v1/teacher/get-list-of-students/${secId}`);
+            const { data } = await axios.get(`${url}/api/v1/teacher/get-list-of-students/${secId}`);
 
             if (data && data.success) {
                 setSectionStudents(data.data.verifiedStudents);
@@ -150,7 +151,7 @@ const MarkAttendance = () => {
 
     const getSubjectsList = async () => {
         try {
-            const { data } = await axios.get(`http://localhost:8002/api/v1/section/get-section-subject-list/${selectedSectionId}`);
+            const { data } = await axios.get(`${url}/api/v1/section/get-section-subject-list/${selectedSectionId}`);
 
             if (data && data.success)
                 setSubjectList(data.data);
@@ -162,7 +163,7 @@ const MarkAttendance = () => {
     const getSectionList = async () => {
         const userId = JSON.parse(localStorage.getItem("icmsUserInfo")).data._id;
         try {
-            const { data } = await axios.get(`http://localhost:8002/api/v1/teacher/fetch-subjects/${userId}`);
+            const { data } = await axios.get(`${url}/api/v1/teacher/fetch-subjects/${userId}`);
 
             if (data && data.success) {
                 let sectionListDB = data.data;
@@ -219,7 +220,7 @@ const MarkAttendance = () => {
     const getSectionListForHOD = async () => {
         const branchName = JSON.parse(localStorage.getItem("icmsUserInfo")).data.user.branchName;
         try {
-            const { data } = await axios.get(`http://localhost:8002/api/v1/hod/get-list-section?branchName=${branchName}`);
+            const { data } = await axios.get(`${url}/api/v1/hod/get-list-section?branchName=${branchName}`);
 
             if (data && data.success) {
                 setSectionList(data);
@@ -233,7 +234,7 @@ const MarkAttendance = () => {
     const fetchSubjectsForSection = async (sId) => {
         let fetchedSubjects = [];
         try {
-            const { data } = await axios.get(`http://localhost:8002/api/v1/section/get-section-subject-list/${sId}`);
+            const { data } = await axios.get(`${url}/api/v1/section/get-section-subject-list/${sId}`);
 
             if (data && data.success) {
                 setSubjectListForSection(data.data);
@@ -294,7 +295,7 @@ const MarkAttendance = () => {
         }
 
         try {
-            axios.post("http://localhost:8002/api/v1/task/create-task", {
+            axios.post(`${url}/api/v1/task/create-task`, {
                 sectionId: selectedSectionId,
                 subjectId: selectedSubjectId,
                 taskId: current_timestamp,
@@ -343,7 +344,7 @@ const MarkAttendance = () => {
         console.log(currentAttendance, "Marking Attendance manually")
         const sectionId = JSON.parse(localStorage.getItem("icmsUserInfo")).data.sectionHeadRef;
         try {
-            let { data } = await axios.post("http://localhost:8002/api/v1/section/upload-section-attendance", {
+            let { data } = await axios.post(`${url}/api/v1/section/upload-section-attendance`, {
                 date: ('' + new Date(selectedDate)).slice(0, 15),
                 presentStudents: currentAttendance,
                 sectionId: selectedSectionId,

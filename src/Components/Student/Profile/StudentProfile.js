@@ -7,6 +7,7 @@ import useDocumentTitle from "../../../Hooks/useDocumentTitle";
 import "./StudentProfile.css"
 import CloudinaryUploadWidget from "../../CloudinaryWidget/CloudinaryUploadWidget";
 import Message from "../../Message/index";
+import { url } from '../url'
 
 function StudentProfile() {
   useDocumentTitle("Profile");
@@ -83,7 +84,7 @@ function StudentProfile() {
     console.log(uploadedUserImages, "save these on db");
 
     try {
-      const { data } = await axios.post(`http://localhost:8002/api/v1/student/upload-images`, {
+      const { data } = await axios.post(`${url}/api/v1/student/upload-images`, {
         studentId: JSON.parse(localStorage.getItem("icmsUserInfo")).data.user._id,
         images: uploadedUserImages
       });
@@ -139,7 +140,7 @@ function StudentProfile() {
       }
       // console.log(updatedDetails)
       try {
-        const response = await axios.post("http://localhost:8002/api/v1/student/update-profile", updatedDetails);
+        const response = await axios.post(`${url}/api/v1/student/update-profile`, updatedDetails);
         console.log(response);
         localStorage.setItem("icmsUserInfo", JSON.stringify(response.data));
         if (response.data.success) {

@@ -5,6 +5,8 @@ import { Button, Form, Image, Toast, ToastContainer, Row, Col, Badge } from "rea
 import { useNavigate } from "react-router-dom";
 import useDocumentTitle from "../../Hooks/useDocumentTitle";
 import "./Profile.css";
+import { url } from '../url'
+
 function Profile() {
   useDocumentTitle("Profile");
   // A variable that will help to re-render by using it as inverter
@@ -83,7 +85,7 @@ function Profile() {
       }
       // console.log(updatedDetails)
       try {
-        const response = await axios.put("http://localhost:8002/api/v1/teacher/update", updatedDetails);
+        const response = await axios.put(`${url}/api/v1/teacher/update`, updatedDetails);
         console.log(response);
         localStorage.setItem("icmsUserInfo", JSON.stringify(response.data));
         if (response.data.success) {

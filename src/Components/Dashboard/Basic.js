@@ -17,6 +17,7 @@ import {
   Legend,
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
+import { url } from '../url'
 
 export const Basic = () => {
   // For attendance
@@ -64,7 +65,7 @@ export const Basic = () => {
 
       setActiveSubject(subjectAndSectionID[index].subjectName);
       try {
-        let { data } = await axios.get(`http://localhost:8002/api/v1/section/get-attendance-subject-section-id?sectionId=${sectionId}&subjectId=${subjectId}`);
+        let { data } = await axios.get(`${url}/api/v1/section/get-attendance-subject-section-id?sectionId=${sectionId}&subjectId=${subjectId}`);
         let attendanceData = data.data[0].attendance;
         updateDateAndAttendanceState(attendanceData);
       } catch (err) {
@@ -86,7 +87,7 @@ export const Basic = () => {
 
   async function fetchSubjectsForSection(sId) {
     try {
-      const { data } = await axios.get(`http://localhost:8002/api/v1/section/get-section-subject-list/${sId}`);
+      const { data } = await axios.get(`${url}/api/v1/section/get-section-subject-list/${sId}`);
 
       if (data && data.success){
         let temp = data.data;
@@ -115,7 +116,7 @@ export const Basic = () => {
     const getClassroomData = async () => {
       if (!isHod && !isSectionHead) {
         try {
-          const { data } = await axios.get(`http://localhost:8002/api/v1/teacher/fetch-subjects/${currUser}`);
+          const { data } = await axios.get(`${url}/api/v1/teacher/fetch-subjects/${currUser}`);
           console.log(data.data);
           let temp = data.data;
           let obj = [];
@@ -135,7 +136,7 @@ export const Basic = () => {
       }
       else if (isSectionHead && !isHod) {
         try {
-          const { data } = await axios.get(`http://localhost:8002/api/v1/section/get-section-data/${currUser}`);
+          const { data } = await axios.get(`${url}/api/v1/section/get-section-data/${currUser}`);
 
           if (data && data.success) {
             let attendanceData = data.data.sectionSubject;
@@ -149,7 +150,7 @@ export const Basic = () => {
       else {
         console.log(userData.branchName || userData.user.branchName);
         try {
-          const { data } = await axios.get(`http://localhost:8002/api/v1/hod/get-list-section?branchName=${userData.branchName || userData.user.branchName}`);
+          const { data } = await axios.get(`${url}/api/v1/hod/get-list-section?branchName=${userData.branchName || userData.user.branchName}`);
 
           if (data && data.success) {
             console.log(data, "sectionList HOD");

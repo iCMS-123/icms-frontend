@@ -10,6 +10,7 @@ import CloudinaryUploadWidget from "../CloudinaryWidget/CloudinaryUploadWidget";
 import CloudinaryIdCardWidget from "../CloudinaryWidget/CloudinaryIdCardWidget";
 import { FaTimesCircle } from "react-icons/fa"
 import Message from "../Message/index";
+import { url } from '../url'
 
 
 const Register = () => {
@@ -48,7 +49,7 @@ const Register = () => {
   useEffect(() => {
     const getBranchList = async () => {
       try {
-        const { data } = await axios.get(`http://localhost:8002/api/v1/admin/get-branch-list`);
+        const { data } = await axios.get(`${url}/api/v1/admin/get-branch-list`);
 
         if (data && data.success) {
           // setSuccess(true);
@@ -153,7 +154,7 @@ const Register = () => {
   const fetchSectionData = async (branchVal, yearVal) => {
     try {
       console.log(branchVal, yearVal)
-      const sectionData = await axios.get(`http://localhost:8002/api/v1/hod/get-list-section?branchName=${branchVal}`)
+      const sectionData = await axios.get(`${url}/api/v1/hod/get-list-section?branchName=${branchVal}`)
       console.log(sectionData, "sectionData");
       if (sectionData) {
         if (yearVal == 1)
@@ -214,7 +215,7 @@ const Register = () => {
     try {
 
       console.log(details);
-      const { data } = await axios.post(`http://localhost:8002/api/v1/${collegeRole}/register`, details);
+      const { data } = await axios.post(`${url}/api/v1/${collegeRole}/register`, details);
 
       console.log(data);
       let icmsUserInfo = JSON.stringify(data);

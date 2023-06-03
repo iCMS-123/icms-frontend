@@ -18,6 +18,7 @@ import {
     Legend,
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
+import { url } from '../url'
 
 const MySubject = () => {
     let icmsLocalStorageData = JSON.parse(localStorage.getItem("icmsUserInfo"));
@@ -52,7 +53,7 @@ const MySubject = () => {
 
     const getClassroomData = async () => {
         try {
-            const { data } = await axios.get(`http://localhost:8002/api/v1/section/get-section-data/${currUser}`);
+            const { data } = await axios.get(`${url}/api/v1/section/get-section-data/${currUser}`);
 
             if (data && data.success) {
                 setSectionData(data.data);
@@ -70,7 +71,7 @@ const MySubject = () => {
     const getDepartmentTeachersList = async () => {
         try {
             const { data } = await axios.get(
-                `http://localhost:8002/api/v1/teacher/get-list?branch=${sectionBranch}`
+                `${url}/api/v1/teacher/get-list?branch=${sectionBranch}`
             );
 
             if (data && data.success) {
@@ -97,7 +98,7 @@ const MySubject = () => {
 
     async function fetchAttendanceData(secId, subId) {
         try {
-            const { data } = await axios.get(`http://localhost:8002/api/v1/section/get-attendance-subject-section-id?sectionId=${secId}&subjectId=${subId}`);
+            const { data } = await axios.get(`${url}/api/v1/section/get-attendance-subject-section-id?sectionId=${secId}&subjectId=${subId}`);
 
             if (data && data.success) {
                 displayAttendanceData(data?.data[0].attendance)
@@ -173,7 +174,7 @@ const MySubject = () => {
 
     const fetchSubjectList = async () => {
         try {
-            const subjectList = await axios.get(`http://localhost:8002/api/v1/teacher/fetch-subjects/${userID}`)
+            const subjectList = await axios.get(`${url}/api/v1/teacher/fetch-subjects/${userID}`)
             console.log(subjectList?.data.data, "subjectList?.data.data");
             setSubjectList(subjectList?.data?.data)
         }

@@ -15,6 +15,7 @@ import styles from "./MyBranch.module.css";
 import Loader1 from "../Loader/Loader-1/index";
 import axios from "axios";
 import Message from "../Message/index";
+import { url } from '../url'
 
 const MyBranch = (props) => {
   const [loading, setLoading] = useState(false);
@@ -73,7 +74,7 @@ const MyBranch = (props) => {
   }
   const getClassroomsList = async () => {
     try {
-      const { data } = await axios.get(`http://localhost:8002/api/v1/hod/get-list-section?branchName=${branchName}`);
+      const { data } = await axios.get(`${url}/api/v1/hod/get-list-section?branchName=${branchName}`);
       if (data && data.success) {
         setClassroomList([data.firstYear, data.secondYear, data.thirdYear, data.fourthYear]);
         // setIssuesData(data.issues); // for issues data
@@ -104,7 +105,7 @@ const MyBranch = (props) => {
   useEffect(() => {
     const getIssuesList = async () => {
       try {
-        const { data } = await axios.get(`http://localhost:8002/api/v1/branch/get-branch-detail?branchName=${branchName}`);
+        const { data } = await axios.get(`${url}/api/v1/branch/get-branch-detail?branchName=${branchName}`);
 
         if (data && data.success) {
           let allIssues = data.data.branchData[0].issues;
@@ -125,7 +126,7 @@ const MyBranch = (props) => {
 // get year wise student count
     const getStudentCount = async ()=>{
       try {
-        const { data } = await axios.get(`http://localhost:8002/api/v1/hod/get-student-count?branchName=${branchName}`);
+        const { data } = await axios.get(`${url}/api/v1/hod/get-student-count?branchName=${branchName}`);
         if (data && data.success) {
           let temp = data.data;
           temp = temp.sort((a,b)=>parseInt(a._id)-parseInt(b._id));
@@ -144,7 +145,7 @@ const MyBranch = (props) => {
     // console.log(classroomList[idx][index], "classroomList[idx][index]");
     getNotSectionHeadList();
     try {
-      const { data } = await axios.get(`http://localhost:8002/api/v1/section/get-section-data/${classroomList[idx][index].sectionHead}`);
+      const { data } = await axios.get(`${url}/api/v1/section/get-section-data/${classroomList[idx][index].sectionHead}`);
 
       if (data && data.success) {
         // console.log(data, "section data");
@@ -166,7 +167,7 @@ const MyBranch = (props) => {
 
     try {
       const { data } = await axios.get(
-        `http://localhost:8002/api/v1/hod/get-availabel-section-head?branchName=${branchName}&isSectionHead=false`
+        `${url}/api/v1/hod/get-availabel-section-head?branchName=${branchName}&isSectionHead=false`
       );
 
       if (data && data.success) {
@@ -183,7 +184,7 @@ const MyBranch = (props) => {
     // console.log(modalSectionRef?.current);
     // console.log(JSON.parse(localStorage.getItem("icmsUserInfo")).data._id);
     try {
-      let { data } = await axios.post("http://localhost:8002/api/v1/hod/create-section", {
+      let { data } = await axios.post(`${url}/api/v1/hod/create-section`, {
         year: modalYearRef?.current?.value,
         branchName: (modalBranchRef?.current?.value).toLowerCase(),
         sectionName: modalSectionRef?.current?.value,
@@ -216,7 +217,7 @@ const MyBranch = (props) => {
     e.preventDefault();
     // console.log("submitUpdateSectionHeadForm called");
     try {
-      const { data } = await axios.post(`http://localhost:8002/api/v1/hod/assign-section-head`, {
+      const { data } = await axios.post(`${url}/api/v1/hod/assign-section-head`, {
         sectionId: sectionId,
         updatedSectionHeadRef: sectionHeadIdForUpdate
       });
@@ -246,7 +247,7 @@ const MyBranch = (props) => {
     setLoadingForFilter(true);
     let hodBranch = JSON.parse(localStorage.getItem("icmsUserInfo")).data.user.branchName;
     try {
-      const { data } = await axios.get(`http://localhost:8002/api/v1/admin/get-unverified-teacher?branchName=${hodBranch}`);
+      const { data } = await axios.get(`${url}/api/v1/admin/get-unverified-teacher?branchName=${hodBranch}`);
       // console.log(data, "dataaaaaaaaaaa");
       if (data && data.success) {
         if (data.data.teacherList.length) {
@@ -319,7 +320,7 @@ const MyBranch = (props) => {
     // console.log(teacher_id, 'teacher_id for verification');
 
     try {
-      const { data } = await axios.put(`http://localhost:8002/api/v1/admin/verify-teacher/${teacher_id}`);
+      const { data } = await axios.put(`${url}/api/v1/admin/verify-teacher/${teacher_id}`);
       if (data && data.success) {
         console.log(data, "verified teacher response");
         setSuccess(true);
@@ -336,7 +337,7 @@ const MyBranch = (props) => {
   async function handleIssueStatusModal(decision) {
     // console.log(issuesData, "allIssues");
     try {
-      const { data } = await axios.put(`http://localhost:8002/api/v1/branch/resolve-issue/${userID}`, {
+      const { data } = await axios.put(`${url}/api/v1/branch/resolve-issue/${userID}`, {
         issueId: issueModalData._id,
         status: decision
       })

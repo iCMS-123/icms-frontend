@@ -6,6 +6,7 @@ import useDocumentTitle from "../../Hooks/useDocumentTitle";
 import "./Login.css";
 import ICMSTitle from "../ICMSTitle/ICMSTitle";
 import Message from "../Message/index";
+import { url } from '../url'
 
 const LoginForm = () => {
   useDocumentTitle("Login");  
@@ -25,7 +26,7 @@ const LoginForm = () => {
     let collegeRole = collegeRoleRef["current"].value;
     try {
       const {data} = await axios.post(
-        `http://localhost:8002/api/v1/${collegeRole}/auth`,
+        `${url}/api/v1/${collegeRole}/auth`,
         {
           email: `${emailRef["current"].value}`,
           password: `${passwordRef["current"].value}`,
